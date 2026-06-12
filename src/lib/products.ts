@@ -23,6 +23,8 @@ export type Product = {
   seo_title: string;
   seo_description: string;
   image_path: string;
+  image_paths: string[];
+  primary_image_path: string;
   slug: string;
   category_slug: string;
 };
@@ -120,6 +122,10 @@ export function getProducts(): Product[] {
     .map((line) => {
       const values = parseCsvLine(line);
       const row = Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
+      const imagePaths = row.image_path
+        .split(/[;|]/)
+        .map((path) => path.trim())
+        .filter(Boolean);
 
       return {
         plant_id: row.plant_id,
@@ -143,6 +149,8 @@ export function getProducts(): Product[] {
         seo_title: row.seo_title,
         seo_description: row.seo_description,
         image_path: row.image_path,
+        image_paths: imagePaths,
+        primary_image_path: imagePaths[0] ?? "",
         slug: `${slugify(row.name_uk)}-${row.plant_id.toLowerCase()}`,
         category_slug: slugify(row.category)
       };

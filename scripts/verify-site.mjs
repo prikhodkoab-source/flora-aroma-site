@@ -91,6 +91,27 @@ if (imagePathIndex === -1) {
   if (missingImages.length > 0) {
     fail(`Expected every product to have image_path, missing ${missingImages.length}.`);
   }
+
+  const productIdIndex = headers.indexOf("plant_id");
+  for (const row of rows.slice(1)) {
+    const values = parseCsvLine(row);
+    const plantId = values[productIdIndex];
+    const imagePaths = values[imagePathIndex]
+      .split(/[;|]/)
+      .map((path) => path.trim())
+      .filter(Boolean);
+
+    for (const imagePath of imagePaths) {
+      if (!imagePath.startsWith("/")) {
+        fail(`Expected absolute public image path for ${plantId}: ${imagePath}`);
+        continue;
+      }
+
+      if (!existsSync(join(root, "public", imagePath.slice(1)))) {
+        fail(`Missing public image file for ${plantId}: ${imagePath}`);
+      }
+    }
+  }
 }
 
 function readHtmlFiles(directory) {
@@ -132,6 +153,10 @@ if (!publicHtml.includes("data-gallery")) {
   fail("Expected product gallery markup in public HTML.");
 }
 
+if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /images/plants/")) {
+  fail("A product list appears to use an unsplit multi-image path as an img src.");
+}
+
 if (!failed) {
-  console.log("Site verification passed: 40 products, images, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
+  console.log("Site verification passed: 40 products, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
 }

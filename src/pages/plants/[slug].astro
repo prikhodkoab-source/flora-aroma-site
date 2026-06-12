@@ -11,10 +11,7 @@ export function getStaticPaths() {
 
 const { product } = Astro.props;
 const description = product.seo_description;
-const imagePaths = product.image_path
-  .split(/[;|]/)
-  .map((path) => path.trim())
-  .filter(Boolean);
+const imagePaths = product.image_paths;
 ---
 
 <BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>

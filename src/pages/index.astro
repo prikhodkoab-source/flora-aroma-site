@@ -36,7 +36,7 @@ const categories = getCategories();
     <div class="product-grid">
       {featured.map((product) => (
         <a class="product-card" href={`/plants/${product.slug}/`}>
-          {product.image_path && <img src={product.image_path} alt="" loading="lazy" />}
+          {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
           <span class="plant-id">{product.plant_id}</span>
           <h3>{product.name_uk}</h3>
           <p>{product.latin_name}</p>
