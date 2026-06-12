@@ -3,7 +3,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCategories, getProducts } from "../lib/products";
 
 const products = getProducts();
-const featured = products.slice(0, 8);
+const featuredPlantIds = ["PLANT-0041", "PLANT-0082", "PLANT-0014", "PLANT-0048"];
+const featured = featuredPlantIds
+  .map((plantId) => products.find((product) => product.plant_id === plantId))
+  .filter((product) => product !== undefined);
 const categories = getCategories();
 ---
 
