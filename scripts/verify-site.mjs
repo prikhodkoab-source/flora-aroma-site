@@ -178,7 +178,13 @@ if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /image
   fail("A product list appears to use an unsplit multi-image path as an img src.");
 }
 
-for (const requiredPhrase of ["Уточнити наявність", "Як замовити", "Відкрити табличний прайс"]) {
+for (const requiredPhrase of [
+  "Дім правильних рослин",
+  "Саджанці, вирощені за сучасними технологіями",
+  "Уточнити наявність",
+  "Як замовити",
+  "Відкрити табличний прайс",
+]) {
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected storefront CTA phrase: ${requiredPhrase}`);
   }
