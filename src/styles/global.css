@@ -339,8 +339,7 @@ th {
 }
 
 .facts div,
-.notice,
-.source-panel {
+.notice {
   min-width: 0;
   width: 100%;
   max-width: 100%;
@@ -355,35 +354,10 @@ th {
   margin-top: 0;
 }
 
-.notice p,
-.source-panel p {
+.notice p {
   max-width: 100%;
   overflow-wrap: anywhere;
   white-space: normal;
-}
-
-.source-panel {
-  margin-bottom: 28px;
-}
-
-.source-panel h2 {
-  margin: 0 0 10px;
-  font-size: 24px;
-}
-
-.source-panel ul {
-  margin: 10px 0;
-  padding-left: 20px;
-}
-
-.source-panel li {
-  margin-bottom: 6px;
-  overflow-wrap: anywhere;
-}
-
-.source-note {
-  color: var(--muted);
-  font-size: 14px;
 }
 
 .back-link {
@@ -452,7 +426,6 @@ th {
   .product-header,
   .plant-summary,
   .plant-details,
-  .source-panel,
   .facts,
   .notice {
     width: min(358px, calc(100vw - 32px));

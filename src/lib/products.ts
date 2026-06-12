@@ -168,7 +168,7 @@ export function getCategories(): { name: string; slug: string; count: number }[]
 
 export function getPublicAvailabilityLabel(product: Product): string {
   if (product.availability_status === "ready_for_sale") {
-    return "Наявність підтверджує оператор у день відповіді.";
+    return "Уточнюємо в день відповіді.";
   }
 
   return "Потребує уточнення оператора.";

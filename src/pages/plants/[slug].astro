@@ -11,10 +11,6 @@ export function getStaticPaths() {
 
 const { product } = Astro.props;
 const description = product.seo_description;
-const sourceUrls = product.source_urls
-  .split(";")
-  .map((url) => url.trim())
-  .filter(Boolean);
 ---
 
 <BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
@@ -67,24 +63,10 @@ const sourceUrls = product.source_urls
       </div>
     </dl>
 
-    <section class="source-panel" aria-labelledby="source-panel-title">
-      <h2 id="source-panel-title">Джерела картки</h2>
-      <p>{product.source_names}</p>
-      {sourceUrls.length > 0 && (
-        <ul>
-          {sourceUrls.map((url) => (
-            <li><a href={url} rel="nofollow noopener noreferrer">{url}</a></li>
-          ))}
-        </ul>
-      )}
-      <p class="source-note">{product.source_note}</p>
-    </section>
-
     <section class="notice">
       <h2>Замовлення</h2>
       <p>
-        Для резерву оператор перевіряє актуальний залишок у системі Flora і підтверджує
-        позиції перед створенням замовлення.
+        Для замовлення напишіть або зателефонуйте нам. Ми уточнимо формат, кількість і зручний спосіб отримання.
       </p>
       <a class="button" href="tel:+380500272882">Зв'язатися з оператором</a>
     </section>

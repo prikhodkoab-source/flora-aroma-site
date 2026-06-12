@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const cwd = typeof process !== "undefined" ? process.cwd() : globalThis.nodeRepl?.cwd;
@@ -44,10 +44,6 @@ const headers = parseCsvLine(rows[0]).map((header) => header.replace(/^\uFEFF/, 
 
 if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
-}
-
-if (!existsSync(join(root, "dist", "image-credits", "index.html"))) {
-  fail("dist/image-credits/index.html is missing.");
 }
 
 if (rows.length !== 41) {
@@ -97,17 +93,40 @@ if (imagePathIndex === -1) {
   }
 }
 
-const publicHtml = [
-  readFileSync(join(root, "dist", "index.html"), "utf8"),
-  readFileSync(join(root, "dist", "catalog", "index.html"), "utf8")
-].join("\n");
+function readHtmlFiles(directory) {
+  const entries = readdirSync(directory);
+  const html = [];
 
-for (const forbidden of ["quantity_snapshot", "точний склад Flora", "Кількість у Tilda"]) {
+  for (const entry of entries) {
+    const path = join(directory, entry);
+    const stats = statSync(path);
+
+    if (stats.isDirectory()) {
+      html.push(...readHtmlFiles(path));
+    } else if (entry.endsWith(".html") || entry.endsWith(".xml")) {
+      html.push(readFileSync(path, "utf8"));
+    }
+  }
+
+  return html;
+}
+
+const publicHtml = readHtmlFiles(join(root, "dist")).join("\n");
+
+for (const forbidden of [
+  "quantity_snapshot",
+  "точний склад Flora",
+  "Кількість у Tilda",
+  "Джерела картки",
+  "Джерела зображень",
+  "/image-credits/",
+  "image-credits"
+]) {
   if (publicHtml.includes(forbidden)) {
     fail(`Forbidden public phrase found: ${forbidden}`);
   }
 }
 
 if (!failed) {
-  console.log("Site verification passed: 40 products, images, expanded descriptions, required columns, no internal stock phrases.");
+  console.log("Site verification passed: 40 products, images, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
 }
