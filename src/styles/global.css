@@ -7,6 +7,7 @@
   --leaf-soft: #e9f3ec;
   --paper: #ffffff;
   --wash: #f7faf7;
+  --shadow: 0 18px 50px rgba(24, 53, 43, 0.12);
 }
 
 * {
@@ -87,12 +88,37 @@ nav a {
 }
 
 .hero {
+  position: relative;
   display: grid;
   align-items: end;
-  min-height: 420px;
-  padding: 72px 0;
+  min-height: 520px;
+  overflow: hidden;
+  padding: 84px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+}
+
+.hero-nursery {
+  width: 100%;
+  max-width: none;
+  padding-right: max(16px, calc((100vw - 1180px) / 2));
+  padding-left: max(16px, calc((100vw - 1180px) / 2));
+  background-image: url("/images/site/nursery-hero.jpg");
+  background-position: center;
+  background-size: cover;
+  color: #fff;
+}
+
+.hero-nursery::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: rgba(8, 28, 20, 0.46);
+}
+
+.hero-nursery > div {
+  position: relative;
+  max-width: 780px;
 }
 
 .hero h1,
@@ -110,6 +136,21 @@ nav a {
   max-width: 720px;
   color: var(--muted);
   font-size: 18px;
+}
+
+.hero-nursery p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.hero-nursery .eyebrow {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 .eyebrow,
@@ -132,6 +173,17 @@ nav a {
   color: #fff;
   font-weight: 700;
   text-decoration: none;
+}
+
+.button-secondary {
+  border: 1px solid rgba(47, 107, 79, 0.32);
+  background: var(--paper);
+  color: var(--leaf);
+}
+
+.hero-nursery .button-secondary {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .section,
@@ -162,6 +214,39 @@ nav a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
+}
+
+.catalog-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.trust-strip div {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.trust-strip strong,
+.trust-strip span {
+  display: block;
+}
+
+.trust-strip strong {
+  font-size: 19px;
+}
+
+.trust-strip span {
+  margin-top: 4px;
+  color: var(--muted);
 }
 
 .link-grid,
@@ -223,6 +308,13 @@ nav a {
   border-radius: 8px;
   background: var(--paper);
   text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.product-card:hover {
+  border-color: rgba(47, 107, 79, 0.45);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
 }
 
 .product-card img {
@@ -329,10 +421,39 @@ th {
 
 .product-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+  grid-template-columns: minmax(0, 0.92fr) minmax(300px, 520px);
   align-items: start;
   gap: 28px;
   padding-bottom: 28px;
+}
+
+.product-buy-panel {
+  max-width: 680px;
+  margin-top: 24px;
+}
+
+.product-buy-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.attribute-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attribute-strip span {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--leaf-soft);
+  color: var(--leaf);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .product-media {
@@ -550,6 +671,39 @@ th {
   color: var(--muted);
 }
 
+.media-band {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.media-band-reverse {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.95fr);
+}
+
+.media-band-reverse img {
+  order: 2;
+}
+
+.media-band img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.media-band h2 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.media-band p:not(.eyebrow) {
+  color: var(--muted);
+}
+
 @media (max-width: 720px) {
   .site-header,
   .site-footer,
@@ -560,6 +714,11 @@ th {
   .table-wrap {
     width: calc(100vw - 32px);
     max-width: calc(100vw - 32px);
+  }
+
+  .hero-nursery {
+    width: 100%;
+    max-width: none;
   }
 
   .site-header,
@@ -591,7 +750,18 @@ th {
   }
 
   .process-list,
-  .contact-grid {
+  .contact-grid,
+  .trust-strip,
+  .media-band,
+  .media-band-reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .media-band-reverse img {
+    order: 0;
+  }
+
+  .product-buy-facts {
     grid-template-columns: 1fr;
   }
 

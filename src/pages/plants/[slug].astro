@@ -12,6 +12,7 @@ export function getStaticPaths() {
 const { product } = Astro.props;
 const description = product.seo_description;
 const imagePaths = product.image_paths;
+const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
 ---
 
 <BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
@@ -19,10 +20,35 @@ const imagePaths = product.image_paths;
     <a class="back-link" href="/catalog/">Назад до каталогу</a>
     <div class="product-header">
       <div>
-        <span class="plant-id">{product.plant_id}</span>
+        <span class="plant-id">{product.category}</span>
         <h1>{product.name_uk}</h1>
         <p><em>{product.latin_name}</em></p>
         <a class="category-link" href={`/categories/${product.category_slug}/`}>{product.category}</a>
+        <div class="product-buy-panel">
+          <dl class="facts product-buy-facts">
+            <div>
+              <dt>Формат</dt>
+              <dd>{product.container}</dd>
+            </div>
+            <div>
+              <dt>Ціна</dt>
+              <dd>{product.price_uah} UAH/{product.unit}</dd>
+            </div>
+            <div>
+              <dt>Наявність</dt>
+              <dd>{getPublicAvailabilityLabel(product)}</dd>
+            </div>
+          </dl>
+          <div class="attribute-strip" aria-label="Короткі характеристики">
+            <span>{product.category}</span>
+            <span>{product.container}</span>
+            {winterHardiness && <span>{winterHardiness}</span>}
+          </div>
+          <div class="hero-actions">
+            <a class="button" href="tel:+380500272882">Уточнити наявність</a>
+            <a class="button button-secondary" href="/how-to-order/">Як замовити</a>
+          </div>
+        </div>
       </div>
       {imagePaths.length > 0 && (
         <div class="product-media" data-gallery>
@@ -112,21 +138,6 @@ const imagePaths = product.image_paths;
         </section>
       </div>
     </section>
-
-    <dl class="facts">
-      <div>
-        <dt>Формат</dt>
-        <dd>{product.container}</dd>
-      </div>
-      <div>
-        <dt>Ціна</dt>
-        <dd>{product.price_uah} UAH/{product.unit}</dd>
-      </div>
-      <div>
-        <dt>Наявність</dt>
-        <dd>{getPublicAvailabilityLabel(product)}</dd>
-      </div>
-    </dl>
 
     <section class="notice">
       <h2>Замовлення</h2>

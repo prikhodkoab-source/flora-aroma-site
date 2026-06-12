@@ -10,7 +10,7 @@ const categories = getCategories();
   <section class="page-title">
     <p class="eyebrow">Актуальний асортимент</p>
     <h1>Каталог рослин</h1>
-    <p>Ціни синхронізовані з затвердженим прайсом. Точну наявність підтверджує оператор.</p>
+    <p>Оберіть рослини за категоріями або відкрийте картку для фото, опису, формату і ціни. Наявність підтверджує оператор.</p>
   </section>
 
   <section class="section compact-section" aria-label="Категорії">
@@ -24,32 +24,35 @@ const categories = getCategories();
     </div>
   </section>
 
-  <section class="table-wrap" aria-label="Каталог рослин">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Українська назва</th>
-          <th>Латинська назва</th>
-          <th>Категорія</th>
-          <th>Формат</th>
-          <th>Ціна</th>
-          <th>Наявність</th>
-        </tr>
-      </thead>
-      <tbody>
-        {products.map((product) => (
-          <tr>
-            <td>{product.plant_id}</td>
-            <td><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></td>
-            <td><em>{product.latin_name}</em></td>
-            <td><a href={`/categories/${product.category_slug}/`}>{product.category}</a></td>
-            <td>{product.container}</td>
-            <td>{product.price_uah} UAH/{product.unit}</td>
-            <td>{getPublicAvailabilityLabel(product)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  <section class="section compact-section" aria-label="Каталог рослин">
+    <div class="section-heading">
+      <h2>Усі рослини</h2>
+      <p><a href="/price/">Відкрити табличний прайс</a></p>
+    </div>
+    <div class="product-grid catalog-grid">
+      {products.map((product) => (
+        <a class="product-card" href={`/plants/${product.slug}/`}>
+          {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
+          <span class="plant-id">{product.category}</span>
+          <h3>{product.name_uk}</h3>
+          <p><em>{product.latin_name}</em></p>
+          <p class="summary">{product.summary}</p>
+          <dl>
+            <div>
+              <dt>Формат</dt>
+              <dd>{product.container}</dd>
+            </div>
+            <div>
+              <dt>Ціна</dt>
+              <dd>{product.price_uah} UAH/{product.unit}</dd>
+            </div>
+            <div>
+              <dt>Наявність</dt>
+              <dd>{getPublicAvailabilityLabel(product)}</dd>
+            </div>
+          </dl>
+        </a>
+      ))}
+    </div>
   </section>
 </BaseLayout>

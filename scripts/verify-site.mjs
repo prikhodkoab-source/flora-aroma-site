@@ -57,6 +57,16 @@ for (const requiredPage of [
   }
 }
 
+for (const requiredAsset of [
+  "public/images/site/nursery-hero.jpg",
+  "public/images/site/nursery-irrigation.jpg",
+  "public/images/site/nursery-greenhouse.jpg"
+]) {
+  if (!existsSync(join(root, requiredAsset))) {
+    fail(`Missing required design asset: ${requiredAsset}`);
+  }
+}
+
 if (rows.length !== 41) {
   fail(`Expected 40 product rows, found ${rows.length - 1}.`);
 }
@@ -166,6 +176,12 @@ if (!publicHtml.includes("data-gallery")) {
 
 if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /images/plants/")) {
   fail("A product list appears to use an unsplit multi-image path as an img src.");
+}
+
+for (const requiredPhrase of ["Уточнити наявність", "Як замовити", "Відкрити табличний прайс"]) {
+  if (!publicHtml.includes(requiredPhrase)) {
+    fail(`Expected storefront CTA phrase: ${requiredPhrase}`);
+  }
 }
 
 if (!failed) {

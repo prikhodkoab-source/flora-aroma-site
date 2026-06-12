@@ -8,15 +8,35 @@ const categories = getCategories();
 ---
 
 <BaseLayout title="Flora & Aroma | Актуальний асортимент рослин">
-  <section class="hero">
+  <section class="hero hero-nursery">
     <div>
-      <p class="eyebrow">Актуальний асортимент рослин</p>
+      <p class="eyebrow">Питомник рослин у касетах і горщиках</p>
       <h1>FLORA & AROMA</h1>
       <p>
-        Саджанці в касетах і горщиках для саду, квітників, ароматичних посадок
-        і невеликих ландшафтних рішень.
+        Вирощуємо саджанці для саду, квітників, ароматичних посадок і невеликих
+        ландшафтних рішень. Ціни публікуємо відкрито, а наявність підтверджує оператор.
       </p>
-      <a class="button" href="/catalog/">Дивитися каталог</a>
+      <div class="hero-actions">
+        <a class="button" href="/catalog/">Дивитися каталог</a>
+        <a class="button button-secondary" href="/how-to-order/">Як замовити</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="trust-strip" aria-label="Переваги Flora & Aroma">
+      <div>
+        <strong>Касети і горщики</strong>
+        <span>зручний формат для посадки та дорощування</span>
+      </div>
+      <div>
+        <strong>40 позицій</strong>
+        <span>у поточному публічному асортименті</span>
+      </div>
+      <div>
+        <strong>Оператор підтверджує</strong>
+        <span>наявність, резерв і спосіб отримання</span>
+      </div>
     </div>
   </section>
 
@@ -48,7 +68,7 @@ const categories = getCategories();
   <section class="section">
     <div class="section-heading">
       <h2>Готові до продажу</h2>
-      <p>{products.length} позицій у першому публічному CSV нового сайту.</p>
+      <p>{products.length} позицій у публічному асортименті.</p>
     </div>
     <div class="category-strip" aria-label="Категорії рослин">
       {categories.map((category) => (
@@ -62,7 +82,7 @@ const categories = getCategories();
       {featured.map((product) => (
         <a class="product-card" href={`/plants/${product.slug}/`}>
           {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
-          <span class="plant-id">{product.plant_id}</span>
+          <span class="plant-id">{product.category}</span>
           <h3>{product.name_uk}</h3>
           <p>{product.latin_name}</p>
           <p class="summary">{product.summary}</p>
