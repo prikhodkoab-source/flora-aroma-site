@@ -98,9 +98,8 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
     </div>
     <div class="product-grid catalog-grid">
       {products.map((product) => (
-        <a
+        <article
           class="product-card"
-          href={`/plants/${product.slug}/`}
           data-product-card
           data-category={product.category_slug}
           data-sun={product.sun_exposure}
@@ -110,9 +109,11 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
           data-container={product.container}
           data-price={product.price_uah}
         >
-          {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
+          <a class="product-card-link" href={`/plants/${product.slug}/`}>
+            {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
+          </a>
           <span class="plant-id">{product.category}</span>
-          <h3>{product.name_uk}</h3>
+          <h3><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></h3>
           <p><em>{product.latin_name}</em></p>
           <p class="summary">{product.summary}</p>
           <div class="card-chips" aria-label="Короткі характеристики">
@@ -134,7 +135,21 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
               <dd>{getPublicAvailabilityLabel(product)}</dd>
             </div>
           </dl>
-        </a>
+          <button
+            class="button cart-add-button"
+            type="button"
+            data-cart-add
+            data-plant-id={product.plant_id}
+            data-name={product.name_uk}
+            data-latin={product.latin_name}
+            data-container={product.container}
+            data-price={product.price_uah}
+            data-unit={product.unit}
+            data-url={`/plants/${product.slug}/`}
+          >
+            Додати в кошик
+          </button>
+        </article>
       ))}
     </div>
   </section>

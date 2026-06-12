@@ -6,6 +6,7 @@ export function GET() {
   const urls = [
     "/",
     "/catalog/",
+    "/cart/",
     "/price/",
     "/how-to-order/",
     "/contacts/",

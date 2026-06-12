@@ -48,6 +48,7 @@ if (!existsSync(join(root, "dist", "index.html"))) {
 
 for (const requiredPage of [
   "catalog/index.html",
+  "cart/index.html",
   "price/index.html",
   "how-to-order/index.html",
   "contacts/index.html"
@@ -221,6 +222,8 @@ for (const requiredPhrase of [
   "Саджанці, вирощені за сучасними технологіями",
   "Підібрати рослини",
   "Посухостійкі рослини",
+  "Кошик",
+  "Чернетка заявки",
   "Уточнити наявність",
   "Як замовити",
   "Відкрити табличний прайс",
@@ -228,6 +231,16 @@ for (const requiredPhrase of [
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected storefront CTA phrase: ${requiredPhrase}`);
   }
+}
+
+for (const requiredCartMarkup of ["data-cart-add", "data-cart-page", "data-cart-message", "/cart/"]) {
+  if (!publicHtml.includes(requiredCartMarkup)) {
+    fail(`Expected cart markup: ${requiredCartMarkup}`);
+  }
+}
+
+if (!existsSync(join(root, "public", "cart.js"))) {
+  fail("Missing public cart script: public/cart.js");
 }
 
 for (const requiredPage of [

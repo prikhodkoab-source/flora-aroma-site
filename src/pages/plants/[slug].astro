@@ -48,6 +48,20 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
             {winterHardiness && <span>{winterHardiness}</span>}
           </div>
           <div class="hero-actions">
+            <button
+              class="button"
+              type="button"
+              data-cart-add
+              data-plant-id={product.plant_id}
+              data-name={product.name_uk}
+              data-latin={product.latin_name}
+              data-container={product.container}
+              data-price={product.price_uah}
+              data-unit={product.unit}
+              data-url={`/plants/${product.slug}/`}
+            >
+              Додати в кошик
+            </button>
             <a class="button" href="tel:+380500272882">Уточнити наявність</a>
             <a class="button button-secondary" href="/how-to-order/">Як замовити</a>
           </div>
@@ -179,9 +193,9 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
     <section class="notice">
       <h2>Замовлення</h2>
       <p>
-        Для замовлення напишіть або зателефонуйте нам. Ми уточнимо формат, кількість і зручний спосіб отримання.
+        Додайте рослину в кошик або напишіть нам. Кошик формує тільки чернетку заявки; наявність, кількість і резерв підтверджує оператор.
       </p>
-      <a class="button" href="tel:+380500272882">Зв'язатися з оператором</a>
+      <a class="button" href="/cart/">Перейти до кошика</a>
     </section>
   </article>
 </BaseLayout>

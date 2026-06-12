@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Кошик | Flora & Aroma"
+  description="Кошик Flora & Aroma формує чернетку заявки для оператора без автоматичного резерву або списання складу."
+>
+  <section class="page-title">
+    <p class="eyebrow">Чернетка заявки</p>
+    <h1>Кошик</h1>
+    <p>
+      Додані позиції не є підтвердженим замовленням. Оператор перевірить наявність,
+      кількість, формат і можливість резерву перед оформленням.
+    </p>
+  </section>
+
+  <section class="section compact-section">
+    <div class="cart-layout" data-cart-page>
+      <section class="cart-panel">
+        <div class="section-heading">
+          <h2>Позиції</h2>
+          <button class="button button-secondary" type="button" data-cart-clear>Очистити</button>
+        </div>
+        <div class="cart-empty" data-cart-empty>
+          <p>Кошик порожній.</p>
+          <a class="button" href="/catalog/">Перейти до каталогу</a>
+        </div>
+        <div class="cart-items" data-cart-items></div>
+      </section>
+
+      <aside class="cart-summary">
+        <h2>Чернетка для оператора</h2>
+        <dl class="facts">
+          <div>
+            <dt>Позицій</dt>
+            <dd data-cart-total-qty>0</dd>
+          </div>
+          <div>
+            <dt>Попередня сума</dt>
+            <dd data-cart-total-sum>0 UAH</dd>
+          </div>
+        </dl>
+        <p>
+          Сума розрахована з публічного прайса. Наявність і резерв підтверджує оператор у день відповіді.
+        </p>
+        <label class="cart-comment">
+          Коментар до заявки
+          <textarea data-cart-comment rows="5" placeholder="Місто, спосіб отримання, побажання по строках або замінах"></textarea>
+        </label>
+        <label class="cart-comment">
+          Текст заявки
+          <textarea data-cart-message rows="10" readonly></textarea>
+        </label>
+        <div class="hero-actions">
+          <button class="button" type="button" data-cart-copy>Скопіювати заявку</button>
+          <a class="button button-secondary" href="tel:+380500272882">Зателефонувати</a>
+        </div>
+        <p class="cart-status" data-cart-status aria-live="polite"></p>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
