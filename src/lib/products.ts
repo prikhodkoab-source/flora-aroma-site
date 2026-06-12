@@ -20,6 +20,22 @@ export type Product = {
   source_urls: string;
   source_confidence: string;
   source_note: string;
+  sun_exposure: string;
+  moisture: string;
+  height_cm_min: number;
+  height_cm_max: number;
+  flowering_months: string;
+  flower_color: string;
+  flower_color_labels: string[];
+  winter_hardiness: string;
+  use_cases: string;
+  spacing_cm: string;
+  selection_tags: string;
+  sun_labels: string[];
+  moisture_labels: string[];
+  flowering_labels: string[];
+  use_case_labels: string[];
+  selection_tag_list: string[];
   seo_title: string;
   seo_description: string;
   image_path: string;
@@ -101,6 +117,122 @@ const transliterationMap: Record<string, string> = {
   ъ: ""
 };
 
+const sunLabels: Record<string, string> = {
+  full_sun: "сонце",
+  part_sun: "півтінь",
+  shade: "тінь"
+};
+
+const moistureLabels: Record<string, string> = {
+  dry: "сухо",
+  medium: "помірно",
+  moist: "волого"
+};
+
+const monthLabels: Record<string, string> = {
+  "04": "квітень",
+  "05": "травень",
+  "06": "червень",
+  "07": "липень",
+  "08": "серпень",
+  "09": "вересень",
+  "10": "жовтень"
+};
+
+const useCaseLabels: Record<string, string> = {
+  accent: "акцент",
+  aromatic: "ароматична посадка",
+  border: "бордюр",
+  container: "контейнер",
+  culinary: "пряна рослина",
+  cut_flower: "зріз",
+  dried_flower: "сухоцвіт",
+  dry_site: "сухе місце",
+  edible: "їстівне використання",
+  groundcover: "ґрунтопокривна",
+  landscape: "ландшафт",
+  mass_planting: "масив",
+  meadow: "луговий квітник",
+  medicinal: "лікарська",
+  moist_site: "вологе місце",
+  naturalistic: "натуралістична посадка",
+  ornamental: "декоративна",
+  ornamental_grass: "декоративний злак",
+  pollinator: "для запилювачів",
+  rain_garden: "вологий квітник",
+  rock_garden: "рокарій",
+  shade: "тіньова посадка",
+  shade_border: "напівтіньовий бордюр",
+  tree: "дерево",
+  windbreak: "вітрозахист"
+};
+
+const flowerColorLabels: Record<string, string> = {
+  blue: "синій",
+  cream: "кремовий",
+  green: "зелений",
+  inconspicuous: "непомітне цвітіння",
+  lavender: "лавандовий",
+  lilac: "ліловий",
+  mixed: "суміш кольорів",
+  orange: "помаранчевий",
+  pale_pink: "світло-рожевий",
+  pale_yellow: "світло-жовтий",
+  pink: "рожевий",
+  purple: "пурпуровий",
+  red: "червоний",
+  tan: "солом'яний",
+  violet: "фіолетовий",
+  white: "білий",
+  yellow: "жовтий"
+};
+
+export const selectionDefinitions = [
+  {
+    slug: "drought-tolerant",
+    tag: "drought_tolerant",
+    title: "Посухостійкі рослини",
+    description: "Рослини для сонячних, добре дренованих місць, де важлива витривалість до коротких сухих періодів."
+  },
+  {
+    slug: "aromatic-garden",
+    tag: "aromatic_garden",
+    title: "Ароматичний сад",
+    description: "Пряні, ефіроолійні та ароматні культури для доріжок, бордюрів і камерних посадок."
+  },
+  {
+    slug: "pollinator-plants",
+    tag: "pollinator_plants",
+    title: "Рослини для запилювачів",
+    description: "Культури з помітним цвітінням, які доречні у квітниках для бджіл, джмелів і метеликів."
+  },
+  {
+    slug: "border-plants",
+    tag: "border_plants",
+    title: "Рослини для бордюрів",
+    description: "Компактні та середньорослі рослини для краю квітника, доріжок і структурних посадок."
+  },
+  {
+    slug: "low-maintenance",
+    tag: "low_maintenance",
+    title: "Невибагливі рослини",
+    description: "Позиції, які за належного місця посадки підходять для простого догляду і стабільних композицій."
+  }
+] as const;
+
+export type SelectionDefinition = (typeof selectionDefinitions)[number];
+
+function splitList(value: string): string[] {
+  return value
+    .split(/[;|]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function labelsFrom(value: string, dictionary: Record<string, string>): string[] {
+  return splitList(value).map((item) => dictionary[item] ?? item);
+}
+
 export function slugify(value: string): string {
   const transliterated = value
     .toLowerCase()
@@ -146,6 +278,22 @@ export function getProducts(): Product[] {
         source_urls: row.source_urls,
         source_confidence: row.source_confidence,
         source_note: row.source_note,
+        sun_exposure: row.sun_exposure,
+        moisture: row.moisture,
+        height_cm_min: Number(row.height_cm_min),
+        height_cm_max: Number(row.height_cm_max),
+        flowering_months: row.flowering_months,
+        flower_color: row.flower_color,
+        flower_color_labels: labelsFrom(row.flower_color, flowerColorLabels),
+        winter_hardiness: row.winter_hardiness,
+        use_cases: row.use_cases,
+        spacing_cm: row.spacing_cm,
+        selection_tags: row.selection_tags,
+        sun_labels: labelsFrom(row.sun_exposure, sunLabels),
+        moisture_labels: labelsFrom(row.moisture, moistureLabels),
+        flowering_labels: labelsFrom(row.flowering_months, monthLabels),
+        use_case_labels: labelsFrom(row.use_cases, useCaseLabels),
+        selection_tag_list: splitList(row.selection_tags),
         seo_title: row.seo_title,
         seo_description: row.seo_description,
         image_path: row.image_path,
@@ -172,6 +320,27 @@ export function getCategories(): { name: string; slug: string; count: number }[]
   }
 
   return Array.from(counts.values()).sort((a, b) => a.name.localeCompare(b.name, "uk"));
+}
+
+export function getSelections(): (SelectionDefinition & { count: number })[] {
+  const products = getProducts();
+
+  return selectionDefinitions.map((selection) => ({
+    ...selection,
+    count: products.filter((product) => product.selection_tag_list.includes(selection.tag)).length
+  }));
+}
+
+export function formatHeight(product: Product): string {
+  if (!Number.isFinite(product.height_cm_min) || !Number.isFinite(product.height_cm_max)) {
+    return "потребує уточнення";
+  }
+
+  return `${product.height_cm_min}-${product.height_cm_max} см`;
+}
+
+export function formatFlowering(product: Product): string {
+  return product.flowering_labels.length > 0 ? product.flowering_labels.join(", ") : "потребує уточнення";
 }
 
 export function getPublicAvailabilityLabel(product: Product): string {

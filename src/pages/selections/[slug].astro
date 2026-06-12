@@ -1,24 +1,24 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatFlowering, formatHeight, getCategories, getProducts } from "../../lib/products";
+import { formatFlowering, formatHeight, getProducts, getPublicAvailabilityLabel, getSelections } from "../../lib/products";
 
 export function getStaticPaths() {
-  return getCategories().map((category) => ({
-    params: { slug: category.slug },
-    props: { category }
+  return getSelections().map((selection) => ({
+    params: { slug: selection.slug },
+    props: { selection }
   }));
 }
 
-const { category } = Astro.props;
-const products = getProducts().filter((product) => product.category_slug === category.slug);
-const description = `${category.name}: ${products.length} позицій Flora & Aroma. Ціни синхронізовані з затвердженим прайсом, наявність підтверджує оператор.`;
+const { selection } = Astro.props;
+const products = getProducts().filter((product) => product.selection_tag_list.includes(selection.tag));
+const description = `${selection.title}: ${products.length} позицій Flora & Aroma. Ціни з публічного прайса, наявність підтверджує оператор.`;
 ---
 
-<BaseLayout title={`${category.name} | Flora & Aroma`} description={description}>
+<BaseLayout title={`${selection.title} | Flora & Aroma`} description={description}>
   <section class="page-title">
-    <p class="eyebrow">Категорія</p>
-    <h1>{category.name}</h1>
-    <p>{products.length} позицій. Точну наявність, готовність і резерв підтверджує оператор.</p>
+    <p class="eyebrow">Добірка</p>
+    <h1>{selection.title}</h1>
+    <p>{selection.description} У добірці {products.length} позицій; фактичну наявність і резерв підтверджує оператор.</p>
   </section>
 
   <section class="section">
@@ -28,7 +28,7 @@ const description = `${category.name}: ${products.length} позицій Flora &
           {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
           <span class="plant-id">{product.category}</span>
           <h3>{product.name_uk}</h3>
-          <p>{product.latin_name}</p>
+          <p><em>{product.latin_name}</em></p>
           <p class="summary">{product.summary}</p>
           <div class="card-chips" aria-label="Короткі характеристики">
             <span>{product.sun_labels.join(" / ")}</span>
@@ -43,6 +43,10 @@ const description = `${category.name}: ${products.length} позицій Flora &
             <div>
               <dt>Ціна</dt>
               <dd>{product.price_uah} UAH/{product.unit}</dd>
+            </div>
+            <div>
+              <dt>Наявність</dt>
+              <dd>{getPublicAvailabilityLabel(product)}</dd>
             </div>
           </dl>
         </a>

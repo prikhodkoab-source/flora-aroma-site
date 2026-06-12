@@ -86,6 +86,16 @@ const requiredColumns = [
   "source_urls",
   "source_confidence",
   "source_note",
+  "sun_exposure",
+  "moisture",
+  "height_cm_min",
+  "height_cm_max",
+  "flowering_months",
+  "flower_color",
+  "winter_hardiness",
+  "use_cases",
+  "spacing_cm",
+  "selection_tags",
   "seo_title",
   "seo_description"
 ];
@@ -101,6 +111,34 @@ for (const required of ["ecology_text", "agrotechnics_text", "use_text", "full_d
   const missing = rows.slice(1).filter((row) => !parseCsvLine(row)[index]?.trim());
   if (missing.length > 0) {
     fail(`Expected every product to have ${required}, missing ${missing.length}.`);
+  }
+}
+
+for (const required of [
+  "sun_exposure",
+  "moisture",
+  "height_cm_min",
+  "height_cm_max",
+  "flowering_months",
+  "flower_color",
+  "winter_hardiness",
+  "use_cases",
+  "spacing_cm",
+  "selection_tags"
+]) {
+  const index = headers.indexOf(required);
+  const missing = rows.slice(1).filter((row) => !parseCsvLine(row)[index]?.trim());
+  if (missing.length > 0) {
+    fail(`Expected every product to have D2 field ${required}, missing ${missing.length}.`);
+  }
+}
+
+const numericD2Fields = ["height_cm_min", "height_cm_max"];
+for (const required of numericD2Fields) {
+  const index = headers.indexOf(required);
+  const invalid = rows.slice(1).filter((row) => Number.isNaN(Number(parseCsvLine(row)[index])));
+  if (invalid.length > 0) {
+    fail(`Expected numeric D2 field ${required}, invalid ${invalid.length}.`);
   }
 }
 
@@ -181,12 +219,26 @@ if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /image
 for (const requiredPhrase of [
   "Дім правильних рослин",
   "Саджанці, вирощені за сучасними технологіями",
+  "Підібрати рослини",
+  "Посухостійкі рослини",
   "Уточнити наявність",
   "Як замовити",
   "Відкрити табличний прайс",
 ]) {
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected storefront CTA phrase: ${requiredPhrase}`);
+  }
+}
+
+for (const requiredPage of [
+  "selections/drought-tolerant/index.html",
+  "selections/aromatic-garden/index.html",
+  "selections/pollinator-plants/index.html",
+  "selections/border-plants/index.html",
+  "selections/low-maintenance/index.html"
+]) {
+  if (!existsSync(join(root, "dist", requiredPage))) {
+    fail(`Missing required D2 selection page: ${requiredPage}`);
   }
 }
 

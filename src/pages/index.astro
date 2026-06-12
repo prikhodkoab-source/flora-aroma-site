@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCategories, getProducts } from "../lib/products";
+import { formatHeight, getCategories, getProducts, getSelections } from "../lib/products";
 
 const products = getProducts();
 const featuredPlantIds = ["PLANT-0041", "PLANT-0082", "PLANT-0014", "PLANT-0048"];
@@ -8,6 +8,7 @@ const featured = featuredPlantIds
   .map((plantId) => products.find((product) => product.plant_id === plantId))
   .filter((product) => product !== undefined);
 const categories = getCategories();
+const selections = getSelections();
 ---
 
 <BaseLayout title="Flora & Aroma | Актуальний асортимент рослин">
@@ -68,6 +69,21 @@ const categories = getCategories();
     </div>
   </section>
 
+  <section class="section compact-section">
+    <div class="section-heading">
+      <h2>Підібрати рослини</h2>
+      <p>Швидкі добірки за умовами ділянки та призначенням.</p>
+    </div>
+    <div class="link-grid">
+      {selections.map((selection) => (
+        <a href={`/selections/${selection.slug}/`}>
+          <span>{selection.title}</span>
+          <p>{selection.description} {selection.count} позицій.</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
   <section class="section">
     <div class="section-heading">
       <h2>Найчастіше обирають</h2>
@@ -89,6 +105,10 @@ const categories = getCategories();
           <h3>{product.name_uk}</h3>
           <p>{product.latin_name}</p>
           <p class="summary">{product.summary}</p>
+          <div class="card-chips" aria-label="Короткі характеристики">
+            <span>{product.sun_labels.join(" / ")}</span>
+            <span>{formatHeight(product)}</span>
+          </div>
           <dl>
             <div>
               <dt>Формат</dt>

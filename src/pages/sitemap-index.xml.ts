@@ -1,4 +1,4 @@
-import { getCategories, getProducts } from "../lib/products";
+import { getCategories, getProducts, getSelections } from "../lib/products";
 
 const site = "https://flora-aroma.com.ua";
 
@@ -10,6 +10,7 @@ export function GET() {
     "/how-to-order/",
     "/contacts/",
     ...getCategories().map((category) => `/categories/${category.slug}/`),
+    ...getSelections().map((selection) => `/selections/${selection.slug}/`),
     ...getProducts().map((product) => `/plants/${product.slug}/`)
   ];
 

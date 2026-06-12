@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getProducts, getPublicAvailabilityLabel } from "../../lib/products";
+import { formatFlowering, formatHeight, getProducts, getPublicAvailabilityLabel } from "../../lib/products";
 
 export function getStaticPaths() {
   return getProducts().map((product) => ({
@@ -42,6 +42,9 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
           <div class="attribute-strip" aria-label="Короткі характеристики">
             <span>{product.category}</span>
             <span>{product.container}</span>
+            <span>{product.sun_labels.join(" / ")}</span>
+            <span>{formatHeight(product)}</span>
+            <span>цвітіння: {formatFlowering(product)}</span>
             {winterHardiness && <span>{winterHardiness}</span>}
           </div>
           <div class="hero-actions">
@@ -123,6 +126,40 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
     </section>
 
     <section class="plant-details" aria-label="Опис рослини">
+      <dl class="facts plant-attributes">
+        <div>
+          <dt>Освітлення</dt>
+          <dd>{product.sun_labels.join(" / ")}</dd>
+        </div>
+        <div>
+          <dt>Волога</dt>
+          <dd>{product.moisture_labels.join(" / ")}</dd>
+        </div>
+        <div>
+          <dt>Висота</dt>
+          <dd>{formatHeight(product)}</dd>
+        </div>
+        <div>
+          <dt>Цвітіння</dt>
+          <dd>{formatFlowering(product)}</dd>
+        </div>
+        <div>
+          <dt>Колір</dt>
+          <dd>{product.flower_color_labels.join(" / ")}</dd>
+        </div>
+        <div>
+          <dt>Зимостійкість</dt>
+          <dd>{product.winter_hardiness}</dd>
+        </div>
+        <div>
+          <dt>Крок посадки</dt>
+          <dd>{product.spacing_cm} см</dd>
+        </div>
+        <div>
+          <dt>Використання</dt>
+          <dd>{product.use_case_labels.slice(0, 4).join(", ")}</dd>
+        </div>
+      </dl>
       <div class="detail-grid">
         <section>
           <h3>Екологічні характеристики</h3>
