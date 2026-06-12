@@ -6,6 +6,9 @@ export function GET() {
   const urls = [
     "/",
     "/catalog/",
+    "/price/",
+    "/how-to-order/",
+    "/contacts/",
     ...getCategories().map((category) => `/categories/${category.slug}/`),
     ...getProducts().map((product) => `/plants/${product.slug}/`)
   ];

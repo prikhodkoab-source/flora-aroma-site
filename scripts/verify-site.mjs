@@ -46,6 +46,17 @@ if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
 }
 
+for (const requiredPage of [
+  "catalog/index.html",
+  "price/index.html",
+  "how-to-order/index.html",
+  "contacts/index.html"
+]) {
+  if (!existsSync(join(root, "dist", requiredPage))) {
+    fail(`Missing required MVP page: ${requiredPage}`);
+  }
+}
+
 if (rows.length !== 41) {
   fail(`Expected 40 product rows, found ${rows.length - 1}.`);
 }
@@ -158,5 +169,5 @@ if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /image
 }
 
 if (!failed) {
-  console.log("Site verification passed: 40 products, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
+  console.log("Site verification passed: MVP pages, 40 products, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
 }

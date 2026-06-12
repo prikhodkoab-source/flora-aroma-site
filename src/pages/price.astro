@@ -1,0 +1,50 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProducts } from "../lib/products";
+
+const products = getProducts();
+const generatedAt = new Intl.DateTimeFormat("uk-UA", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric"
+}).format(new Date());
+---
+
+<BaseLayout
+  title="Прайс Flora & Aroma"
+  description="Актуальний публічний прайс Flora & Aroma: українська назва, латинська назва, формат і ціна рослин."
+>
+  <section class="page-title">
+    <p class="eyebrow">Прайс</p>
+    <h1>Актуальний асортимент</h1>
+    <p>
+      Дата формування: {generatedAt}. Ціни синхронізовані з затвердженим публічним прайсом.
+      Наявність і можливість резерву підтверджує оператор у день відповіді.
+    </p>
+  </section>
+
+  <section class="table-wrap" aria-label="Прайс Flora & Aroma">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Українська назва</th>
+          <th>Латинська назва</th>
+          <th>Горщик / касета</th>
+          <th>Ціна</th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((product) => (
+          <tr>
+            <td>{product.plant_id}</td>
+            <td><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></td>
+            <td><em>{product.latin_name}</em></td>
+            <td>{product.container}</td>
+            <td>{product.price_uah} UAH/{product.unit}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+</BaseLayout>
