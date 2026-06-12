@@ -119,12 +119,17 @@ for (const forbidden of [
   "Кількість у Tilda",
   "Джерела картки",
   "Джерела зображень",
+  "Розширений опис",
   "/image-credits/",
   "image-credits"
 ]) {
   if (publicHtml.includes(forbidden)) {
     fail(`Forbidden public phrase found: ${forbidden}`);
   }
+}
+
+if (!publicHtml.includes("data-gallery")) {
+  fail("Expected product gallery markup in public HTML.");
 }
 
 if (!failed) {

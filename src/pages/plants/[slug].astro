@@ -11,6 +11,10 @@ export function getStaticPaths() {
 
 const { product } = Astro.props;
 const description = product.seo_description;
+const imagePaths = product.image_path
+  .split(/[;|]/)
+  .map((path) => path.trim())
+  .filter(Boolean);
 ---
 
 <BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
@@ -23,15 +27,79 @@ const description = product.seo_description;
         <p><em>{product.latin_name}</em></p>
         <a class="category-link" href={`/categories/${product.category_slug}/`}>{product.category}</a>
       </div>
-      {product.image_path && <img src={product.image_path} alt="" loading="eager" />}
+      {imagePaths.length > 0 && (
+        <div class="product-media" data-gallery>
+          <div class="gallery-stage">
+            <button
+              class="gallery-nav gallery-nav-prev"
+              type="button"
+              aria-label="Попереднє фото"
+              data-gallery-prev
+              hidden={imagePaths.length < 2}
+            >
+              ‹
+            </button>
+            <button class="gallery-image-button" type="button" aria-label={`Переглянути фото: ${product.name_uk}`} data-gallery-open>
+              <img src={imagePaths[0]} alt={`${product.name_uk} - фото`} loading="eager" data-gallery-image />
+            </button>
+            <button
+              class="gallery-nav gallery-nav-next"
+              type="button"
+              aria-label="Наступне фото"
+              data-gallery-next
+              hidden={imagePaths.length < 2}
+            >
+              ›
+            </button>
+          </div>
+          {imagePaths.length > 1 && (
+            <div class="gallery-thumbs" aria-label="Фото рослини">
+              {imagePaths.map((path, index) => (
+                <button
+                  class="gallery-thumb"
+                  type="button"
+                  aria-label={`Фото ${index + 1}`}
+                  aria-pressed={index === 0 ? "true" : "false"}
+                  data-gallery-thumb
+                  data-src={path}
+                  data-index={index}
+                >
+                  <img src={path} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+          <dialog class="gallery-dialog" data-gallery-dialog>
+            <button class="gallery-close" type="button" aria-label="Закрити перегляд" data-gallery-close>×</button>
+            <button
+              class="gallery-dialog-nav gallery-dialog-prev"
+              type="button"
+              aria-label="Попереднє фото"
+              data-gallery-prev
+              hidden={imagePaths.length < 2}
+            >
+              ‹
+            </button>
+            <img src={imagePaths[0]} alt={`${product.name_uk} - фото`} data-gallery-dialog-image />
+            <button
+              class="gallery-dialog-nav gallery-dialog-next"
+              type="button"
+              aria-label="Наступне фото"
+              data-gallery-next
+              hidden={imagePaths.length < 2}
+            >
+              ›
+            </button>
+          </dialog>
+        </div>
+      )}
     </div>
 
     <section class="plant-summary">
       <p>{product.summary}</p>
     </section>
 
-    <section class="plant-details" aria-labelledby="plant-details-title">
-      <h2 id="plant-details-title">Розширений опис</h2>
+    <section class="plant-details" aria-label="Опис рослини">
       <div class="detail-grid">
         <section>
           <h3>Екологічні характеристики</h3>
@@ -72,3 +140,49 @@ const description = product.seo_description;
     </section>
   </article>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((gallery) => {
+    const image = gallery.querySelector<HTMLImageElement>("[data-gallery-image]");
+    const dialog = gallery.querySelector<HTMLDialogElement>("[data-gallery-dialog]");
+    const dialogImage = gallery.querySelector<HTMLImageElement>("[data-gallery-dialog-image]");
+    const thumbs = Array.from(gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-thumb]"));
+    const openButton = gallery.querySelector<HTMLButtonElement>("[data-gallery-open]");
+    const closeButton = gallery.querySelector<HTMLButtonElement>("[data-gallery-close]");
+    const paths = thumbs.length > 0 ? thumbs.map((thumb) => thumb.dataset.src || "") : image?.src ? [image.getAttribute("src") || image.src] : [];
+    let current = 0;
+
+    function setCurrent(index: number) {
+      if (!image || paths.length === 0) return;
+      current = (index + paths.length) % paths.length;
+      image.src = paths[current];
+      if (dialogImage) dialogImage.src = paths[current];
+      thumbs.forEach((thumb, thumbIndex) => {
+        thumb.setAttribute("aria-pressed", thumbIndex === current ? "true" : "false");
+      });
+    }
+
+    gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-prev]").forEach((button) => {
+      button.addEventListener("click", () => setCurrent(current - 1));
+    });
+
+    gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-next]").forEach((button) => {
+      button.addEventListener("click", () => setCurrent(current + 1));
+    });
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener("click", () => setCurrent(Number(thumb.dataset.index || 0)));
+    });
+
+    openButton?.addEventListener("click", () => {
+      if (!dialog) return;
+      setCurrent(current);
+      dialog.showModal();
+    });
+
+    closeButton?.addEventListener("click", () => dialog?.close());
+    dialog?.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>
