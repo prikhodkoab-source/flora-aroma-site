@@ -233,7 +233,7 @@ for (const requiredPhrase of [
   }
 }
 
-for (const requiredCartMarkup of ["data-cart-add", "data-cart-page", "data-cart-message", "/cart/"]) {
+for (const requiredCartMarkup of ["data-cart-add", "data-cart-page", "data-cart-message", "data-cart-toast", "/cart/"]) {
   if (!publicHtml.includes(requiredCartMarkup)) {
     fail(`Expected cart markup: ${requiredCartMarkup}`);
   }
@@ -241,6 +241,13 @@ for (const requiredCartMarkup of ["data-cart-add", "data-cart-page", "data-cart-
 
 if (!existsSync(join(root, "public", "cart.js"))) {
   fail("Missing public cart script: public/cart.js");
+}
+
+const cartScript = readFileSync(join(root, "public", "cart.js"), "utf8");
+for (const requiredCartScriptMarker of ["data-cart-increase", "data-cart-decrease", "data-cart-toast-title"]) {
+  if (!cartScript.includes(requiredCartScriptMarker)) {
+    fail(`Expected cart script marker: ${requiredCartScriptMarker}`);
+  }
 }
 
 for (const requiredPage of [

@@ -1,5 +1,6 @@
 (() => {
   const STORAGE_KEY = "flora_cart_draft_v1";
+  let toastTimer;
 
   function readCart() {
     try {
@@ -34,12 +35,41 @@
     return Math.min(Math.round(number), 9999);
   }
 
+  function cartTotals(items = readCart()) {
+    return items.reduce(
+      (totals, item) => {
+        const qty = normalizeQty(item.qty);
+        const price = Number(item.price || 0);
+        totals.qty += qty;
+        totals.sum += qty * price;
+        return totals;
+      },
+      { qty: 0, sum: 0 }
+    );
+  }
+
   function updateCount() {
-    const total = readCart().reduce((sum, item) => sum + normalizeQty(item.qty), 0);
+    const total = cartTotals().qty;
     document.querySelectorAll("[data-cart-count]").forEach((node) => {
       node.textContent = String(total);
       node.toggleAttribute("hidden", total === 0);
     });
+  }
+
+  function showToast(item) {
+    const toast = document.querySelector("[data-cart-toast]");
+    if (!(toast instanceof HTMLElement)) return;
+
+    const title = toast.querySelector("[data-cart-toast-title]");
+    const text = toast.querySelector("[data-cart-toast-text]");
+    if (title) title.textContent = "Додано до кошика";
+    if (text) text.textContent = item.name || item.plantId;
+
+    toast.hidden = false;
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => {
+      toast.hidden = true;
+    }, 3600);
   }
 
   function addItem(dataset) {
@@ -49,9 +79,11 @@
     const cart = readCart();
     const existing = cart.find((item) => item.plantId === plantId);
     if (existing) {
-      existing.qty = normalizeQty(existing.qty + 1);
+      existing.qty = normalizeQty(Number(existing.qty) + 1);
+      existing.image = existing.image || dataset.image || "";
+      showToast(existing);
     } else {
-      cart.push({
+      const item = {
         plantId,
         name: dataset.name || plantId,
         latin: dataset.latin || "",
@@ -59,15 +91,25 @@
         price: Number(dataset.price || 0),
         unit: dataset.unit || "шт.",
         url: dataset.url || "",
+        image: dataset.image || "",
         qty: 1
-      });
+      };
+      cart.push(item);
+      showToast(item);
     }
 
     writeCart(cart);
   }
 
+  function setQty(plantId, qty) {
+    const next = readCart()
+      .map((item) => (item.plantId === plantId ? { ...item, qty: normalizeQty(qty) } : item))
+      .filter((item) => normalizeQty(item.qty) > 0);
+    writeCart(next);
+  }
+
   function buildMessage(items, comment) {
-    const total = items.reduce((sum, item) => sum + normalizeQty(item.qty) * Number(item.price || 0), 0);
+    const total = cartTotals(items).sum;
     const lines = [
       "Добрий день. Прошу перевірити наявність і можливість резерву:",
       ...items.map((item) => {
@@ -97,32 +139,41 @@
     const comment = page.querySelector("[data-cart-comment]");
     const status = page.querySelector("[data-cart-status]");
     const items = readCart();
-    const qty = items.reduce((sum, item) => sum + normalizeQty(item.qty), 0);
-    const sum = items.reduce((total, item) => total + normalizeQty(item.qty) * Number(item.price || 0), 0);
+    const totals = cartTotals(items);
 
     if (empty) empty.hidden = items.length > 0;
-    if (totalQty) totalQty.textContent = String(qty);
-    if (totalSum) totalSum.textContent = money(sum);
+    if (totalQty) totalQty.textContent = String(totals.qty);
+    if (totalSum) totalSum.textContent = money(totals.sum);
     if (itemsRoot) {
       itemsRoot.innerHTML = items
         .map((item) => {
           const itemQty = normalizeQty(item.qty);
+          const url = escapeHtml(item.url || "");
+          const name = escapeHtml(item.name);
+          const image = escapeHtml(item.image || "");
+          const plantId = escapeHtml(item.plantId);
+          const imageMarkup = image
+            ? `<a class="cart-item-image" href="${url || "#"}"><img src="${image}" alt="" loading="lazy"></a>`
+            : `<div class="cart-item-image cart-item-image-empty" aria-hidden="true"></div>`;
+
           return `
-            <article class="cart-item" data-cart-item="${escapeHtml(item.plantId)}">
-              <div>
-                <strong>${escapeHtml(item.name)}</strong>
-                <span>${escapeHtml(item.plantId)}</span>
+            <article class="cart-item" data-cart-item="${plantId}">
+              ${imageMarkup}
+              <div class="cart-item-main">
+                <strong>${url ? `<a href="${url}">${name}</a>` : name}</strong>
+                <span>${plantId}</span>
                 <small>${escapeHtml(item.container)}</small>
               </div>
-              <label>
-                Кількість
-                <input type="number" min="1" max="9999" step="1" value="${itemQty}" data-cart-qty="${escapeHtml(item.plantId)}">
-              </label>
-              <div>
+              <div class="quantity-control" aria-label="Кількість">
+                <button type="button" data-cart-decrease="${plantId}" aria-label="Зменшити кількість">−</button>
+                <input type="number" min="1" max="9999" step="1" value="${itemQty}" data-cart-qty="${plantId}">
+                <button type="button" data-cart-increase="${plantId}" aria-label="Збільшити кількість">+</button>
+              </div>
+              <div class="cart-item-price">
                 <strong>${money(itemQty * Number(item.price || 0))}</strong>
                 <span>${escapeHtml(item.price)} UAH/${escapeHtml(item.unit)}</span>
               </div>
-              <button class="table-cart-button" type="button" data-cart-remove="${escapeHtml(item.plantId)}">Прибрати</button>
+              <button class="table-cart-button" type="button" data-cart-remove="${plantId}">Прибрати</button>
             </article>
           `;
         })
@@ -149,6 +200,32 @@
       return;
     }
 
+    const decreaseButton = target.closest("[data-cart-decrease]");
+    if (decreaseButton instanceof HTMLElement) {
+      const plantId = decreaseButton.dataset.cartDecrease;
+      const item = readCart().find((cartItem) => cartItem.plantId === plantId);
+      if (item) {
+        if (normalizeQty(item.qty) <= 1) {
+          writeCart(readCart().filter((cartItem) => cartItem.plantId !== plantId));
+        } else {
+          setQty(plantId, normalizeQty(item.qty) - 1);
+        }
+        renderCartPage();
+      }
+      return;
+    }
+
+    const increaseButton = target.closest("[data-cart-increase]");
+    if (increaseButton instanceof HTMLElement) {
+      const plantId = increaseButton.dataset.cartIncrease;
+      const item = readCart().find((cartItem) => cartItem.plantId === plantId);
+      if (item) {
+        setQty(plantId, normalizeQty(item.qty) + 1);
+        renderCartPage();
+      }
+      return;
+    }
+
     const removeButton = target.closest("[data-cart-remove]");
     if (removeButton instanceof HTMLElement) {
       const plantId = removeButton.dataset.cartRemove;
@@ -160,6 +237,12 @@
     if (target.closest("[data-cart-clear]")) {
       writeCart([]);
       renderCartPage();
+      return;
+    }
+
+    if (target.closest("[data-cart-toast-close]")) {
+      const toast = document.querySelector("[data-cart-toast]");
+      if (toast instanceof HTMLElement) toast.hidden = true;
       return;
     }
 
@@ -186,11 +269,7 @@
     if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
 
     if (target.matches("[data-cart-qty]")) {
-      const plantId = target.dataset.cartQty;
-      const cart = readCart().map((item) =>
-        item.plantId === plantId ? { ...item, qty: normalizeQty(target.value) } : item
-      );
-      writeCart(cart);
+      setQty(target.dataset.cartQty, target.value);
       renderCartPage();
     }
 
@@ -198,6 +277,13 @@
       renderCartPage();
     }
   });
+
+  document.addEventListener("focus", (event) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement && target.matches("[data-cart-qty]")) {
+      target.select();
+    }
+  }, true);
 
   window.addEventListener("flora-cart-updated", updateCount);
   updateCount();

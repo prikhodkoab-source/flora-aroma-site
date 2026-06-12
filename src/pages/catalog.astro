@@ -146,6 +146,7 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
             data-price={product.price_uah}
             data-unit={product.unit}
             data-url={`/plants/${product.slug}/`}
+            data-image={product.primary_image_path}
           >
             Додати в кошик
           </button>
