@@ -1,0 +1,92 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getProducts, getPublicAvailabilityLabel } from "../../lib/products";
+
+export function getStaticPaths() {
+  return getProducts().map((product) => ({
+    params: { slug: product.slug },
+    props: { product }
+  }));
+}
+
+const { product } = Astro.props;
+const description = product.seo_description;
+const sourceUrls = product.source_urls
+  .split(";")
+  .map((url) => url.trim())
+  .filter(Boolean);
+---
+
+<BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
+  <article class="product-page">
+    <a class="back-link" href="/catalog/">Назад до каталогу</a>
+    <div class="product-header">
+      <div>
+        <span class="plant-id">{product.plant_id}</span>
+        <h1>{product.name_uk}</h1>
+        <p><em>{product.latin_name}</em></p>
+        <a class="category-link" href={`/categories/${product.category_slug}/`}>{product.category}</a>
+      </div>
+      {product.image_path && <img src={product.image_path} alt="" loading="eager" />}
+    </div>
+
+    <section class="plant-summary">
+      <p>{product.summary}</p>
+    </section>
+
+    <section class="plant-details" aria-labelledby="plant-details-title">
+      <h2 id="plant-details-title">Розширений опис</h2>
+      <div class="detail-grid">
+        <section>
+          <h3>Екологічні характеристики</h3>
+          <p>{product.ecology_text}</p>
+        </section>
+        <section>
+          <h3>Агротехніка</h3>
+          <p>{product.agrotechnics_text}</p>
+        </section>
+        <section>
+          <h3>Господарське застосування</h3>
+          <p>{product.use_text}</p>
+        </section>
+      </div>
+    </section>
+
+    <dl class="facts">
+      <div>
+        <dt>Формат</dt>
+        <dd>{product.container}</dd>
+      </div>
+      <div>
+        <dt>Ціна</dt>
+        <dd>{product.price_uah} UAH/{product.unit}</dd>
+      </div>
+      <div>
+        <dt>Наявність</dt>
+        <dd>{getPublicAvailabilityLabel(product)}</dd>
+      </div>
+    </dl>
+
+    <section class="source-panel" aria-labelledby="source-panel-title">
+      <h2 id="source-panel-title">Джерела картки</h2>
+      <p>{product.source_names}</p>
+      {sourceUrls.length > 0 && (
+        <ul>
+          {sourceUrls.map((url) => (
+            <li><a href={url} rel="nofollow noopener noreferrer">{url}</a></li>
+          ))}
+        </ul>
+      )}
+      <p class="source-note">{product.source_note}</p>
+    </section>
+
+    <section class="notice">
+      <h2>Замовлення</h2>
+      <p>
+        Для резерву оператор перевіряє актуальний залишок у системі Flora і підтверджує
+        позиції перед створенням замовлення.
+      </p>
+      <a class="button" href="tel:+380500272882">Зв'язатися з оператором</a>
+    </section>
+  </article>
+</BaseLayout>

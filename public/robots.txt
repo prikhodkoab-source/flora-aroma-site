@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://flora-aroma.com.ua/sitemap-index.xml

@@ -1,0 +1,58 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCategories, getProducts } from "../lib/products";
+
+const products = getProducts();
+const featured = products.slice(0, 8);
+const categories = getCategories();
+---
+
+<BaseLayout title="Flora & Aroma | Актуальний асортимент рослин">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Актуальний асортимент рослин</p>
+      <h1>FLORA & AROMA</h1>
+      <p>
+        Саджанці в касетах і горщиках для саду, квітників, ароматичних посадок
+        і невеликих ландшафтних рішень.
+      </p>
+      <a class="button" href="/catalog/">Дивитися каталог</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2>Готові до продажу</h2>
+      <p>{products.length} позицій у першому публічному CSV нового сайту.</p>
+    </div>
+    <div class="category-strip" aria-label="Категорії рослин">
+      {categories.map((category) => (
+        <a href={`/categories/${category.slug}/`}>
+          {category.name}
+          <span>{category.count}</span>
+        </a>
+      ))}
+    </div>
+    <div class="product-grid">
+      {featured.map((product) => (
+        <a class="product-card" href={`/plants/${product.slug}/`}>
+          {product.image_path && <img src={product.image_path} alt="" loading="lazy" />}
+          <span class="plant-id">{product.plant_id}</span>
+          <h3>{product.name_uk}</h3>
+          <p>{product.latin_name}</p>
+          <p class="summary">{product.summary}</p>
+          <dl>
+            <div>
+              <dt>Формат</dt>
+              <dd>{product.container}</dd>
+            </div>
+            <div>
+              <dt>Ціна</dt>
+              <dd>{product.price_uah} UAH/{product.unit}</dd>
+            </div>
+          </dl>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

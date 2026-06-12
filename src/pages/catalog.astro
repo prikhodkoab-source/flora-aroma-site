@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCategories, getProducts, getPublicAvailabilityLabel } from "../lib/products";
+
+const products = getProducts();
+const categories = getCategories();
+---
+
+<BaseLayout title="Каталог рослин | Flora & Aroma">
+  <section class="page-title">
+    <p class="eyebrow">Актуальний асортимент</p>
+    <h1>Каталог рослин</h1>
+    <p>Ціни синхронізовані з затвердженим прайсом. Точну наявність підтверджує оператор.</p>
+  </section>
+
+  <section class="section compact-section" aria-label="Категорії">
+    <div class="category-strip">
+      {categories.map((category) => (
+        <a href={`/categories/${category.slug}/`}>
+          {category.name}
+          <span>{category.count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="table-wrap" aria-label="Каталог рослин">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Українська назва</th>
+          <th>Латинська назва</th>
+          <th>Категорія</th>
+          <th>Формат</th>
+          <th>Ціна</th>
+          <th>Наявність</th>
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((product) => (
+          <tr>
+            <td>{product.plant_id}</td>
+            <td><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></td>
+            <td><em>{product.latin_name}</em></td>
+            <td><a href={`/categories/${product.category_slug}/`}>{product.category}</a></td>
+            <td>{product.container}</td>
+            <td>{product.price_uah} UAH/{product.unit}</td>
+            <td>{getPublicAvailabilityLabel(product)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+</BaseLayout>

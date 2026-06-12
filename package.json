@@ -1,0 +1,21 @@
+{
+  "name": "flora-aroma-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "sync:products": "node scripts/build-products.mjs",
+    "images:fetch-missing": "node scripts/fetch-missing-plant-images.mjs",
+    "images:add-local-review": "node scripts/add-local-review-images.mjs && node scripts/add-manual-image-mappings.mjs && node scripts/add-ruta-commons-image.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "verify": "node scripts/verify-site.mjs"
+  },
+  "dependencies": {
+    "astro": "^6.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}
