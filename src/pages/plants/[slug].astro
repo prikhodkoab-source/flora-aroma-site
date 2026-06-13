@@ -13,6 +13,7 @@ const { product } = Astro.props;
 const description = product.seo_description;
 const imagePaths = product.image_paths;
 const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
+const selectedOption = product.options[0];
 ---
 
 <BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
@@ -28,11 +29,11 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
           <dl class="facts product-buy-facts">
             <div>
               <dt>Формат</dt>
-              <dd>{product.container}</dd>
+              <dd data-selected-container>{selectedOption.container}</dd>
             </div>
             <div>
               <dt>Ціна</dt>
-              <dd>{product.price_uah} UAH/{product.unit}</dd>
+              <dd data-selected-price>{selectedOption.price_uah} UAH/{selectedOption.unit}</dd>
             </div>
             <div>
               <dt>Наявність</dt>
@@ -47,6 +48,27 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
             <span>цвітіння: {formatFlowering(product)}</span>
             {winterHardiness && <span>{winterHardiness}</span>}
           </div>
+          {product.has_multiple_options && (
+            <fieldset class="product-option-picker" data-product-options>
+              <legend>Оберіть формат</legend>
+              {product.options.map((option, index) => (
+                <label>
+                  <input
+                    type="radio"
+                    name={`option-${product.plant_id}`}
+                    value={option.variant_id}
+                    checked={index === 0}
+                    data-product-option
+                    data-option-id={option.variant_id}
+                    data-container={option.container}
+                    data-price={option.price_uah}
+                    data-unit={option.unit}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </fieldset>
+          )}
           <div class="hero-actions">
             <button
               class="button"
@@ -55,9 +77,10 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
               data-plant-id={product.plant_id}
               data-name={product.name_uk}
               data-latin={product.latin_name}
-              data-container={product.container}
-              data-price={product.price_uah}
-              data-unit={product.unit}
+              data-container={selectedOption.container}
+              data-price={selectedOption.price_uah}
+              data-unit={selectedOption.unit}
+              data-option-id={selectedOption.variant_id}
               data-url={`/plants/${product.slug}/`}
               data-image={product.primary_image_path}
             >
@@ -243,6 +266,29 @@ const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
     closeButton?.addEventListener("click", () => dialog?.close());
     dialog?.addEventListener("click", (event) => {
       if (event.target === dialog) dialog.close();
+    });
+  });
+
+  document.querySelectorAll<HTMLElement>("[data-product-options]").forEach((picker) => {
+    const panel = picker.closest<HTMLElement>(".product-buy-panel");
+    const container = panel?.querySelector<HTMLElement>("[data-selected-container]");
+    const price = panel?.querySelector<HTMLElement>("[data-selected-price]");
+    const addButton = panel?.querySelector<HTMLButtonElement>("[data-cart-add]");
+
+    picker.querySelectorAll<HTMLInputElement>("[data-product-option]").forEach((input) => {
+      input.addEventListener("change", () => {
+        if (!input.checked || !addButton) return;
+        const nextContainer = input.dataset.container || "";
+        const nextPrice = input.dataset.price || "";
+        const nextUnit = input.dataset.unit || "шт.";
+
+        addButton.dataset.container = nextContainer;
+        addButton.dataset.price = nextPrice;
+        addButton.dataset.unit = nextUnit;
+        addButton.dataset.optionId = input.dataset.optionId || "";
+        if (container) container.textContent = nextContainer;
+        if (price) price.textContent = `${nextPrice} UAH/${nextUnit}`;
+      });
     });
   });
 </script>

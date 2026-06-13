@@ -244,9 +244,16 @@ if (!existsSync(join(root, "public", "cart.js"))) {
 }
 
 const cartScript = readFileSync(join(root, "public", "cart.js"), "utf8");
-for (const requiredCartScriptMarker of ["data-cart-increase", "data-cart-decrease", "data-cart-toast-title"]) {
+for (const requiredCartScriptMarker of ["data-cart-increase", "data-cart-decrease", "data-cart-toast-title", "optionId", "cartItemKey"]) {
   if (!cartScript.includes(requiredCartScriptMarker)) {
     fail(`Expected cart script marker: ${requiredCartScriptMarker}`);
+  }
+}
+
+const plantPageSource = readFileSync(join(root, "src", "pages", "plants", "[slug].astro"), "utf8");
+for (const requiredVariantMarker of ["data-product-options", "data-product-option", "data-selected-price", "data-option-id"]) {
+  if (!plantPageSource.includes(requiredVariantMarker)) {
+    fail(`Expected product variant marker: ${requiredVariantMarker}`);
   }
 }
 

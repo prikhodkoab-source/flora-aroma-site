@@ -587,6 +587,46 @@ th {
   margin-bottom: 14px;
 }
 
+.product-option-picker {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.product-option-picker legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.product-option-picker label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--wash);
+  cursor: pointer;
+}
+
+.product-option-picker input {
+  flex: 0 0 auto;
+  accent-color: var(--leaf);
+}
+
+.product-option-picker span {
+  color: var(--ink);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
 .attribute-strip {
   display: flex;
   flex-wrap: wrap;

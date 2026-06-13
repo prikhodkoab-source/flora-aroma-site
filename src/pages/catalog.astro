@@ -145,6 +145,7 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
             data-container={product.container}
             data-price={product.price_uah}
             data-unit={product.unit}
+            data-option-id={product.options[0].variant_id}
             data-url={`/plants/${product.slug}/`}
             data-image={product.primary_image_path}
           >

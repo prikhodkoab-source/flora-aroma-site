@@ -35,6 +35,18 @@
     return Math.min(Math.round(number), 9999);
   }
 
+  function cartItemKey(item) {
+    if (item.cartKey) return item.cartKey;
+    if (item.optionId && item.optionId !== "default") return `${item.plantId}::${item.optionId}`;
+    return item.plantId;
+  }
+
+  function datasetCartKey(dataset) {
+    const plantId = dataset.plantId || "";
+    const optionId = dataset.optionId || "default";
+    return optionId && optionId !== "default" ? `${plantId}::${optionId}` : plantId;
+  }
+
   function cartTotals(items = readCart()) {
     return items.reduce(
       (totals, item) => {
@@ -76,8 +88,10 @@
     const plantId = dataset.plantId || "";
     if (!plantId) return;
 
+    const optionId = dataset.optionId || "default";
+    const cartKey = datasetCartKey(dataset);
     const cart = readCart();
-    const existing = cart.find((item) => item.plantId === plantId);
+    const existing = cart.find((item) => cartItemKey(item) === cartKey);
     if (existing) {
       existing.qty = normalizeQty(Number(existing.qty) + 1);
       existing.image = existing.image || dataset.image || "";
@@ -85,6 +99,8 @@
     } else {
       const item = {
         plantId,
+        optionId,
+        cartKey,
         name: dataset.name || plantId,
         latin: dataset.latin || "",
         container: dataset.container || "",
@@ -101,9 +117,9 @@
     writeCart(cart);
   }
 
-  function setQty(plantId, qty) {
+  function setQty(cartKey, qty) {
     const next = readCart()
-      .map((item) => (item.plantId === plantId ? { ...item, qty: normalizeQty(qty) } : item))
+      .map((item) => (cartItemKey(item) === cartKey ? { ...item, qty: normalizeQty(qty) } : item))
       .filter((item) => normalizeQty(item.qty) > 0);
     writeCart(next);
   }
@@ -152,12 +168,13 @@
           const name = escapeHtml(item.name);
           const image = escapeHtml(item.image || "");
           const plantId = escapeHtml(item.plantId);
+          const key = escapeHtml(cartItemKey(item));
           const imageMarkup = image
             ? `<a class="cart-item-image" href="${url || "#"}"><img src="${image}" alt="" loading="lazy"></a>`
             : `<div class="cart-item-image cart-item-image-empty" aria-hidden="true"></div>`;
 
           return `
-            <article class="cart-item" data-cart-item="${plantId}">
+            <article class="cart-item" data-cart-item="${key}">
               ${imageMarkup}
               <div class="cart-item-main">
                 <strong>${url ? `<a href="${url}">${name}</a>` : name}</strong>
@@ -165,15 +182,15 @@
                 <small>${escapeHtml(item.container)}</small>
               </div>
               <div class="quantity-control" aria-label="Кількість">
-                <button type="button" data-cart-decrease="${plantId}" aria-label="Зменшити кількість">−</button>
-                <input type="number" min="1" max="9999" step="1" value="${itemQty}" data-cart-qty="${plantId}">
-                <button type="button" data-cart-increase="${plantId}" aria-label="Збільшити кількість">+</button>
+                <button type="button" data-cart-decrease="${key}" aria-label="Зменшити кількість">−</button>
+                <input type="number" min="1" max="9999" step="1" value="${itemQty}" data-cart-qty="${key}">
+                <button type="button" data-cart-increase="${key}" aria-label="Збільшити кількість">+</button>
               </div>
               <div class="cart-item-price">
                 <strong>${money(itemQty * Number(item.price || 0))}</strong>
                 <span>${escapeHtml(item.price)} UAH/${escapeHtml(item.unit)}</span>
               </div>
-              <button class="table-cart-button" type="button" data-cart-remove="${plantId}">Прибрати</button>
+              <button class="table-cart-button" type="button" data-cart-remove="${key}">Прибрати</button>
             </article>
           `;
         })
@@ -202,13 +219,13 @@
 
     const decreaseButton = target.closest("[data-cart-decrease]");
     if (decreaseButton instanceof HTMLElement) {
-      const plantId = decreaseButton.dataset.cartDecrease;
-      const item = readCart().find((cartItem) => cartItem.plantId === plantId);
+      const key = decreaseButton.dataset.cartDecrease;
+      const item = readCart().find((cartItem) => cartItemKey(cartItem) === key);
       if (item) {
         if (normalizeQty(item.qty) <= 1) {
-          writeCart(readCart().filter((cartItem) => cartItem.plantId !== plantId));
+          writeCart(readCart().filter((cartItem) => cartItemKey(cartItem) !== key));
         } else {
-          setQty(plantId, normalizeQty(item.qty) - 1);
+          setQty(key, normalizeQty(item.qty) - 1);
         }
         renderCartPage();
       }
@@ -217,10 +234,10 @@
 
     const increaseButton = target.closest("[data-cart-increase]");
     if (increaseButton instanceof HTMLElement) {
-      const plantId = increaseButton.dataset.cartIncrease;
-      const item = readCart().find((cartItem) => cartItem.plantId === plantId);
+      const key = increaseButton.dataset.cartIncrease;
+      const item = readCart().find((cartItem) => cartItemKey(cartItem) === key);
       if (item) {
-        setQty(plantId, normalizeQty(item.qty) + 1);
+        setQty(key, normalizeQty(item.qty) + 1);
         renderCartPage();
       }
       return;
@@ -228,8 +245,8 @@
 
     const removeButton = target.closest("[data-cart-remove]");
     if (removeButton instanceof HTMLElement) {
-      const plantId = removeButton.dataset.cartRemove;
-      writeCart(readCart().filter((item) => item.plantId !== plantId));
+      const key = removeButton.dataset.cartRemove;
+      writeCart(readCart().filter((item) => cartItemKey(item) !== key));
       renderCartPage();
       return;
     }

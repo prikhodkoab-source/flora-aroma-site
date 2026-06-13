@@ -1,6 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+export type ProductOption = {
+  variant_id: string;
+  container: string;
+  price_uah: number;
+  unit: string;
+  label: string;
+};
+
 export type Product = {
   plant_id: string;
   name_uk: string;
@@ -41,6 +49,8 @@ export type Product = {
   image_path: string;
   image_paths: string[];
   primary_image_path: string;
+  options: ProductOption[];
+  has_multiple_options: boolean;
   slug: string;
   category_slug: string;
 };
@@ -233,6 +243,43 @@ function labelsFrom(value: string, dictionary: Record<string, string>): string[]
   return splitList(value).map((item) => dictionary[item] ?? item);
 }
 
+function optionIdFrom(container: string, index: number): string {
+  const slug = slugify(container);
+  return slug || `option-${index + 1}`;
+}
+
+function productOptionsFrom(row: Record<string, string>): ProductOption[] {
+  const containers = splitList(row.variant_containers || "");
+  const prices = splitList(row.variant_prices_uah || "");
+  const units = splitList(row.variant_units || "");
+  const labels = splitList(row.variant_labels || "");
+
+  if (containers.length === 0) {
+    return [
+      {
+        variant_id: "default",
+        container: row.container,
+        price_uah: Number(row.price_uah),
+        unit: row.unit,
+        label: `${row.container} - ${row.price_uah} UAH/${row.unit}`
+      }
+    ];
+  }
+
+  return containers.map((container, index) => {
+    const price = Number(prices[index] || row.price_uah);
+    const unit = units[index] || row.unit;
+
+    return {
+      variant_id: optionIdFrom(container, index),
+      container,
+      price_uah: price,
+      unit,
+      label: labels[index] || `${container} - ${price} UAH/${unit}`
+    };
+  });
+}
+
 export function slugify(value: string): string {
   const transliterated = value
     .toLowerCase()
@@ -258,15 +305,17 @@ export function getProducts(): Product[] {
         .split(/[;|]/)
         .map((path) => path.trim())
         .filter(Boolean);
+      const options = productOptionsFrom(row);
+      const primaryOption = options[0];
 
       return {
         plant_id: row.plant_id,
         name_uk: row.name_uk,
         latin_name: row.latin_name,
         category: row.category,
-        container: row.container,
-        price_uah: Number(row.price_uah),
-        unit: row.unit,
+        container: primaryOption.container,
+        price_uah: primaryOption.price_uah,
+        unit: primaryOption.unit,
         availability_status: row.availability_status,
         summary: row.summary,
         ecology_text: row.ecology_text,
@@ -299,6 +348,8 @@ export function getProducts(): Product[] {
         image_path: row.image_path,
         image_paths: imagePaths,
         primary_image_path: imagePaths[0] ?? "",
+        options,
+        has_multiple_options: options.length > 1,
         slug: `${slugify(row.name_uk)}-${row.plant_id.toLowerCase()}`,
         category_slug: slugify(row.category)
       };
