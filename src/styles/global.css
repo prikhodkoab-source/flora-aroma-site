@@ -215,6 +215,27 @@ nav a {
   margin-top: 22px;
 }
 
+.hero-proof-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 760px;
+  margin-top: 22px;
+}
+
+.hero-proof-list span {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .eyebrow,
 .plant-id {
   color: var(--leaf);
@@ -320,6 +341,14 @@ nav a {
 
 .link-grid {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.selection-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.solution-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .link-grid a,

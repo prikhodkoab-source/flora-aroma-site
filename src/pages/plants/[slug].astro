@@ -41,11 +41,13 @@ const selectedOption = product.options[0];
             </div>
           </dl>
           <div class="attribute-strip" aria-label="Короткі характеристики">
-            <span>{product.category}</span>
-            <span>{product.container}</span>
-            <span>{product.sun_labels.join(" / ")}</span>
-            <span>{formatHeight(product)}</span>
+            <span>сонце: {product.sun_labels.join(" / ")}</span>
+            <span>вологість: {product.moisture_labels.join(" / ")}</span>
+            <span>висота: {formatHeight(product)}</span>
             <span>цвітіння: {formatFlowering(product)}</span>
+            <span>призначення: {product.use_case_labels.slice(0, 3).join(", ")}</span>
+            <span data-selected-format-chip>формат: {selectedOption.container}</span>
+            <span data-selected-price-chip>ціна: {selectedOption.price_uah} UAH/{selectedOption.unit}</span>
             {winterHardiness && <span>{winterHardiness}</span>}
           </div>
           {product.has_multiple_options && (
@@ -273,6 +275,8 @@ const selectedOption = product.options[0];
     const panel = picker.closest<HTMLElement>(".product-buy-panel");
     const container = panel?.querySelector<HTMLElement>("[data-selected-container]");
     const price = panel?.querySelector<HTMLElement>("[data-selected-price]");
+    const formatChip = panel?.querySelector<HTMLElement>("[data-selected-format-chip]");
+    const priceChip = panel?.querySelector<HTMLElement>("[data-selected-price-chip]");
     const addButton = panel?.querySelector<HTMLButtonElement>("[data-cart-add]");
 
     picker.querySelectorAll<HTMLInputElement>("[data-product-option]").forEach((input) => {
@@ -288,6 +292,8 @@ const selectedOption = product.options[0];
         addButton.dataset.optionId = input.dataset.optionId || "";
         if (container) container.textContent = nextContainer;
         if (price) price.textContent = `${nextPrice} UAH/${nextUnit}`;
+        if (formatChip) formatChip.textContent = `формат: ${nextContainer}`;
+        if (priceChip) priceChip.textContent = `ціна: ${nextPrice} UAH/${nextUnit}`;
       });
     });
   });

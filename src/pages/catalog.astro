@@ -117,9 +117,13 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
           <p><em>{product.latin_name}</em></p>
           <p class="summary">{product.summary}</p>
           <div class="card-chips" aria-label="Короткі характеристики">
-            <span>{product.sun_labels.join(" / ")}</span>
-            <span>{formatHeight(product)}</span>
-            <span>{formatFlowering(product)}</span>
+            <span>сонце: {product.sun_labels.join(" / ")}</span>
+            <span>вологість: {product.moisture_labels.join(" / ")}</span>
+            <span>висота: {formatHeight(product)}</span>
+            <span>цвітіння: {formatFlowering(product)}</span>
+            <span>призначення: {product.use_case_labels.slice(0, 2).join(", ")}</span>
+            <span>формат: {product.container}</span>
+            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
           </div>
           <dl>
             <div>

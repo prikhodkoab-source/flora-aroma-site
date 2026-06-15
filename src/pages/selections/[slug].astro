@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatFlowering, formatHeight, getProducts, getPublicAvailabilityLabel, getSelections } from "../../lib/products";
+import { formatFlowering, formatHeight, getProducts, getPublicAvailabilityLabel, getSelections, productMatchesSelection } from "../../lib/products";
 
 export function getStaticPaths() {
   return getSelections().map((selection) => ({
@@ -10,7 +10,7 @@ export function getStaticPaths() {
 }
 
 const { selection } = Astro.props;
-const products = getProducts().filter((product) => product.selection_tag_list.includes(selection.tag));
+const products = getProducts().filter((product) => productMatchesSelection(product, selection));
 const description = `${selection.title}: ${products.length} позицій Flora & Aroma. Ціни з публічного прайса, наявність підтверджує оператор.`;
 ---
 
@@ -31,9 +31,13 @@ const description = `${selection.title}: ${products.length} позицій Flora
           <p><em>{product.latin_name}</em></p>
           <p class="summary">{product.summary}</p>
           <div class="card-chips" aria-label="Короткі характеристики">
-            <span>{product.sun_labels.join(" / ")}</span>
-            <span>{formatHeight(product)}</span>
-            <span>{formatFlowering(product)}</span>
+            <span>сонце: {product.sun_labels.join(" / ")}</span>
+            <span>вологість: {product.moisture_labels.join(" / ")}</span>
+            <span>висота: {formatHeight(product)}</span>
+            <span>цвітіння: {formatFlowering(product)}</span>
+            <span>призначення: {product.use_case_labels.slice(0, 2).join(", ")}</span>
+            <span>формат: {product.container}</span>
+            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
           </div>
           <dl>
             <div>

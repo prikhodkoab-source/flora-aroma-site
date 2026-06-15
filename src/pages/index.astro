@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatHeight, getCategories, getProducts, getSelections } from "../lib/products";
+import { formatFlowering, formatHeight, getCategories, getProducts, getSelections } from "../lib/products";
 
 const products = getProducts();
 const featuredPlantIds = ["PLANT-0041", "PLANT-0082", "PLANT-0014", "PLANT-0048"];
@@ -9,20 +9,49 @@ const featured = featuredPlantIds
   .filter((product) => product !== undefined);
 const categories = getCategories();
 const selections = getSelections();
+const solutionLinks = [
+  {
+    title: "Ароматна грядка",
+    href: "/selections/aromatic-garden/",
+    text: "Шавлії, м'яти, чабер, майоран та інші ароматні культури для доріжок, кухонної грядки і камерного саду."
+  },
+  {
+    title: "Сухий квітник",
+    href: "/selections/drought-tolerant/",
+    text: "Рослини для сонячних місць із добрим дренажем, де потрібна витривалість і проста підтримка."
+  },
+  {
+    title: "Медоносна посадка",
+    href: "/selections/pollinator-plants/",
+    text: "Квітучі позиції для бджіл, джмелів і метеликів, які додають руху та сезонного цвітіння."
+  },
+  {
+    title: "Бордюр",
+    href: "/selections/border-plants/",
+    text: "Компактні й середньорослі культури для краю квітника, доріжок і структурних ліній."
+  }
+];
 ---
 
-<BaseLayout title="Flora & Aroma | Актуальний асортимент рослин">
+<BaseLayout title="Flora & Aroma | Саджанці у касетах і горщиках">
   <section class="hero hero-nursery">
     <div>
       <p class="eyebrow">Дім правильних рослин</p>
       <h1>FLORA & AROMA</h1>
       <p>
-        Саджанці, вирощені за сучасними технологіями.
-        Для саду, квітників, ароматичних посадок і ландшафтних рішень.
+        Ми вирощуємо саджанці для саду, квітників, ароматичних посадок і ландшафтних рішень.
+        У каталозі показані рослини в касетах Hiko та горщиках з публічною ціною; наявність,
+        кількість і можливість резерву підтверджує оператор у день відповіді.
       </p>
+      <div class="hero-proof-list" aria-label="Коротко про асортимент">
+        <span>власне вирощування</span>
+        <span>касети / горщики</span>
+        <span>закрита коренева система</span>
+        <span>заявка без автоматичного резерву</span>
+      </div>
       <div class="hero-actions">
         <a class="button" href="/catalog/">Дивитися каталог</a>
-        <a class="button button-secondary" href="/how-to-order/">Як замовити</a>
+        <a class="button button-secondary" href="/cart/">Скласти заявку</a>
       </div>
     </div>
   </section>
@@ -30,57 +59,98 @@ const selections = getSelections();
   <section class="section">
     <div class="trust-strip" aria-label="Переваги Flora & Aroma">
       <div>
-        <strong>Касети і горщики</strong>
-        <span>зручний формат для посадки та дорощування</span>
+        <strong>Вирощуємо самі</strong>
+        <span>Контролюємо партії, формат рослин і якість саджанців до передачі клієнту.</span>
       </div>
       <div>
-        <strong>40 позицій</strong>
-        <span>у поточному публічному асортименті</span>
+        <strong>Касети Hiko / горщики</strong>
+        <span>Публікуємо формат постачання біля кожної позиції, щоб замовлення було зрозумілим.</span>
       </div>
       <div>
-        <strong>Оператор підтверджує</strong>
-        <span>наявність, резерв і спосіб отримання</span>
+        <strong>Закрита коренева система</strong>
+        <span>Саджанці зручні для перевезення, дорощування та висадки без оголеного кореня.</span>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="section-heading">
-      <h2>Основні розділи</h2>
-      <p>Короткий шлях від перегляду асортименту до заявки оператору.</p>
-    </div>
-    <div class="link-grid">
-      <a href="/catalog/">
-        <span>Каталог</span>
-        <p>Усі рослини з фото, описами, форматом і ціною.</p>
-      </a>
-      <a href="/price/">
-        <span>Прайс</span>
-        <p>Таблиця для швидкого перегляду цін і форматів постачання.</p>
-      </a>
-      <a href="/how-to-order/">
-        <span>Як замовити</span>
-        <p>Порядок уточнення наявності, резерву, оплати й отримання.</p>
-      </a>
-      <a href="/contacts/">
-        <span>Контакти</span>
-        <p>Телефон і коротка форма повідомлення для заявки.</p>
-      </a>
+  <section class="section media-band">
+    <img src="/images/site/nursery-irrigation.jpg" alt="Виробництво саджанців Flora & Aroma" loading="lazy" />
+    <div>
+      <p class="eyebrow">Фото виробництва</p>
+      <h2>Рослини проходять шлях від касети до готової посадки</h2>
+      <p>
+        Вітрина показує асортимент для клієнта, але не відкриває внутрішній склад.
+        Перед підтвердженням заявки оператор перевіряє актуальну наявність, формат і кількість.
+      </p>
+      <a class="button button-secondary" href="/how-to-order/">Як працює заявка</a>
     </div>
   </section>
 
   <section class="section compact-section">
     <div class="section-heading">
       <h2>Підібрати рослини</h2>
-      <p>Швидкі добірки за умовами ділянки та призначенням.</p>
+      <p>Швидкі клієнтські підбірки за умовами ділянки та призначенням.</p>
     </div>
-    <div class="link-grid">
+    <div class="link-grid selection-grid">
       {selections.map((selection) => (
         <a href={`/selections/${selection.slug}/`}>
           <span>{selection.title}</span>
           <p>{selection.description} {selection.count} позицій.</p>
         </a>
       ))}
+    </div>
+  </section>
+
+  <section class="section compact-section">
+    <div class="section-heading">
+      <h2>Готові рішення</h2>
+      <p>Стартові сценарії для клієнта: не готовий проект, а зручний напрямок для підбору.</p>
+    </div>
+    <div class="link-grid solution-grid">
+      {solutionLinks.map((solution) => (
+        <a href={solution.href}>
+          <span>{solution.title}</span>
+          <p>{solution.text}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2>Основні розділи</h2>
+      <p>Короткий шлях від перегляду асортименту до чернетки заявки оператору.</p>
+    </div>
+    <div class="link-grid">
+      <a href="/catalog/">
+        <span>Каталог</span>
+        <p>Усі рослини з фото, описами, форматом, ціною та фільтрами підбору.</p>
+      </a>
+      <a href="/price/">
+        <span>Прайс</span>
+        <p>Таблиця для швидкого перегляду цін і форматів постачання.</p>
+      </a>
+      <a href="/cart/">
+        <span>Кошик-заявка</span>
+        <p>Чернетка звернення: кількість і резерв підтверджує оператор.</p>
+      </a>
+      <a href="/contacts/">
+        <span>Контакти</span>
+        <p>Телефон і короткий шлях для уточнення асортименту.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="section media-band media-band-reverse">
+    <img src="/images/site/nursery-greenhouse.jpg" alt="Касетне вирощування рослин у питомнику" loading="lazy" />
+    <div>
+      <p class="eyebrow">Комерційна витрина</p>
+      <h2>Ціна відкрита, точний склад не публікується</h2>
+      <p>
+        На сайті є публічний асортимент і ціна за одиницю. Це допомагає швидко зібрати заявку,
+        але не створює автоматичний заказ, резерв, оплату або списання складу.
+      </p>
+      <a class="button" href="/catalog/">Перейти до асортименту</a>
     </div>
   </section>
 
@@ -106,19 +176,13 @@ const selections = getSelections();
           <p>{product.latin_name}</p>
           <p class="summary">{product.summary}</p>
           <div class="card-chips" aria-label="Короткі характеристики">
-            <span>{product.sun_labels.join(" / ")}</span>
-            <span>{formatHeight(product)}</span>
+            <span>сонце: {product.sun_labels.join(" / ")}</span>
+            <span>вологість: {product.moisture_labels.join(" / ")}</span>
+            <span>висота: {formatHeight(product)}</span>
+            <span>цвітіння: {formatFlowering(product)}</span>
+            <span>формат: {product.container}</span>
+            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
           </div>
-          <dl>
-            <div>
-              <dt>Формат</dt>
-              <dd>{product.container}</dd>
-            </div>
-            <div>
-              <dt>Ціна</dt>
-              <dd>{product.price_uah} UAH/{product.unit}</dd>
-            </div>
-          </dl>
         </a>
       ))}
     </div>

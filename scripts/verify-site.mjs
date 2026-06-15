@@ -219,9 +219,18 @@ if (publicHtml.includes('src="/images/plants/') && publicHtml.includes("; /image
 
 for (const requiredPhrase of [
   "Дім правильних рослин",
-  "Саджанці, вирощені за сучасними технологіями",
+  "Ми вирощуємо саджанці",
+  "касетах Hiko та горщиках",
+  "Скласти заявку",
+  "Вирощуємо самі",
+  "Закрита коренева система",
+  "Фото виробництва",
   "Підібрати рослини",
-  "Посухостійкі рослини",
+  "Рослини для сонця",
+  "Готові рішення",
+  "Ароматна грядка",
+  "Сухий квітник",
+  "Медоносна посадка",
   "Кошик",
   "Чернетка заявки",
   "Уточнити наявність",
@@ -258,6 +267,7 @@ for (const requiredVariantMarker of ["data-product-options", "data-product-optio
 }
 
 for (const requiredPage of [
+  "selections/sunny-site/index.html",
   "selections/drought-tolerant/index.html",
   "selections/aromatic-garden/index.html",
   "selections/pollinator-plants/index.html",

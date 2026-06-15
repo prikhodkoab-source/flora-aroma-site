@@ -199,32 +199,44 @@ const flowerColorLabels: Record<string, string> = {
 
 export const selectionDefinitions = [
   {
+    slug: "sunny-site",
+    tag: "sunny_site",
+    match: "sun:full_sun",
+    title: "Рослини для сонця",
+    description: "Культури для відкритих сонячних місць: квітники, бордюри, ароматичні посадки та сухіші ділянки з добрим дренажем."
+  },
+  {
     slug: "drought-tolerant",
     tag: "drought_tolerant",
+    match: "tag:drought_tolerant",
     title: "Посухостійкі рослини",
     description: "Рослини для сонячних, добре дренованих місць, де важлива витривалість до коротких сухих періодів."
   },
   {
     slug: "aromatic-garden",
     tag: "aromatic_garden",
+    match: "tag:aromatic_garden",
     title: "Ароматичний сад",
     description: "Пряні, ефіроолійні та ароматні культури для доріжок, бордюрів і камерних посадок."
   },
   {
     slug: "pollinator-plants",
     tag: "pollinator_plants",
+    match: "tag:pollinator_plants",
     title: "Рослини для запилювачів",
     description: "Культури з помітним цвітінням, які доречні у квітниках для бджіл, джмелів і метеликів."
   },
   {
     slug: "border-plants",
     tag: "border_plants",
+    match: "tag:border_plants",
     title: "Рослини для бордюрів",
     description: "Компактні та середньорослі рослини для краю квітника, доріжок і структурних посадок."
   },
   {
     slug: "low-maintenance",
     tag: "low_maintenance",
+    match: "tag:low_maintenance",
     title: "Невибагливі рослини",
     description: "Позиції, які за належного місця посадки підходять для простого догляду і стабільних композицій."
   }
@@ -378,8 +390,20 @@ export function getSelections(): (SelectionDefinition & { count: number })[] {
 
   return selectionDefinitions.map((selection) => ({
     ...selection,
-    count: products.filter((product) => product.selection_tag_list.includes(selection.tag)).length
+    count: products.filter((product) => productMatchesSelection(product, selection)).length
   }));
+}
+
+export function productMatchesSelection(product: Product, selection: SelectionDefinition): boolean {
+  if (selection.match.startsWith("sun:")) {
+    return splitList(product.sun_exposure).includes(selection.match.replace("sun:", ""));
+  }
+
+  if (selection.match.startsWith("tag:")) {
+    return product.selection_tag_list.includes(selection.match.replace("tag:", ""));
+  }
+
+  return product.selection_tag_list.includes(selection.tag);
 }
 
 export function formatHeight(product: Product): string {
