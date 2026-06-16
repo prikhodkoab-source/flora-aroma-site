@@ -14,7 +14,7 @@ const publicLocalDir = join(publicPlantDir, "local");
 
 const localGalleryPlan = [
   ["PLANT-0084", "Агастахе фенхельне", ["Агастахе фенхельне-1.jpg", "Агастахе фенхельне V-120.jpg"]],
-  ["PLANT-0058", "Аквілегія низька 'Columbine Dwarf Mixed'", ["Аквілегія-1.jpg", "Аквілегія-2_.jpg", "Аквілегія-3.jpg", "Аквілегія Р-11.jpg"]],
+  ["PLANT-0058", "Аквілегія низька 'Columbine Dwarf Mixed'", ["Аквілегія-1.jpg", "Аквілегія-2_.jpg", "Аквілегія-3.jpg"]],
   ["PLANT-0064", "Волошка синя 'Низька махрова суміш'", ["Волошка синя.jpg", "Волошка 1.jpg", "Волошка синя V-120.jpg"]],
   ["PLANT-0027", "Левиний зів", ["Левиний зів -1.jpg", "Левиний зів V-120.jpg"]],
   ["PLANT-0014", "Котівник котячий", ["Котівник котячий.jpg", "Котівник котячий-2.jpg"]],
@@ -32,6 +32,48 @@ const thymusCommons = {
   pageTitle: "File:Thymus vulgaris 002.JPG",
   sourcePage: "https://commons.wikimedia.org/wiki/File:Thymus_vulgaris_002.JPG"
 };
+
+const galleryOverrides = new Map([
+  [
+    "PLANT-0049",
+    [
+      "/images/plants/local/plant-0049-local-01.jpg",
+      "/images/plants/local/plant-0049-local-02.jpg",
+      "/images/plants/local/plant-0049-local-03.jpg",
+      "/images/plants/plant-0049.jpg"
+    ]
+  ],
+  [
+    "PLANT-0002",
+    [
+      "/images/plants/local/plant-0002-local-03.jpg",
+      "/images/plants/local/plant-0002-local-01.jpg",
+      "/images/plants/plant-0002.jpg"
+    ]
+  ],
+  [
+    "PLANT-0052",
+    [
+      "/images/plants/local/plant-0052-local-01.jpg",
+      "/images/plants/local/plant-0052-local-02.jpg",
+      "/images/plants/local/plant-0052-local-03.jpg",
+      "/images/plants/plant-0052-commons.jpg"
+    ]
+  ],
+  [
+    "PLANT-0058",
+    [
+      "/images/plants/local/plant-0058-local-gallery-01.jpg",
+      "/images/plants/local/plant-0058-local-gallery-02.jpg",
+      "/images/plants/local/plant-0058-local-gallery-03.jpg",
+      "/images/plants/plant-0058.jpg"
+    ]
+  ]
+]);
+
+const blockedGalleryPaths = new Map([
+  ["PLANT-0058", new Set(["/images/plants/local/plant-0058-local-gallery-04.jpg"])]
+]);
 
 function parseCsv(text) {
   const rows = [];
@@ -111,6 +153,53 @@ function uniquePaths(paths) {
     seen.add(key);
     return true;
   });
+}
+
+function applyGalleryOverrides() {
+  for (const [plantId, preferredPaths] of galleryOverrides) {
+    const product = productById.get(plantId);
+    if (!product) {
+      continue;
+    }
+    const blocked = blockedGalleryPaths.get(plantId) ?? new Set();
+    const existingPaths = (product.image_path || "")
+      .split(/[;|]/)
+      .map((path) => path.trim())
+      .filter(Boolean)
+      .filter((path) => !blocked.has(path));
+
+    product.image_path = uniquePaths([
+      ...preferredPaths.filter((path) => existingPaths.includes(path)),
+      ...existingPaths
+    ]).join("; ");
+  }
+}
+
+function addSourceStatus(plantId, imagePath, status, note) {
+  const key = `${plantId}|${imagePath}`;
+  if (sourceKeys.has(key)) {
+    const existing = imageSources.find((row) => row.plant_id === plantId && row.image_path === imagePath);
+    if (existing) {
+      existing.reviewed_status = status;
+      existing.title = existing.title || note;
+    }
+    return;
+  }
+
+  imageSources.push({
+    plant_id: plantId,
+    image_path: imagePath,
+    source: "Flora storefront legacy image",
+    source_page: "",
+    source_file_url: "",
+    downloaded_file_url: "",
+    title: note,
+    author: "Flora & Aroma local file",
+    license: "local_review_needed",
+    license_url: "",
+    reviewed_status: status
+  });
+  sourceKeys.add(key);
 }
 
 function localTargetName(plantId, sourceName, index) {
@@ -259,6 +348,11 @@ for (const [plantId, title, fileNames] of localGalleryPlan) {
     .sort((a, b) => (sourceRankByPath.get(a) ?? containerPhotoRank(a)) - (sourceRankByPath.get(b) ?? containerPhotoRank(b)))
     .join("; ");
 }
+
+applyGalleryOverrides();
+addSourceStatus("PLANT-0049", "/images/plants/plant-0049.jpg", "container_photo_not_primary", "Sinyukha cassette plug photo kept as non-primary gallery image");
+addSourceStatus("PLANT-0002", "/images/plants/plant-0002.jpg", "container_photo_not_primary", "Immortelle pot photo kept as non-primary gallery image");
+addSourceStatus("PLANT-0058", "/images/plants/local/plant-0058-local-gallery-04.jpg", "duplicate_hidden_from_product_gallery", "Duplicate aquilegia pot photo removed from public product gallery");
 
 if (!productById.has("PLANT-0090")) {
   const summary =
