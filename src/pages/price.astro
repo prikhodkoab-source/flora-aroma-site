@@ -3,6 +3,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { getProducts } from "../lib/products";
 
 const products = getProducts();
+const priceRows = products.flatMap((product) =>
+  product.options.map((option) => ({
+    product,
+    option
+  }))
+);
 const generatedAt = new Intl.DateTimeFormat("uk-UA", {
   day: "2-digit",
   month: "2-digit",
@@ -36,13 +42,13 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
         </tr>
       </thead>
       <tbody>
-        {products.map((product) => (
+        {priceRows.map(({ product, option }) => (
           <tr>
             <td>{product.plant_id}</td>
             <td><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></td>
             <td><em>{product.latin_name}</em></td>
-            <td>{product.container}</td>
-            <td>{product.price_uah} UAH/{product.unit}</td>
+            <td>{option.container}</td>
+            <td>{option.price_uah} UAH/{option.unit}</td>
             <td>
               <button
                 class="table-cart-button"
@@ -51,10 +57,10 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
                 data-plant-id={product.plant_id}
                 data-name={product.name_uk}
                 data-latin={product.latin_name}
-                data-container={product.container}
-                data-price={product.price_uah}
-                data-unit={product.unit}
-                data-option-id={product.options[0].variant_id}
+                data-container={option.container}
+                data-price={option.price_uah}
+                data-unit={option.unit}
+                data-option-id={option.variant_id}
                 data-url={`/plants/${product.slug}/`}
                 data-image={product.primary_image_path}
               >

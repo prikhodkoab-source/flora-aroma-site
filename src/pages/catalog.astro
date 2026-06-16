@@ -4,8 +4,25 @@ import { formatFlowering, formatHeight, getCategories, getProducts, getPublicAva
 
 const products = getProducts();
 const categories = getCategories();
-const containers = Array.from(new Set(products.map((product) => product.container))).sort((a, b) => a.localeCompare(b, "uk"));
-const maxPrice = Math.max(...products.map((product) => product.price_uah));
+const containers = Array.from(new Set(products.flatMap((product) => product.options.map((option) => option.container)))).sort((a, b) => a.localeCompare(b, "uk"));
+const maxPrice = Math.max(...products.flatMap((product) => product.options.map((option) => option.price_uah)));
+
+function optionContainers(product) {
+  return product.options.map((option) => option.container).join("; ");
+}
+
+function optionPriceLabel(product) {
+  if (product.options.length === 1) {
+    const option = product.options[0];
+    return `${option.price_uah} UAH/${option.unit}`;
+  }
+
+  return product.options.map((option) => option.label).join("; ");
+}
+
+function minOptionPrice(product) {
+  return Math.min(...product.options.map((option) => option.price_uah));
+}
 ---
 
 <BaseLayout title="Каталог рослин | Flora & Aroma">
@@ -106,8 +123,8 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
           data-moisture={product.moisture}
           data-flowering={product.flowering_months}
           data-use={product.use_cases}
-          data-container={product.container}
-          data-price={product.price_uah}
+          data-container={optionContainers(product)}
+          data-price={minOptionPrice(product)}
         >
           <a class="product-card-link" href={`/plants/${product.slug}/`}>
             {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
@@ -122,17 +139,17 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
             <span>висота: {formatHeight(product)}</span>
             <span>цвітіння: {formatFlowering(product)}</span>
             <span>призначення: {product.use_case_labels.slice(0, 2).join(", ")}</span>
-            <span>формат: {product.container}</span>
-            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
+            <span>формат: {optionContainers(product)}</span>
+            <span>ціна: {optionPriceLabel(product)}</span>
           </div>
           <dl>
             <div>
               <dt>Формат</dt>
-              <dd>{product.container}</dd>
+              <dd>{optionContainers(product)}</dd>
             </div>
             <div>
               <dt>Ціна</dt>
-              <dd>{product.price_uah} UAH/{product.unit}</dd>
+              <dd>{optionPriceLabel(product)}</dd>
             </div>
             <div>
               <dt>Наявність</dt>
@@ -190,7 +207,7 @@ const maxPrice = Math.max(...products.map((product) => product.price_uah));
         hasToken(card.dataset.moisture, moisture) &&
         hasToken(card.dataset.flowering, flowering) &&
         hasToken(card.dataset.use, use) &&
-        (!container || card.dataset.container === container) &&
+        hasToken(card.dataset.container, container) &&
         (!price || Number(card.dataset.price || 0) <= price);
 
       card.hidden = !matches;

@@ -7,6 +7,46 @@ const productsCsv = readFileSync(join(root, "data", "products.csv"), "utf8");
 const rows = productsCsv.trim().split(/\r?\n/);
 let failed = false;
 
+function parseCsvRows(text) {
+  const parsedRows = [];
+  let row = [];
+  let current = "";
+  let quoted = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+    if (char === '"' && quoted && next === '"') {
+      current += '"';
+      i += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      row.push(current);
+      current = "";
+    } else if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") {
+        i += 1;
+      }
+      row.push(current);
+      if (row.some((value) => value.length > 0)) {
+        parsedRows.push(row);
+      }
+      row = [];
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  row.push(current);
+  if (row.some((value) => value.length > 0)) {
+    parsedRows.push(row);
+  }
+
+  return parsedRows;
+}
+
 function parseCsvLine(line) {
   const values = [];
   let current = "";
@@ -41,6 +81,9 @@ function fail(message) {
 }
 
 const headers = parseCsvLine(rows[0]).map((header) => header.replace(/^\uFEFF/, ""));
+const parsedRows = parseCsvRows(productsCsv.trim());
+const parsedHeaders = parsedRows[0].map((header) => header.replace(/^\uFEFF/, ""));
+const productRows = parsedRows.slice(1);
 
 if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
@@ -68,8 +111,8 @@ for (const requiredAsset of [
   }
 }
 
-if (rows.length !== 41) {
-  fail(`Expected 40 product rows, found ${rows.length - 1}.`);
+if (productRows.length !== 41) {
+  fail(`Expected 41 product rows, found ${productRows.length}.`);
 }
 
 const requiredColumns = [
@@ -107,9 +150,49 @@ for (const required of requiredColumns) {
   }
 }
 
+for (const required of ["variant_containers", "variant_prices_uah", "variant_units", "variant_labels", "price_rule"]) {
+  if (!headers.includes(required)) {
+    fail(`Missing products.csv variant column: ${required}`);
+  }
+}
+
+const columnIndex = (name) => parsedHeaders.indexOf(name);
+const variantContainersIndex = columnIndex("variant_containers");
+const variantPricesIndex = columnIndex("variant_prices_uah");
+const variantLabelsIndex = columnIndex("variant_labels");
+const priceRuleIndex = columnIndex("price_rule");
+
+let potOptionCount = 0;
+for (const row of productRows) {
+  const containers = (row[variantContainersIndex] || "").split(";").filter(Boolean);
+  const prices = (row[variantPricesIndex] || "").split(";").filter(Boolean).map(Number);
+  const labels = row[variantLabelsIndex] || "";
+  const hasPot = containers.some((container) => container.startsWith("Горщик"));
+
+  if (containers.length !== prices.length) {
+    fail(`Variant container/price mismatch for row: ${row[columnIndex("plant_id")]}`);
+  }
+
+  if (hasPot && row[priceRuleIndex] !== "pot_plus_20_uah_from_cassette_base") {
+    fail(`Expected pot price rule marker for ${row[columnIndex("plant_id")]}`);
+  }
+
+  potOptionCount += containers.filter((container) => container.startsWith("Горщик")).length;
+
+  for (let index = 0; index < containers.length; index += 1) {
+    if (!labels.includes(`${containers[index]} — ${prices[index]} UAH/шт.`)) {
+      fail(`Variant label missing exact price for ${row[columnIndex("plant_id")]}: ${containers[index]}`);
+    }
+  }
+}
+
+if (potOptionCount !== 20) {
+  fail(`Expected 20 pot price options, found ${potOptionCount}.`);
+}
+
 for (const required of ["ecology_text", "agrotechnics_text", "use_text", "full_description", "source_names", "source_urls"]) {
   const index = headers.indexOf(required);
-  const missing = rows.slice(1).filter((row) => !parseCsvLine(row)[index]?.trim());
+  const missing = productRows.filter((row) => !row[index]?.trim());
   if (missing.length > 0) {
     fail(`Expected every product to have ${required}, missing ${missing.length}.`);
   }
@@ -128,7 +211,7 @@ for (const required of [
   "selection_tags"
 ]) {
   const index = headers.indexOf(required);
-  const missing = rows.slice(1).filter((row) => !parseCsvLine(row)[index]?.trim());
+  const missing = productRows.filter((row) => !row[index]?.trim());
   if (missing.length > 0) {
     fail(`Expected every product to have D2 field ${required}, missing ${missing.length}.`);
   }
@@ -137,7 +220,7 @@ for (const required of [
 const numericD2Fields = ["height_cm_min", "height_cm_max"];
 for (const required of numericD2Fields) {
   const index = headers.indexOf(required);
-  const invalid = rows.slice(1).filter((row) => Number.isNaN(Number(parseCsvLine(row)[index])));
+  const invalid = productRows.filter((row) => Number.isNaN(Number(row[index])));
   if (invalid.length > 0) {
     fail(`Expected numeric D2 field ${required}, invalid ${invalid.length}.`);
   }
@@ -147,14 +230,30 @@ const imagePathIndex = headers.indexOf("image_path");
 if (imagePathIndex === -1) {
   fail("Missing products.csv column: image_path");
 } else {
-  const missingImages = rows.slice(1).filter((row) => !parseCsvLine(row)[imagePathIndex]);
+  const imageSourcePath = join(root, "data", "plant-image-sources.csv");
+  const containerPrimaryBlocked = new Set();
+  if (existsSync(imageSourcePath)) {
+    const imageSourceRows = readFileSync(imageSourcePath, "utf8").trim().split(/\r?\n/);
+    const sourceHeaders = parseCsvLine(imageSourceRows[0]).map((header) => header.replace(/^\uFEFF/, ""));
+    const sourcePlantIdIndex = sourceHeaders.indexOf("plant_id");
+    const sourceImagePathIndex = sourceHeaders.indexOf("image_path");
+    const sourceStatusIndex = sourceHeaders.indexOf("reviewed_status");
+
+    for (const row of imageSourceRows.slice(1)) {
+      const values = parseCsvLine(row);
+      if (values[sourceStatusIndex] === "container_photo_not_primary") {
+        containerPrimaryBlocked.add(`${values[sourcePlantIdIndex]}|${values[sourceImagePathIndex]}`);
+      }
+    }
+  }
+
+  const missingImages = productRows.filter((row) => !row[imagePathIndex]);
   if (missingImages.length > 0) {
     fail(`Expected every product to have image_path, missing ${missingImages.length}.`);
   }
 
   const productIdIndex = headers.indexOf("plant_id");
-  for (const row of rows.slice(1)) {
-    const values = parseCsvLine(row);
+  for (const values of productRows) {
     const plantId = values[productIdIndex];
     const imagePaths = values[imagePathIndex]
       .split(/[;|]/)
@@ -171,6 +270,25 @@ if (imagePathIndex === -1) {
         fail(`Missing public image file for ${plantId}: ${imagePath}`);
       }
     }
+
+    if (imagePaths.length > 0 && containerPrimaryBlocked.has(`${plantId}|${imagePaths[0]}`)) {
+      fail(`Container/pot photo must not be primary for ${plantId}: ${imagePaths[0]}`);
+    }
+  }
+}
+
+const plantIdIndex = parsedHeaders.indexOf("plant_id");
+const nameUkIndex = parsedHeaders.indexOf("name_uk");
+const latinNameIndex = parsedHeaders.indexOf("latin_name");
+const thymusVulgarisRow = productRows.find((values) => values[plantIdIndex] === "PLANT-0090");
+if (!thymusVulgarisRow) {
+  fail("Expected PLANT-0090 Thymus vulgaris product row.");
+} else {
+  if (thymusVulgarisRow[nameUkIndex] !== "Чебрець звичайний") {
+    fail("Expected PLANT-0090 Ukrainian name: Чебрець звичайний.");
+  }
+  if (thymusVulgarisRow[latinNameIndex] !== "Thymus vulgaris") {
+    fail("Expected PLANT-0090 Latin name: Thymus vulgaris.");
   }
 }
 
@@ -280,5 +398,5 @@ for (const requiredPage of [
 }
 
 if (!failed) {
-  console.log("Site verification passed: MVP pages, 40 products, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
+  console.log("Site verification passed: MVP pages, 41 products, 20 pot price options, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
 }
