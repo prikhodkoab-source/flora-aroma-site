@@ -316,6 +316,7 @@ for (const forbidden of [
   "quantity_snapshot",
   "точний склад Flora",
   "Кількість у Tilda",
+  "USDA ",
   "Джерела картки",
   "Джерела зображень",
   "Розширений опис",
@@ -324,6 +325,15 @@ for (const forbidden of [
 ]) {
   if (publicHtml.includes(forbidden)) {
     fail(`Forbidden public phrase found: ${forbidden}`);
+  }
+}
+
+for (const requiredWinterPhrase of [
+  "Зимостійка в умовах Києва",
+  "Не зимостійка у відкритому ґрунті в умовах Києва"
+]) {
+  if (!publicHtml.includes(requiredWinterPhrase)) {
+    fail(`Expected Kyiv winter hardiness wording: ${requiredWinterPhrase}`);
   }
 }
 

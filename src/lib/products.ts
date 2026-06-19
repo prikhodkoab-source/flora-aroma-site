@@ -36,6 +36,7 @@ export type Product = {
   flower_color: string;
   flower_color_labels: string[];
   winter_hardiness: string;
+  winter_hardiness_short: string;
   use_cases: string;
   spacing_cm: string;
   selection_tags: string;
@@ -255,6 +256,68 @@ function labelsFrom(value: string, dictionary: Record<string, string>): string[]
   return splitList(value).map((item) => dictionary[item] ?? item);
 }
 
+function getKyivWinterHardiness(value: string): { short: string; full: string } {
+  const normalized = value.trim().toLowerCase();
+
+  if (!normalized) {
+    return {
+      short: "Потребує уточнення",
+      full: "Зимостійкість в умовах Києва потребує уточнення."
+    };
+  }
+
+  if (normalized.includes("annual") || normalized.includes("tender")) {
+    return {
+      short: "Ні · не зимує",
+      full: "Не зимостійка у відкритому ґрунті в умовах Києва. Рівень: недостатній; вирощується як однорічна або потребує зимівлі в захищеному приміщенні."
+    };
+  }
+
+  const zoneMatch = normalized.match(/(?:usda\s*)?(\d+)/);
+  const minimumZone = zoneMatch ? Number(zoneMatch[1]) : Number.NaN;
+
+  if (!Number.isFinite(minimumZone)) {
+    return {
+      short: "Потребує уточнення",
+      full: "Зимостійкість в умовах Києва потребує уточнення."
+    };
+  }
+
+  if (minimumZone <= 4) {
+    return {
+      short: "Так · високий рівень",
+      full: "Зимостійка в умовах Києва. Рівень: високий; доросла рослина зазвичай зимує у відкритому ґрунті без спеціального укриття."
+    };
+  }
+
+  if (minimumZone <= 5) {
+    return {
+      short: "Так · достатній рівень",
+      full: "Зимостійка в умовах Києва. Рівень: достатній; бажані добре дреноване місце та легке укриття молодих рослин у першу зиму."
+    };
+  }
+
+  if (minimumZone <= 7) {
+    return {
+      short: "Ні · низький рівень",
+      full: "Не має надійної зимостійкості у відкритому ґрунті в умовах Києва. Рівень: низький; потрібні тепле захищене місце, сухий дренований ґрунт і зимове укриття."
+    };
+  }
+
+  return {
+    short: "Ні · не зимує",
+    full: "Не зимостійка у відкритому ґрунті в умовах Києва. Рівень: недостатній; рослину потрібно переносити на захищену зимівлю."
+  };
+}
+
+function replaceTechnicalWinterHardiness(text: string, publicText: string): string {
+  if (!text) {
+    return text;
+  }
+
+  return text.replace(/Зимостійкість:\s*[^.]+\.?/giu, publicText);
+}
+
 function optionIdFrom(container: string, index: number): string {
   const slug = slugify(container);
   return slug || `option-${index + 1}`;
@@ -319,6 +382,7 @@ export function getProducts(): Product[] {
         .filter(Boolean);
       const options = productOptionsFrom(row);
       const primaryOption = options[0];
+      const kyivWinterHardiness = getKyivWinterHardiness(row.winter_hardiness);
 
       return {
         plant_id: row.plant_id,
@@ -329,11 +393,11 @@ export function getProducts(): Product[] {
         price_uah: primaryOption.price_uah,
         unit: primaryOption.unit,
         availability_status: row.availability_status,
-        summary: row.summary,
-        ecology_text: row.ecology_text,
-        agrotechnics_text: row.agrotechnics_text,
-        use_text: row.use_text,
-        full_description: row.full_description,
+        summary: replaceTechnicalWinterHardiness(row.summary, kyivWinterHardiness.full),
+        ecology_text: replaceTechnicalWinterHardiness(row.ecology_text, kyivWinterHardiness.full),
+        agrotechnics_text: replaceTechnicalWinterHardiness(row.agrotechnics_text, kyivWinterHardiness.full),
+        use_text: replaceTechnicalWinterHardiness(row.use_text, kyivWinterHardiness.full),
+        full_description: replaceTechnicalWinterHardiness(row.full_description, kyivWinterHardiness.full),
         content_status: row.content_status,
         source_names: row.source_names,
         source_urls: row.source_urls,
@@ -346,7 +410,8 @@ export function getProducts(): Product[] {
         flowering_months: row.flowering_months,
         flower_color: row.flower_color,
         flower_color_labels: labelsFrom(row.flower_color, flowerColorLabels),
-        winter_hardiness: row.winter_hardiness,
+        winter_hardiness: kyivWinterHardiness.full,
+        winter_hardiness_short: kyivWinterHardiness.short,
         use_cases: row.use_cases,
         spacing_cm: row.spacing_cm,
         selection_tags: row.selection_tags,
@@ -356,7 +421,7 @@ export function getProducts(): Product[] {
         use_case_labels: labelsFrom(row.use_cases, useCaseLabels),
         selection_tag_list: splitList(row.selection_tags),
         seo_title: row.seo_title,
-        seo_description: row.seo_description,
+        seo_description: replaceTechnicalWinterHardiness(row.seo_description, kyivWinterHardiness.full),
         image_path: row.image_path,
         image_paths: imagePaths,
         primary_image_path: imagePaths[0] ?? "",

@@ -12,7 +12,7 @@ export function getStaticPaths() {
 const { product } = Astro.props;
 const description = product.seo_description;
 const imagePaths = product.image_paths;
-const winterHardiness = product.summary.match(/USDA\s+[^.]+/)?.[0];
+const winterHardiness = product.winter_hardiness_short;
 const selectedOption = product.options[0];
 ---
 
