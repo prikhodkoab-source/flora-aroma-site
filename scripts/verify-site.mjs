@@ -414,12 +414,26 @@ if (!existsSync(siteOrderFunctionPath)) {
     "TELEGRAM_TOKEN",
     "TELEGRAM_CHAT_ID",
     "TELEGRAM_ALLOWED_USER_IDS",
+    "SITE_REQUESTS_DB",
     "status: \"draft\"",
+    "stored: true",
     "заявка без резерву",
     "onRequestPost"
   ]) {
     if (!siteOrderFunction.includes(marker)) {
       fail(`Expected site order function marker: ${marker}`);
+    }
+  }
+}
+
+const siteOrdersExportPath = join(root, "functions", "api", "site-orders.js");
+if (!existsSync(siteOrdersExportPath)) {
+  fail("Missing protected site-order export: functions/api/site-orders.js");
+} else {
+  const exportSource = readFileSync(siteOrdersExportPath, "utf8");
+  for (const marker of ["W2_SYNC_TOKEN", "SITE_REQUESTS_DB", "sync_status", "Authorization"]) {
+    if (!exportSource.includes(marker)) {
+      fail(`Expected site-order export marker: ${marker}`);
     }
   }
 }

@@ -47,10 +47,14 @@ function validatePayload(payload) {
   const delivery = cleanText(payload.customer?.delivery, 80) || "Не вказано";
   const address = cleanText(payload.customer?.address, 180);
   const comment = cleanText(payload.comment, 500);
+  const submissionId = cleanText(payload.submissionId, 64);
   const rawItems = Array.isArray(payload.items) ? payload.items : [];
 
   if (!name) return { error: "Вкажіть ім'я." };
   if (!contact) return { error: "Вкажіть телефон або Telegram/Viber." };
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) {
+    return { error: "Некоректний ідентифікатор заявки." };
+  }
   if (rawItems.length < 1) return { error: "Кошик порожній." };
   if (rawItems.length > MAX_ITEMS) return { error: "У заявці забагато позицій." };
 
@@ -86,7 +90,7 @@ function validatePayload(payload) {
     });
   }
 
-  return { value: { name, contact, delivery, address, comment, items } };
+  return { value: { submissionId, name, contact, delivery, address, comment, items } };
 }
 
 function buildTelegramMessage(requestId, order) {
@@ -140,35 +144,100 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: validation.error }, 400);
   }
 
-  const token = cleanText(context.env.TELEGRAM_TOKEN, 256);
-  const chatId = firstChatId(context.env);
-  if (!token || !chatId) {
-    console.error("Telegram site-order bindings are not configured.");
-    return json({ ok: false, error: "Канал заявок тимчасово не налаштований. Зателефонуйте оператору." }, 503);
+  if (!context.env.SITE_REQUESTS_DB) {
+    console.error("SITE_REQUESTS_DB binding is not configured.");
+    return json({ ok: false, error: "Сховище заявок тимчасово не налаштоване." }, 503);
+  }
+
+  const existing = await context.env.SITE_REQUESTS_DB.prepare(
+    "SELECT request_id, telegram_status FROM site_orders WHERE submission_id = ?"
+  )
+    .bind(validation.value.submissionId)
+    .first();
+  if (existing) {
+    return json({
+      ok: true,
+      requestId: existing.request_id,
+      status: "draft",
+      stored: true,
+      duplicate: true,
+      message: "Заявку вже збережено. Очікуйте підтвердження оператора."
+    });
   }
 
   const requestId = makeRequestId();
-  const message = buildTelegramMessage(requestId, validation.value);
-  const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message,
-      disable_web_page_preview: true
-    })
-  });
+  const receivedAt = new Date().toISOString();
+  const statements = [
+    context.env.SITE_REQUESTS_DB.prepare(
+      `INSERT INTO site_orders (
+         request_id, submission_id, received_at, customer_name, customer_contact,
+         delivery_method, delivery_address, customer_comment
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      requestId,
+      validation.value.submissionId,
+      receivedAt,
+      validation.value.name,
+      validation.value.contact,
+      validation.value.delivery,
+      validation.value.address,
+      validation.value.comment
+    ),
+    ...validation.value.items.map((item, index) =>
+      context.env.SITE_REQUESTS_DB.prepare(
+        `INSERT INTO site_order_items (
+           request_id, line_no, plant_id, product_name, container, unit, qty, unit_price
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+        requestId,
+        index + 1,
+        item.plantId,
+        item.name,
+        item.container,
+        item.unit,
+        item.qty,
+        item.price
+      )
+    )
+  ];
+  await context.env.SITE_REQUESTS_DB.batch(statements);
 
-  if (!telegramResponse.ok) {
-    console.error("Telegram sendMessage failed.", telegramResponse.status);
-    return json({ ok: false, error: "Не вдалося передати заявку оператору. Спробуйте ще раз або зателефонуйте." }, 502);
+  const token = cleanText(context.env.TELEGRAM_TOKEN, 256);
+  const chatId = firstChatId(context.env);
+  const message = buildTelegramMessage(requestId, validation.value);
+  let telegramStatus = "not_configured";
+  let telegramError = "";
+  if (token && chatId) {
+    const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        disable_web_page_preview: true
+      })
+    });
+    telegramStatus = telegramResponse.ok ? "sent" : "failed";
+    telegramError = telegramResponse.ok ? "" : `HTTP ${telegramResponse.status}`;
+  } else {
+    telegramError = "Telegram bindings are not configured.";
   }
+  await context.env.SITE_REQUESTS_DB.prepare(
+    "UPDATE site_orders SET telegram_status = ?, telegram_error = ? WHERE request_id = ?"
+  )
+    .bind(telegramStatus, telegramError, requestId)
+    .run();
 
   return json({
     ok: true,
     requestId,
     status: "draft",
-    message: "Заявку передано оператору. Очікуйте підтвердження наявності та резерву."
+    stored: true,
+    telegramStatus,
+    message:
+      telegramStatus === "sent"
+        ? "Заявку збережено та передано оператору. Очікуйте підтвердження."
+        : "Заявку збережено. Оператор опрацює її після синхронізації."
   });
 }
 

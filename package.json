@@ -11,12 +11,15 @@
     "build": "node scripts/build-site-order-catalog.mjs && astro build",
     "preview": "astro preview",
     "verify": "node scripts/verify-site.mjs",
-    "test:site-order": "node scripts/test-site-order-function.mjs"
+    "test:site-order": "node scripts/test-site-order-function.mjs",
+    "db:migrate:local": "wrangler d1 migrations apply flora-aroma-site-requests --local",
+    "db:migrate:remote": "wrangler d1 migrations apply flora-aroma-site-requests --remote"
   },
   "dependencies": {
     "astro": "^6.3.1"
   },
   "devDependencies": {
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "wrangler": "^4.0.0"
   }
 }

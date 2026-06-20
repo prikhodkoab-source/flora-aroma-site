@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flora-aroma-site",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-06-12",
+  "d1_databases": [
+    {
+      "binding": "SITE_REQUESTS_DB",
+      "database_name": "flora-aroma-site-requests",
+      "database_id": "cc1c393b-54bf-4d7b-806c-349f9800e3af",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

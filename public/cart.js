@@ -251,10 +251,17 @@
     if (status) status.textContent = "Передаємо заявку оператору.";
 
     try {
+      const submissionStorageKey = "flora-aroma-site-submission-id";
+      let submissionId = window.localStorage.getItem(submissionStorageKey);
+      if (!submissionId) {
+        submissionId = window.crypto.randomUUID();
+        window.localStorage.setItem(submissionStorageKey, submissionId);
+      }
       const response = await fetch("/api/site-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          submissionId,
           customer,
           comment,
           website,
@@ -274,6 +281,7 @@
       }
 
       writeCart([]);
+      window.localStorage.removeItem(submissionStorageKey);
       renderCartPage();
       if (status) {
         status.textContent = `Заявку ${result.requestId} передано оператору. Очікуйте підтвердження.`;
