@@ -983,6 +983,8 @@ th {
 }
 
 .cart-item input,
+.cart-comment input,
+.cart-comment select,
 .cart-comment textarea {
   width: 100%;
   padding: 9px 10px;
@@ -1004,6 +1006,34 @@ th {
 
 .cart-comment {
   margin-top: 14px;
+}
+
+.cart-customer-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.cart-message-preview {
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.cart-message-preview summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cart-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.cart-status.is-success {
+  color: var(--leaf);
 }
 
 .cart-summary {
@@ -1119,6 +1149,10 @@ th {
 
   .cart-summary {
     position: static;
+  }
+
+  .cart-customer-fields {
+    grid-template-columns: 1fr;
   }
 
   .cart-panel-actions {

@@ -33,7 +33,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </section>
 
       <aside class="cart-summary">
-        <h2>Чернетка для оператора</h2>
+        <h2>Оформити заявку</h2>
         <dl class="facts">
           <div>
             <dt>Позицій</dt>
@@ -47,16 +47,46 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <p>
           Сума розрахована з публічного прайса. Наявність і резерв підтверджує оператор у день відповіді.
         </p>
+        <div class="cart-customer-fields">
+          <label class="cart-comment">
+            Ім'я *
+            <input type="text" autocomplete="name" maxlength="80" required data-cart-customer-name placeholder="Як до вас звертатися">
+          </label>
+          <label class="cart-comment">
+            Телефон або Telegram/Viber *
+            <input type="text" autocomplete="tel" maxlength="100" required data-cart-customer-contact placeholder="+380... або @username">
+          </label>
+          <label class="cart-comment">
+            Спосіб отримання
+            <select data-cart-delivery>
+              <option value="Самовивіз">Самовивіз</option>
+              <option value="Нова пошта">Нова пошта</option>
+              <option value="Кур'єр або інше">Кур'єр або інше</option>
+            </select>
+          </label>
+          <label class="cart-comment">
+            Місто та адреса / відділення
+            <input type="text" autocomplete="street-address" maxlength="180" data-cart-address placeholder="Для самовивозу можна не заповнювати">
+          </label>
+          <label class="cart-honeypot" aria-hidden="true">
+            Сайт
+            <input type="text" tabindex="-1" autocomplete="off" data-cart-website>
+          </label>
+        </div>
         <label class="cart-comment">
           Коментар до заявки
-          <textarea data-cart-comment rows="5" placeholder="Місто, спосіб отримання, побажання по строках або замінах"></textarea>
+          <textarea data-cart-comment rows="4" maxlength="500" placeholder="Побажання по строках, замінах або інші уточнення"></textarea>
         </label>
-        <label class="cart-comment">
+        <details class="cart-message-preview">
+          <summary>Переглянути текст заявки</summary>
+          <label class="cart-comment">
           Текст заявки
           <textarea data-cart-message rows="10" readonly></textarea>
-        </label>
+          </label>
+        </details>
         <div class="hero-actions">
-          <button class="button" type="button" data-cart-copy>Скопіювати заявку</button>
+          <button class="button" type="button" data-cart-submit>Надіслати заявку оператору</button>
+          <button class="button button-secondary" type="button" data-cart-copy>Скопіювати</button>
           <a class="button button-secondary" href="/catalog/">Продовжити покупки</a>
           <a class="button button-secondary" href="tel:+380500272882">Зателефонувати</a>
         </div>

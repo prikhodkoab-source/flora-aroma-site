@@ -8,9 +8,10 @@
     "sync:products": "node scripts/build-products.mjs",
     "images:fetch-missing": "node scripts/fetch-missing-plant-images.mjs",
     "images:add-local-review": "node scripts/add-local-review-images.mjs && node scripts/add-manual-image-mappings.mjs && node scripts/add-ruta-commons-image.mjs",
-    "build": "astro build",
+    "build": "node scripts/build-site-order-catalog.mjs && astro build",
     "preview": "astro preview",
-    "verify": "node scripts/verify-site.mjs"
+    "verify": "node scripts/verify-site.mjs",
+    "test:site-order": "node scripts/test-site-order-function.mjs"
   },
   "dependencies": {
     "astro": "^6.3.1"

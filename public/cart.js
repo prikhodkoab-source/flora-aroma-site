@@ -124,7 +124,16 @@
     writeCart(next);
   }
 
-  function buildMessage(items, comment) {
+  function customerData(page = document) {
+    return {
+      name: page.querySelector("[data-cart-customer-name]")?.value?.trim() || "",
+      contact: page.querySelector("[data-cart-customer-contact]")?.value?.trim() || "",
+      delivery: page.querySelector("[data-cart-delivery]")?.value || "Самовивіз",
+      address: page.querySelector("[data-cart-address]")?.value?.trim() || ""
+    };
+  }
+
+  function buildMessage(items, comment, customer = {}) {
     const total = cartTotals(items).sum;
     const lines = [
       "Добрий день. Прошу перевірити наявність і можливість резерву:",
@@ -136,6 +145,10 @@
       "Розумію, що це чернетка заявки: наявність, формат і резерв підтверджує оператор."
     ];
 
+    if (customer.name) lines.push(`Ім'я: ${customer.name}`);
+    if (customer.contact) lines.push(`Контакт: ${customer.contact}`);
+    if (customer.delivery) lines.push(`Отримання: ${customer.delivery}`);
+    if (customer.address) lines.push(`Адреса: ${customer.address}`);
     if (comment.trim()) {
       lines.push(`Коментар: ${comment.trim()}`);
     }
@@ -154,6 +167,7 @@
     const message = page.querySelector("[data-cart-message]");
     const comment = page.querySelector("[data-cart-comment]");
     const status = page.querySelector("[data-cart-status]");
+    const submit = page.querySelector("[data-cart-submit]");
     const items = readCart();
     const totals = cartTotals(items);
 
@@ -198,9 +212,82 @@
     }
 
     if (message) {
-      message.value = items.length > 0 ? buildMessage(items, comment?.value || "") : "";
+      message.value = items.length > 0 ? buildMessage(items, comment?.value || "", customerData(page)) : "";
     }
-    if (status) status.textContent = "";
+    if (submit instanceof HTMLButtonElement) submit.disabled = items.length === 0;
+    if (status) {
+      status.textContent = "";
+      status.classList.remove("is-success");
+    }
+  }
+
+  async function submitOrder(button) {
+    const page = document.querySelector("[data-cart-page]");
+    if (!page) return;
+
+    const status = page.querySelector("[data-cart-status]");
+    const items = readCart();
+    const customer = customerData(page);
+    const comment = page.querySelector("[data-cart-comment]")?.value || "";
+    const website = page.querySelector("[data-cart-website]")?.value || "";
+
+    if (items.length === 0) {
+      if (status) status.textContent = "Кошик порожній.";
+      return;
+    }
+    if (!customer.name) {
+      page.querySelector("[data-cart-customer-name]")?.focus();
+      if (status) status.textContent = "Вкажіть ім'я.";
+      return;
+    }
+    if (!customer.contact) {
+      page.querySelector("[data-cart-customer-contact]")?.focus();
+      if (status) status.textContent = "Вкажіть телефон або Telegram/Viber.";
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Надсилаємо...";
+    if (status) status.textContent = "Передаємо заявку оператору.";
+
+    try {
+      const response = await fetch("/api/site-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer,
+          comment,
+          website,
+          items: items.map((item) => ({
+            plantId: item.plantId,
+            name: item.name,
+            container: item.container,
+            price: Number(item.price || 0),
+            unit: item.unit || "шт.",
+            qty: normalizeQty(item.qty)
+          }))
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "Не вдалося передати заявку.");
+      }
+
+      writeCart([]);
+      renderCartPage();
+      if (status) {
+        status.textContent = `Заявку ${result.requestId} передано оператору. Очікуйте підтвердження.`;
+        status.classList.add("is-success");
+      }
+    } catch (error) {
+      if (status) {
+        status.textContent = error instanceof Error ? error.message : "Не вдалося передати заявку.";
+        status.classList.remove("is-success");
+      }
+    } finally {
+      button.disabled = readCart().length === 0;
+      button.textContent = "Надіслати заявку оператору";
+    }
   }
 
   document.addEventListener("click", async (event) => {
@@ -278,19 +365,37 @@
       } else if (status) {
         status.textContent = "Кошик порожній.";
       }
+      return;
+    }
+
+    const submitButton = target.closest("[data-cart-submit]");
+    if (submitButton instanceof HTMLButtonElement) {
+      await submitOrder(submitButton);
     }
   });
 
   document.addEventListener("input", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+    if (
+      !(
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement
+      )
+    ) {
+      return;
+    }
 
     if (target.matches("[data-cart-qty]")) {
       setQty(target.dataset.cartQty, target.value);
       renderCartPage();
     }
 
-    if (target.matches("[data-cart-comment]")) {
+    if (
+      target.matches(
+        "[data-cart-comment], [data-cart-customer-name], [data-cart-customer-contact], [data-cart-delivery], [data-cart-address]"
+      )
+    ) {
       renderCartPage();
     }
   });

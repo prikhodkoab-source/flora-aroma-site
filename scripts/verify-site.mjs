@@ -370,7 +370,17 @@ for (const requiredPhrase of [
   }
 }
 
-for (const requiredCartMarkup of ["data-cart-add", "data-cart-page", "data-cart-message", "data-cart-toast", "/cart/"]) {
+for (const requiredCartMarkup of [
+  "data-cart-add",
+  "data-cart-page",
+  "data-cart-message",
+  "data-cart-submit",
+  "data-cart-customer-name",
+  "data-cart-customer-contact",
+  "data-cart-delivery",
+  "data-cart-toast",
+  "/cart/"
+]) {
   if (!publicHtml.includes(requiredCartMarkup)) {
     fail(`Expected cart markup: ${requiredCartMarkup}`);
   }
@@ -381,9 +391,36 @@ if (!existsSync(join(root, "public", "cart.js"))) {
 }
 
 const cartScript = readFileSync(join(root, "public", "cart.js"), "utf8");
-for (const requiredCartScriptMarker of ["data-cart-increase", "data-cart-decrease", "data-cart-toast-title", "optionId", "cartItemKey"]) {
+for (const requiredCartScriptMarker of [
+  "data-cart-increase",
+  "data-cart-decrease",
+  "data-cart-toast-title",
+  "data-cart-submit",
+  'fetch("/api/site-order"',
+  "optionId",
+  "cartItemKey"
+]) {
   if (!cartScript.includes(requiredCartScriptMarker)) {
     fail(`Expected cart script marker: ${requiredCartScriptMarker}`);
+  }
+}
+
+const siteOrderFunctionPath = join(root, "functions", "api", "site-order.js");
+if (!existsSync(siteOrderFunctionPath)) {
+  fail("Missing Cloudflare Pages Function: functions/api/site-order.js");
+} else {
+  const siteOrderFunction = readFileSync(siteOrderFunctionPath, "utf8");
+  for (const marker of [
+    "TELEGRAM_TOKEN",
+    "TELEGRAM_CHAT_ID",
+    "TELEGRAM_ALLOWED_USER_IDS",
+    "status: \"draft\"",
+    "заявка без резерву",
+    "onRequestPost"
+  ]) {
+    if (!siteOrderFunction.includes(marker)) {
+      fail(`Expected site order function marker: ${marker}`);
+    }
   }
 }
 
