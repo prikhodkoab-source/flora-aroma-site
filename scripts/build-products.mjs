@@ -151,9 +151,36 @@ function categoryKind(rawCategory, publicCategoryName) {
 }
 
 function winterSentence(card) {
-  return card.winter_hardy
-    ? `Зимостійкість у каталозі Flora зазначена як ${card.winter_hardy}; для конкретної ділянки її варто співвідносити з місцевим мікрокліматом, дренажем і зимовим перезволоженням.`
-    : "Зимостійкість потребує уточнення для конкретної ділянки; перед масовою посадкою бажано врахувати місцевий мікроклімат, дренаж і ризик зимового перезволоження.";
+  const value = String(card.winter_hardy ?? "").trim();
+  if (!value) {
+    return "Зимостійкість в умовах Києва потребує уточнення.";
+  }
+
+  const normalized = value.toLowerCase();
+  if (normalized.includes("однорічник")) {
+    return "У Києві вирощується як однорічна культура і не зимує у відкритому ґрунті.";
+  }
+
+  const minimumZone = Number(value.match(/\d+/)?.[0]);
+  if (!Number.isFinite(minimumZone)) {
+    return "Зимостійкість в умовах Києва потребує уточнення.";
+  }
+  if (minimumZone <= 5) {
+    const level = minimumZone <= 4 ? "високий" : "достатній";
+    return `Зимостійка в умовах Києва, рівень ${level}.`;
+  }
+  if (minimumZone <= 7) {
+    return "Не має надійної зимостійкості у відкритому ґрунті в умовах Києва; рівень низький, потрібне зимове укриття.";
+  }
+  return "Не зимостійка у відкритому ґрунті в умовах Києва; потрібна захищена зимівля.";
+}
+
+function replacePublicWinterSentence(text, card) {
+  const cleaned = String(text ?? "").trim().replace(
+    /\s+(?:Зимостійкість:.*|Добре зимує в умовах Києва.*|У Києві вирощується.*|Зимівля у відкритому ґрунті.*|Не зимує у відкритому ґрунті.*|Зимостійка в умовах Києва.*|Не має надійної зимостійкості.*|Не зимостійка у відкритому ґрунті.*)$/iu,
+    ""
+  ).trim();
+  return compactSpaces(`${cleaned} ${winterSentence(card)}`);
 }
 
 function compactSpaces(value) {
@@ -297,7 +324,10 @@ const products = priceRows.map((priceRow) => {
   const card = cardsByPlantId.get(priceRow.plant_id) ?? {};
   const externalImage = externalImagesByPlantId.get(priceRow.plant_id);
   const category = publicCategory(card.category ?? "");
-  const summary = card.client_description || fallbackSummary({ name_uk: priceRow["Українська назва"], category });
+  const summary = replacePublicWinterSentence(
+    card.client_description || fallbackSummary({ name_uk: priceRow["Українська назва"], category }),
+    card
+  );
   const source = sourceForPlant(sourcesByPlantId.get(priceRow.plant_id))[priceRow.plant_id] ?? sourceForPlant(sourcesByPlantId.get(priceRow.plant_id));
   const expanded = expandedTexts({
     card,

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "sync:products": "node scripts/build-products.mjs",
+    "sync:kyiv-cards": "python scripts/sync-kyiv-card-copy-and-ruta-photo.py",
+    "price:pdf": "python scripts/generate-public-price.py",
     "images:fetch-missing": "node scripts/fetch-missing-plant-images.mjs",
     "images:add-local-review": "node scripts/add-local-review-images.mjs && node scripts/add-manual-image-mappings.mjs && node scripts/add-ruta-commons-image.mjs",
     "build": "node scripts/build-site-order-catalog.mjs && astro build",

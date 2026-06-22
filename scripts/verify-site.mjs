@@ -104,7 +104,8 @@ for (const requiredPage of [
 for (const requiredAsset of [
   "public/images/site/nursery-hero.jpg",
   "public/images/site/nursery-irrigation.jpg",
-  "public/images/site/nursery-greenhouse.jpg"
+  "public/images/site/nursery-greenhouse.jpg",
+  "public/downloads/flora-aroma-price.pdf"
 ]) {
   if (!existsSync(join(root, requiredAsset))) {
     fail(`Missing required design asset: ${requiredAsset}`);
@@ -364,9 +365,21 @@ for (const requiredPhrase of [
   "Уточнити наявність",
   "Як замовити",
   "Відкрити табличний прайс",
+  "Завантажити PDF-прайс",
 ]) {
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected storefront CTA phrase: ${requiredPhrase}`);
+  }
+}
+
+for (const requiredSeoMarker of [
+  'rel="canonical"',
+  'property="og:title"',
+  'property="og:description"',
+  'property="og:image"'
+]) {
+  if (!publicHtml.includes(requiredSeoMarker)) {
+    fail(`Expected SEO metadata marker: ${requiredSeoMarker}`);
   }
 }
 

@@ -155,6 +155,31 @@ function uniquePaths(paths) {
   });
 }
 
+function kyivWinterSentence(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (!normalized) return "Зимостійкість в умовах Києва потребує уточнення.";
+  if (normalized.includes("annual") || normalized.includes("одноріч")) {
+    return "У Києві вирощується як однорічна культура і не зимує у відкритому ґрунті.";
+  }
+  const minimumZone = Number(String(value).match(/\d+/)?.[0]);
+  if (!Number.isFinite(minimumZone)) return "Зимостійкість в умовах Києва потребує уточнення.";
+  if (minimumZone <= 5) {
+    const level = minimumZone <= 4 ? "високий" : "достатній";
+    return `Зимостійка в умовах Києва, рівень ${level}.`;
+  }
+  if (minimumZone <= 7) {
+    return "Не має надійної зимостійкості у відкритому ґрунті в умовах Києва; рівень низький, потрібне зимове укриття.";
+  }
+  return "Не зимостійка у відкритому ґрунті в умовах Києва; потрібна захищена зимівля.";
+}
+
+function localizeWinterText(text, value) {
+  return String(text ?? "").replace(
+    /Зимостійкість:\s*USDA[^.]*\.?/giu,
+    kyivWinterSentence(value)
+  );
+}
+
 function applyGalleryOverrides() {
   for (const [plantId, preferredPaths] of galleryOverrides) {
     const product = productById.get(plantId);
@@ -356,7 +381,7 @@ addSourceStatus("PLANT-0058", "/images/plants/local/plant-0058-local-gallery-04.
 
 if (!productById.has("PLANT-0090")) {
   const summary =
-    "Ароматичний напівкущик і класичний кулінарний чебрець для сонячних, добре дренованих місць. Має дрібне запашне сіро-зелене листя, літнє цвітіння і підходить для пряно-ароматичних посадок, контейнерів, рокаріїв та сухіших бордюрів. Зимостійкість: USDA 5-9.";
+    "Ароматичний напівкущик і класичний кулінарний чебрець для сонячних, добре дренованих місць. Має дрібне запашне сіро-зелене листя, літнє цвітіння і підходить для пряно-ароматичних посадок, контейнерів, рокаріїв та сухіших бордюрів. Добре зимує в умовах Києва (USDA 5-9).";
   const ecology =
     "Довідкова основа картки: Чебрець звичайний (Thymus vulgaris) росте як низький дерев'янистий ароматичний напівкущик для відкритих сонячних місць. Найкраще підходить легкий, водопроникний грунт без застою води; у важких або перезволожених місцях рослина швидше втрачає декоративність і зимостійкість.";
   const agrotechnics =
@@ -422,6 +447,12 @@ if (!existsSync(thymusTarget)) {
       reviewed_status: "needs_operator_visual_review"
     });
     sourceKeys.add(key);
+  }
+}
+
+for (const product of products) {
+  for (const field of ["summary", "ecology_text", "full_description"]) {
+    product[field] = localizeWinterText(product[field], product.winter_hardiness);
   }
 }
 

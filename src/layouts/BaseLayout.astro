@@ -4,12 +4,16 @@ import "../styles/global.css";
 type Props = {
   title: string;
   description?: string;
+  image?: string;
 };
 
 const {
   title,
-  description = "Flora & Aroma: актуальний асортимент рослин у горщиках і касетах."
+  description = "Flora & Aroma: актуальний асортимент рослин у горщиках і касетах.",
+  image = "/images/site/nursery-hero.jpg"
 } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const socialImageUrl = new URL(image, Astro.site);
 ---
 
 <!doctype html>
@@ -18,6 +22,15 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content="Flora & Aroma" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="uk_UA" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
   <body>

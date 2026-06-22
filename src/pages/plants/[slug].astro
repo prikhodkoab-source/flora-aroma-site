@@ -16,7 +16,11 @@ const winterHardiness = product.winter_hardiness_short;
 const selectedOption = product.options[0];
 ---
 
-<BaseLayout title={product.seo_title || `${product.name_uk} | Flora & Aroma`} description={description}>
+<BaseLayout
+  title={product.seo_title || `${product.name_uk} | Flora & Aroma`}
+  description={description}
+  image={product.primary_image_path}
+>
   <article class="product-page">
     <a class="back-link" href="/catalog/">Назад до каталогу</a>
     <div class="product-header">
