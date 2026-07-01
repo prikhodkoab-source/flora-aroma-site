@@ -190,6 +190,16 @@ export const productCatalog = {
       }
     ]
   },
+  "PLANT-0035": {
+    "name": "Левізія 'Elise Mix'",
+    "variants": [
+      {
+        "container": "Касета Hiko V-120ss",
+        "price": 45,
+        "unit": "шт."
+      }
+    ]
+  },
   "PLANT-0011": {
     "name": "Люпин багатолистий",
     "variants": [
@@ -305,6 +315,16 @@ export const productCatalog = {
       }
     ]
   },
+  "PLANT-0067": {
+    "name": "Полин гіркий",
+    "variants": [
+      {
+        "container": "Касета Hiko V-120ss",
+        "price": 30,
+        "unit": "шт."
+      }
+    ]
+  },
   "PLANT-0039": {
     "name": "Піщанка гірська 'Snowbank'",
     "variants": [
@@ -385,21 +405,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0087": {
-    "name": "Чебрець повзучий",
-    "variants": [
-      {
-        "container": "Горщик P9",
-        "price": 50,
-        "unit": "шт."
-      },
-      {
-        "container": "Горщик P11",
-        "price": 50,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0061": {
     "name": "Шавлія австрійська",
     "variants": [
@@ -456,16 +461,6 @@ export const productCatalog = {
       {
         "container": "Горщик P11",
         "price": 55,
-        "unit": "шт."
-      }
-    ]
-  },
-  "PLANT-0085": {
-    "name": "Костриця Готьє",
-    "variants": [
-      {
-        "container": "Горщик P11",
-        "price": 49,
         "unit": "шт."
       }
     ]
