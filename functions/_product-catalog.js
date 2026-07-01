@@ -230,6 +230,16 @@ export const productCatalog = {
       }
     ]
   },
+  "PLANT-0057": {
+    "name": "Мак східний червоний",
+    "variants": [
+      {
+        "container": "Касета Hiko V-120ss",
+        "price": 40,
+        "unit": "шт."
+      }
+    ]
+  },
   "PLANT-0081": {
     "name": "М’ята перцева",
     "variants": [

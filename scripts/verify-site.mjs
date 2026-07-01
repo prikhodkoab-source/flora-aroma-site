@@ -112,8 +112,8 @@ for (const requiredAsset of [
   }
 }
 
-if (productRows.length !== 41) {
-  fail(`Expected 41 product rows, found ${productRows.length}.`);
+if (productRows.length !== 42) {
+  fail(`Expected 42 product rows, found ${productRows.length}.`);
 }
 
 const requiredColumns = [
@@ -472,5 +472,5 @@ for (const requiredPage of [
 }
 
 if (!failed) {
-  console.log("Site verification passed: MVP pages, 41 products, valid product variants, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
+  console.log("Site verification passed: MVP pages, 42 products, valid product variants, gallery image paths, expanded descriptions, required columns, no public source blocks or internal stock phrases.");
 }
