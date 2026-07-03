@@ -844,6 +844,75 @@ select {
   color: var(--primary-color);
 }
 
+.tilda-order-success {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.tilda-order-success[hidden] {
+  display: none;
+}
+
+.tilda-order-success__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.tilda-order-success__dialog {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 42px 44px 38px;
+  background: #ffffff;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24);
+  color: #000000;
+  outline: none;
+}
+
+.tilda-order-success__close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.tilda-order-success h2 {
+  margin: 0 34px 18px 0;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.tilda-order-success p {
+  margin: 0 0 16px;
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+.tilda-order-success__note {
+  color: var(--muted-text-color);
+  font-size: 15px !important;
+}
+
+.tilda-order-success__button {
+  width: 100%;
+  min-height: 58px;
+  margin-top: 12px;
+  border: 0;
+  background: #000000;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+}
+
 .tilda-cart-honeypot {
   position: absolute;
   left: -10000px;
@@ -1035,6 +1104,22 @@ select {
   .tilda-cart-qty,
   .tilda-cart-remove {
     grid-column: 2;
+  }
+
+  .tilda-order-success {
+    padding: 18px;
+  }
+
+  .tilda-order-success__dialog {
+    padding: 34px 26px 28px;
+  }
+
+  .tilda-order-success h2 {
+    font-size: 25px;
+  }
+
+  .tilda-order-success p {
+    font-size: 17px;
   }
 
   .tilda-product-description dl {

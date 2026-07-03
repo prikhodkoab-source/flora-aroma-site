@@ -168,6 +168,8 @@ for (const requiredMarker of [
   "data-cart-submit",
   "data-cart-customer-name",
   "data-cart-customer-contact",
+  "data-order-success",
+  "tilda-order-success",
   "data-product-option",
   "data-selected-price",
   'rel="canonical"',

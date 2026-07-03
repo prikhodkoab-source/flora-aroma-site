@@ -210,9 +210,29 @@
   function closeCart() {
     const modal = document.querySelector("[data-cart-modal]");
     if (!(modal instanceof HTMLElement)) return;
+    hideSuccessDialog();
     modal.hidden = true;
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("tilda-cart-open");
+  }
+
+  function showSuccessDialog(requestId) {
+    const dialogRoot = document.querySelector("[data-order-success]");
+    const dialog = dialogRoot?.querySelector(".tilda-order-success__dialog");
+    const idRoot = document.querySelector("[data-order-success-id]");
+    if (!(dialogRoot instanceof HTMLElement)) return;
+
+    if (idRoot) idRoot.textContent = requestId || "";
+    dialogRoot.hidden = false;
+    dialogRoot.setAttribute("aria-hidden", "false");
+    if (dialog instanceof HTMLElement) dialog.focus();
+  }
+
+  function hideSuccessDialog() {
+    const dialogRoot = document.querySelector("[data-order-success]");
+    if (!(dialogRoot instanceof HTMLElement)) return;
+    dialogRoot.hidden = true;
+    dialogRoot.setAttribute("aria-hidden", "true");
   }
 
   async function submitOrder(button) {
@@ -273,9 +293,10 @@
       window.localStorage.removeItem(submissionStorageKey);
       renderCart();
       if (status) {
-        status.textContent = `Заявку ${result.requestId} передано оператору. Очікуйте підтвердження.`;
+        status.textContent = `Дякуємо за замовлення. Заявку ${result.requestId} передано оператору. Очікуйте підтвердження.`;
         status.classList.add("is-success");
       }
+      showSuccessDialog(result.requestId);
     } catch (error) {
       if (status) {
         status.textContent = error instanceof Error ? error.message : "Не вдалося передати заявку.";
@@ -303,6 +324,12 @@
     }
 
     if (target.closest("[data-cart-close]")) {
+      closeCart();
+      return;
+    }
+
+    if (target.closest("[data-order-success-close]")) {
+      hideSuccessDialog();
       closeCart();
       return;
     }
@@ -351,7 +378,14 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeCart();
+    if (event.key !== "Escape") return;
+    const successDialog = document.querySelector("[data-order-success]");
+    if (successDialog instanceof HTMLElement && !successDialog.hidden) {
+      hideSuccessDialog();
+      closeCart();
+      return;
+    }
+    closeCart();
   });
 
   window.addEventListener("flora-cart-updated", renderCart);
