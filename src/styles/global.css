@@ -390,6 +390,7 @@ select {
 }
 
 .tilda-product-card__button {
+  display: none;
   margin-top: 16px;
   min-height: 42px;
   padding: 0 22px;
