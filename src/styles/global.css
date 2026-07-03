@@ -464,26 +464,6 @@ select {
   text-decoration: none;
 }
 
-.tilda-service-footer {
-  display: flex;
-  min-height: 56px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #000000;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 11px;
-}
-
-.tilda-service-footer__mark {
-  display: grid;
-  width: 20px;
-  height: 20px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-}
-
 .tilda-product-page,
 .tilda-cart-route {
   width: min(var(--container-width), calc(100% - 40px));
