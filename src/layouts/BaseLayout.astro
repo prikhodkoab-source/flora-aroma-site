@@ -1,16 +1,19 @@
 ---
 import "../styles/global.css";
+import TildaCloneCart from "../components/TildaCloneCart.astro";
 
 type Props = {
   title: string;
   description?: string;
   image?: string;
+  showCart?: boolean;
 };
 
 const {
   title,
-  description = "Flora & Aroma: актуальний асортимент рослин у горщиках і касетах.",
-  image = "/images/site/nursery-hero.jpg"
+  description = "Контейнерні саджанці декоративних, ароматичних і лікарських рослин. Власне вирощування, консультація перед замовленням, погодження наявності.",
+  image = "/images/tilda-clone/hero-greenhouse.jpg",
+  showCart = true
 } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const socialImageUrl = new URL(image, Astro.site);
@@ -20,8 +23,10 @@ const socialImageUrl = new URL(image, Astro.site);
 <html lang="uk">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:site_name" content="Flora & Aroma" />
     <meta property="og:type" content="website" />
@@ -33,40 +38,11 @@ const socialImageUrl = new URL(image, Astro.site);
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
-  <body>
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="Flora & Aroma">
-        <img src="/images/logo.png" alt="" width="88" height="88" />
-        <span>
-          <strong>FLORA & AROMA</strong>
-          <small>саджанці рослин у касетах і горщиках</small>
-        </span>
-      </a>
-      <nav aria-label="Головна навігація">
-        <a href="/">Головна</a>
-        <a href="/catalog/">Каталог</a>
-        <a href="/price/">Прайс</a>
-        <a href="/how-to-order/">Як замовити</a>
-        <a class="cart-nav-link" href="/cart/">Кошик <span data-cart-count>0</span></a>
-        <a href="/contacts/">Контакти</a>
-        <a href="tel:+380500272882">+380500272882</a>
-      </nav>
-    </header>
+  <body class="tilda-clone-body">
     <main>
       <slot />
     </main>
-    <footer class="site-footer">
-      <span>flora-aroma.com.ua</span>
-      <span>+380500272882</span>
-    </footer>
-    <div class="cart-toast" data-cart-toast hidden aria-live="polite">
-      <div>
-        <strong data-cart-toast-title></strong>
-        <span data-cart-toast-text></span>
-      </div>
-      <a class="button" href="/cart/">Відкрити кошик</a>
-      <button class="cart-toast-close" type="button" data-cart-toast-close aria-label="Закрити">×</button>
-    </div>
+    {showCart && <TildaCloneCart />}
     <script src="/cart.js" defer></script>
   </body>
 </html>

@@ -1,190 +1,119 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatFlowering, formatHeight, getCategories, getProducts, getSelections } from "../lib/products";
-
-const products = getProducts();
-const featuredPlantIds = ["PLANT-0041", "PLANT-0082", "PLANT-0014", "PLANT-0048"];
-const featured = featuredPlantIds
-  .map((plantId) => products.find((product) => product.plant_id === plantId))
-  .filter((product) => product !== undefined);
-const categories = getCategories();
-const selections = getSelections();
-const solutionLinks = [
-  {
-    title: "Ароматна грядка",
-    href: "/selections/aromatic-garden/",
-    text: "Шавлії, м'яти, чабер, майоран та інші ароматні культури для доріжок, кухонної грядки і камерного саду."
-  },
-  {
-    title: "Сухий квітник",
-    href: "/selections/drought-tolerant/",
-    text: "Рослини для сонячних місць із добрим дренажем, де потрібна витривалість і проста підтримка."
-  },
-  {
-    title: "Медоносна посадка",
-    href: "/selections/pollinator-plants/",
-    text: "Квітучі позиції для бджіл, джмелів і метеликів, які додають руху та сезонного цвітіння."
-  },
-  {
-    title: "Бордюр",
-    href: "/selections/border-plants/",
-    text: "Компактні й середньорослі культури для краю квітника, доріжок і структурних ліній."
-  }
-];
+import TildaCloneFooter from "../components/TildaCloneFooter.astro";
 ---
 
-<BaseLayout title="Flora & Aroma | Саджанці у касетах і горщиках">
-  <section class="hero hero-nursery">
-    <div>
-      <p class="eyebrow">Дім правильних рослин</p>
-      <h1>FLORA & AROMA</h1>
+<BaseLayout title="Флора і Арома — саджанці рослин у контейнерах">
+  <section class="tilda-cover">
+    <div class="tilda-cover__carrier"></div>
+    <div class="tilda-cover__filter"></div>
+    <div class="tilda-cover__wrapper">
+      <div class="tilda-hero-content">
+        <div class="tilda-hero-content__uptitle">Flora &amp; Аrоmа</div>
+        <h1>Дім правильних рослин</h1>
+        <p>Рослини, вирощені за сучасними технологіями.</p>
+        <div class="tilda-hero-buttons">
+          <a href="https://t.me/+380500272882?text=Доброго%20дня,%20цікавлять%20рослини">Отримати консультацію</a>
+          <a href="/shop/">Перейти до асортименту</a>
+        </div>
+      </div>
+    </div>
+    <a class="tilda-cover__arrow" href="#about" aria-label="Далі">
+      <svg viewBox="0 0 38.417 18.592" width="38.417" height="18.592"><path d="M19.208,18.592c-0.241,0-0.483-0.087-0.673-0.261L0.327,1.74c-0.408-0.372-0.438-1.004-0.066-1.413c0.372-0.409,1.004-0.439,1.413-0.066L19.208,16.24L36.743,0.261c0.411-0.372,1.042-0.342,1.413,0.066c0.372,0.408,0.343,1.041-0.065,1.413L19.881,18.332C19.691,18.505,19.449,18.592,19.208,18.592z"></path></svg>
+    </a>
+  </section>
+
+  <section id="about" class="tilda-text-block tilda-text-block--about">
+    <div class="tilda-container tilda-container--narrow">
       <p>
-        Ми вирощуємо саджанці для саду, квітників, ароматичних посадок і ландшафтних рішень.
-        У каталозі показані рослини в касетах Hiko та горщиках з публічною ціною; наявність,
-        кількість і можливість резерву підтверджує оператор у день відповіді.
+        <strong>«Флора і Арома»</strong> — приватний розсадник, у якому рослини вирощуються за сучасними контейнерними технологіями з контрольованими умовами розвитку.<br />
+        Ми працюємо з рослиною від раннього етапу росту до готовності до висадки, приділяючи увагу не лише зовнішньому вигляду, а й тому, як рослина поводитиметься після пересаджування. Об’єм контейнера, склад субстрату та умови дорощування підібрані так, щоб рослина легко адаптувалася до відкритого ґрунту та продовжувала стабільний ріст.<br />
+        «Флора і Арома» не є майданчиком масового перепродажу. Ми вирощуємо посадковий матеріал у власних касетах і контейнерах, з прогнозованим результатом — для саду, озеленення або ландшафтного проєкту, де важлива не кількість, а якість і передбачуваність.
       </p>
-      <div class="hero-proof-list" aria-label="Коротко про асортимент">
-        <span>власне вирощування</span>
-        <span>касети / горщики</span>
-        <span>закрита коренева система</span>
-        <span>заявка без автоматичного резерву</span>
-      </div>
-      <div class="hero-actions">
-        <a class="button" href="/catalog/">Дивитися каталог</a>
-        <a class="button button-secondary" href="/cart/">Скласти заявку</a>
-      </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="trust-strip" aria-label="Переваги Flora & Aroma">
-      <div>
-        <strong>Вирощуємо самі</strong>
-        <span>Контролюємо партії, формат рослин і якість саджанців до передачі клієнту.</span>
-      </div>
-      <div>
-        <strong>Касети Hiko / горщики</strong>
-        <span>Публікуємо формат постачання біля кожної позиції, щоб замовлення було зрозумілим.</span>
-      </div>
-      <div>
-        <strong>Закрита коренева система</strong>
-        <span>Саджанці зручні для перевезення, дорощування та висадки без оголеного кореня.</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="section media-band">
-    <img src="/images/site/nursery-irrigation.jpg" alt="Виробництво саджанців Flora & Aroma" loading="lazy" />
-    <div>
-      <p class="eyebrow">Фото виробництва</p>
-      <h2>Рослини проходять шлях від касети до готової посадки</h2>
-      <p>
-        Вітрина показує асортимент для клієнта, але не відкриває внутрішній склад.
-        Перед відповіддю на заявку ми звіряємо формат і кількість рослин.
-      </p>
-      <a class="button button-secondary" href="/how-to-order/">Як працює заявка</a>
-    </div>
-  </section>
-
-  <section class="section compact-section">
-    <div class="section-heading">
-      <h2>Підібрати рослини</h2>
-      <p>Швидкі клієнтські підбірки за умовами ділянки та призначенням.</p>
-    </div>
-    <div class="link-grid selection-grid">
-      {selections.map((selection) => (
-        <a href={`/selections/${selection.slug}/`}>
-          <span>{selection.title}</span>
-          <p>{selection.description} {selection.count} позицій.</p>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <section class="section compact-section">
-    <div class="section-heading">
-      <h2>Готові рішення</h2>
-      <p>Стартові сценарії для клієнта: не готовий проект, а зручний напрямок для підбору.</p>
-    </div>
-    <div class="link-grid solution-grid">
-      {solutionLinks.map((solution) => (
-        <a href={solution.href}>
-          <span>{solution.title}</span>
-          <p>{solution.text}</p>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-heading">
-      <h2>Основні розділи</h2>
-      <p>Короткий шлях від перегляду асортименту до чернетки заявки оператору.</p>
-    </div>
-    <div class="link-grid">
-      <a href="/catalog/">
-        <span>Каталог</span>
-        <p>Усі рослини з фото, описами, форматом, ціною та фільтрами підбору.</p>
-      </a>
-      <a href="/price/">
-        <span>Прайс</span>
-        <p>Таблиця для швидкого перегляду цін і форматів постачання та PDF для завантаження.</p>
-      </a>
-      <a href="/cart/">
-        <span>Кошик-заявка</span>
-        <p>Чернетка звернення: кількість і резерв підтверджує оператор.</p>
-      </a>
-      <a href="/contacts/">
-        <span>Контакти</span>
-        <p>Телефон і короткий шлях для уточнення асортименту.</p>
-      </a>
-    </div>
-  </section>
-
-  <section class="section media-band media-band-reverse">
-    <img src="/images/site/nursery-greenhouse.jpg" alt="Касетне вирощування рослин у розсаднику" loading="lazy" />
-    <div>
-      <p class="eyebrow">Комерційна витрина</p>
-      <h2>Ціна відкрита, точний склад не публікується</h2>
-      <p>
-        На сайті є публічний асортимент і ціна за одиницю. Це допомагає швидко зібрати заявку,
-        але не створює автоматичне замовлення, резерв, оплату або списання складу.
-      </p>
-      <a class="button" href="/catalog/">Перейти до асортименту</a>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-heading">
-      <h2>Найчастіше обирають</h2>
-      <p>Добірка популярних позицій з актуального публічного асортименту.</p>
-    </div>
-    <div class="category-strip" aria-label="Категорії рослин">
-      {categories.map((category) => (
-        <a href={`/categories/${category.slug}/`}>
-          {category.name}
-          <span>{category.count}</span>
-        </a>
-      ))}
-    </div>
-    <div class="product-grid">
-      {featured.map((product) => (
-        <a class="product-card" href={`/plants/${product.slug}/`}>
-          {product.primary_image_path && <img src={product.primary_image_path} alt="" loading="lazy" />}
-          <span class="plant-id">{product.category}</span>
-          <h3>{product.name_uk}</h3>
-          <p>{product.latin_name}</p>
-          <p class="summary">{product.summary}</p>
-          <div class="card-chips" aria-label="Короткі характеристики">
-            <span>сонце: {product.sun_labels.join(" / ")}</span>
-            <span>вологість: {product.moisture_labels.join(" / ")}</span>
-            <span>висота: {formatHeight(product)}</span>
-            <span>цвітіння: {formatFlowering(product)}</span>
-            <span>формат: {product.container}</span>
-            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
+  <section class="tilda-list-section">
+    <div class="tilda-container tilda-container--narrow">
+      <h2>Як ми вирощуємо</h2>
+      <p class="tilda-section-descr">Сучасні технології та максимальний контроль на усіх етапах від посіву до пакування для відправки</p>
+      <ul class="tilda-check-list">
+        <li>
+          <span class="tilda-check-icon"></span>
+          <div>
+            <h3>Контейнерна технологія</h3>
+            <p>Ми вирощуємо рослини у професійних касетах і контейнерах, які забезпечують рівномірний розвиток кореневої системи без деформацій. Це дозволяє рослині швидко адаптуватися після пересаджування та продовжувати ріст без «стресу приживлення».</p>
           </div>
-        </a>
-      ))}
+        </li>
+        <li>
+          <span class="tilda-check-icon"></span>
+          <div>
+            <h3>Контроль субстрату</h3>
+            <p>Субстрат формується з урахуванням водо- та повітропроникності, поживності й стабільності структури протягом усього циклу вирощування. Такий підхід дозволяє кореневій системі працювати ефективно, а рослині — формувати збалансований надземний ріст.</p>
+          </div>
+        </li>
+        <li>
+          <span class="tilda-check-icon"></span>
+          <div>
+            <h3>Адаптація до клімату</h3>
+            <p>Рослини проходять повний цикл дорощування в умовах, наближених до реальних умов висадки. Завдяки цьому вони краще переносять зміну середовища та демонструють стабільний розвиток після посадки в ґрунт або ландшафтний об’єкт.</p>
+          </div>
+        </li>
+      </ul>
     </div>
   </section>
+
+  <section class="tilda-list-section">
+    <div class="tilda-container tilda-container--narrow">
+      <h2>Що ми вирощуємо</h2>
+      <ul class="tilda-plain-list">
+        <li>
+          <h3>Ароматичні трави та лікарські рослини</h3>
+          <p>Рослини для використання в ландшафтному дизайні, кулінарії, фітотерапії та ароматерапії.<br />Підходять для приватних садів, грядок і невеликих трав’яних композицій, де важливі аромат, смакові властивості та стабільний ріст.</p>
+        </li>
+        <li>
+          <h3>Дерева</h3>
+          <p>Рослини для ландшафтного дизайну, озеленення територій і екологічної стабілізації простору.<br />Використовуються для створення тіні, живоплотів, декоративних акцентів і довготривалих зелених зон.</p>
+        </li>
+        <li>
+          <h3>Декоративні рослини</h3>
+          <p>Квіткові та декоративні культури для естетики простору та сезонного оформлення.<br />Підходять для садів, дворів і ландшафтних рішень, де важливий вигляд рослин після висадки та протягом сезону.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="tilda-list-section">
+    <div class="tilda-container tilda-container--narrow">
+      <h2>Як замовити</h2>
+      <ol class="tilda-step-list">
+        <li>
+          <span></span>
+          <div>
+            <h3>Напишіть нам у Telegram</h3>
+            <p>Опишіть, які рослини вас цікавлять і для яких умов.</p>
+          </div>
+        </li>
+        <li>
+          <span></span>
+          <div>
+            <h3>Отримайте консультацію</h3>
+            <p>Ми підкажемо оптимальні варіанти та надамо актуальну інформацію.</p>
+          </div>
+        </li>
+        <li>
+          <span></span>
+          <div>
+            <h3>Погодження та отримання</h3>
+            <p>Узгоджуємо деталі та спосіб отримання садивного матеріалу.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="tilda-section-button">
+        <a href="https://t.me/+380500272882?text=Доброго%20дня,%20цікавлять%20рослини">Отримати консультацію</a>
+      </div>
+    </div>
+  </section>
+
+  <TildaCloneFooter />
 </BaseLayout>
