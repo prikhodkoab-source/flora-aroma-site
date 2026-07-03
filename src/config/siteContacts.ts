@@ -4,18 +4,18 @@ export const siteContacts = {
   emailDisplay: "Flora_&_Aroma@gmail.com",
   emailHref: "mailto:Flora_%26_Aroma@gmail.com",
   facebookUrl: "https://www.facebook.com/share/1HhvejhSAr/",
-  telegramUrl: ""
+  telegramUrl: "https://t.me/FLORA_AROMA_GARDEN"
 } as const;
 
 export const socialLinks = [
   {
-    key: "facebook",
-    label: "Facebook",
-    url: siteContacts.facebookUrl
-  },
-  {
     key: "telegram",
     label: "Telegram",
     url: siteContacts.telegramUrl
+  },
+  {
+    key: "facebook",
+    label: "Facebook",
+    url: siteContacts.facebookUrl
   }
 ].filter((link) => link.url);

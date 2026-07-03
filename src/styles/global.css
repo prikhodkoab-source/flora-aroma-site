@@ -459,29 +459,40 @@ select {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin-top: 34px;
+  gap: 16px;
+  margin-top: 32px;
 }
 
 .tilda-socials a {
-  display: inline-flex;
-  min-width: 132px;
-  min-height: 48px;
+  display: grid;
+  width: 42px;
+  height: 42px;
   align-items: center;
   justify-content: center;
-  border: 1px solid #000000;
-  color: #000000;
-  font-size: 15px;
-  font-weight: 700;
+  border-radius: 999px;
+  background: #000000;
+  color: #ffffff;
   text-decoration: none;
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .tilda-socials a:hover {
-  background: #000000;
-  color: #ffffff;
+  opacity: 0.72;
+  transform: translateY(-1px);
+}
+
+.tilda-socials svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.tilda-socials__link--facebook svg {
+  width: 19px;
+  height: 19px;
 }
 
 .tilda-product-page,
