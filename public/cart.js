@@ -1,6 +1,6 @@
 (() => {
   const STORAGE_KEY = "flora_cart_draft_v1";
-  let toastTimer;
+  const submissionStorageKey = "flora-aroma-site-submission-id";
 
   function readCart() {
     try {
@@ -16,8 +16,14 @@
     window.dispatchEvent(new CustomEvent("flora-cart-updated"));
   }
 
+  function normalizeQty(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number) || number < 1) return 1;
+    return Math.min(Math.round(number), 9999);
+  }
+
   function money(value) {
-    return `${Math.round(value)} UAH`;
+    return `${Math.round(value)} грн.`;
   }
 
   function escapeHtml(value) {
@@ -29,62 +35,35 @@
       .replaceAll("'", "&#39;");
   }
 
-  function normalizeQty(value) {
-    const number = Number(value);
-    if (!Number.isFinite(number) || number < 1) return 1;
-    return Math.min(Math.round(number), 9999);
-  }
-
   function cartItemKey(item) {
-    if (item.cartKey) return item.cartKey;
-    if (item.optionId && item.optionId !== "default") return `${item.plantId}::${item.optionId}`;
-    return item.plantId;
+    return item.cartKey || (item.optionId && item.optionId !== "default" ? `${item.plantId}::${item.optionId}` : item.plantId);
   }
 
   function datasetCartKey(dataset) {
-    const plantId = dataset.plantId || "";
     const optionId = dataset.optionId || "default";
-    return optionId && optionId !== "default" ? `${plantId}::${optionId}` : plantId;
+    return optionId && optionId !== "default" ? `${dataset.plantId}::${optionId}` : dataset.plantId;
   }
 
   function cartTotals(items = readCart()) {
     return items.reduce(
       (totals, item) => {
         const qty = normalizeQty(item.qty);
-        const price = Number(item.price || 0);
         totals.qty += qty;
-        totals.sum += qty * price;
+        totals.sum += qty * Number(item.price || 0);
         return totals;
       },
       { qty: 0, sum: 0 }
     );
   }
 
-  function updateCount() {
-    const total = cartTotals().qty;
-    document.querySelectorAll("[data-cart-count]").forEach((node) => {
-      node.textContent = String(total);
-      node.toggleAttribute("hidden", total === 0);
-    });
+  function qtyFromContext(button) {
+    const page = button.closest("[data-product-page]");
+    const input = page?.querySelector("[data-product-qty]");
+    return normalizeQty(input?.value || 1);
   }
 
-  function showToast(item) {
-    const toast = document.querySelector("[data-cart-toast]");
-    if (!(toast instanceof HTMLElement)) return;
-
-    const title = toast.querySelector("[data-cart-toast-title]");
-    const text = toast.querySelector("[data-cart-toast-text]");
-    if (title) title.textContent = "Додано до кошика";
-    if (text) text.textContent = item.name || item.plantId;
-
-    toast.hidden = false;
-    window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => {
-      toast.hidden = true;
-    }, 3600);
-  }
-
-  function addItem(dataset) {
+  function addItem(button) {
+    const dataset = button.dataset;
     const plantId = dataset.plantId || "";
     if (!plantId) return;
 
@@ -92,12 +71,13 @@
     const cartKey = datasetCartKey(dataset);
     const cart = readCart();
     const existing = cart.find((item) => cartItemKey(item) === cartKey);
+    const qty = qtyFromContext(button);
+
     if (existing) {
-      existing.qty = normalizeQty(Number(existing.qty) + 1);
+      existing.qty = normalizeQty(Number(existing.qty || 1) + qty);
       existing.image = existing.image || dataset.image || "";
-      showToast(existing);
     } else {
-      const item = {
+      cart.push({
         plantId,
         optionId,
         cartKey,
@@ -108,13 +88,12 @@
         unit: dataset.unit || "шт.",
         url: dataset.url || "",
         image: dataset.image || "",
-        qty: 1
-      };
-      cart.push(item);
-      showToast(item);
+        qty
+      });
     }
 
     writeCart(cart);
+    openCart();
   }
 
   function setQty(cartKey, qty) {
@@ -124,87 +103,83 @@
     writeCart(next);
   }
 
-  function customerData(page = document) {
+  function removeItem(cartKey) {
+    writeCart(readCart().filter((item) => cartItemKey(item) !== cartKey));
+  }
+
+  function customerData(root = document) {
     return {
-      name: page.querySelector("[data-cart-customer-name]")?.value?.trim() || "",
-      contact: page.querySelector("[data-cart-customer-contact]")?.value?.trim() || "",
-      delivery: page.querySelector("[data-cart-delivery]")?.value || "Самовивіз",
-      address: page.querySelector("[data-cart-address]")?.value?.trim() || ""
+      name: root.querySelector("[data-cart-customer-name]")?.value?.trim() || "",
+      email: root.querySelector("[data-cart-customer-email]")?.value?.trim() || "",
+      contact: root.querySelector("[data-cart-customer-contact]")?.value?.trim() || "",
+      delivery: "Уточнити з оператором",
+      address: ""
     };
   }
 
   function buildMessage(items, comment, customer = {}) {
-    const total = cartTotals(items).sum;
     const lines = [
-      "Добрий день. Прошу перевірити наявність і можливість резерву:",
+      "Доброго дня. Прошу перевірити наявність і можливість резерву:",
       ...items.map((item) => {
         const qty = normalizeQty(item.qty);
-        return `- ${item.name} (${item.plantId}), ${item.container}: ${qty} ${item.unit} x ${item.price} UAH = ${money(qty * Number(item.price || 0))}`;
+        return `- ${item.name}, ${item.container}: ${qty} ${item.unit} x ${item.price} UAH = ${Math.round(qty * Number(item.price || 0))} UAH`;
       }),
-      `Попередня сума за публічним прайсом: ${money(total)}.`,
-      "Розумію, що це чернетка заявки: наявність, формат і резерв підтверджує оператор."
+      `Попередня сума: ${Math.round(cartTotals(items).sum)} UAH.`,
+      "Наявність, формат і можливість резерву підтвердить оператор."
     ];
-
     if (customer.name) lines.push(`Ім'я: ${customer.name}`);
+    if (customer.email) lines.push(`Email: ${customer.email}`);
     if (customer.contact) lines.push(`Контакт: ${customer.contact}`);
-    if (customer.delivery) lines.push(`Отримання: ${customer.delivery}`);
-    if (customer.address) lines.push(`Адреса: ${customer.address}`);
-    if (comment.trim()) {
-      lines.push(`Коментар: ${comment.trim()}`);
-    }
-
+    if (comment.trim()) lines.push(`Коментар: ${comment.trim()}`);
     return lines.join("\n");
   }
 
-  function renderCartPage() {
-    const page = document.querySelector("[data-cart-page]");
-    if (!page) return;
+  function updateCount() {
+    const totals = cartTotals();
+    document.querySelectorAll("[data-cart-count]").forEach((node) => {
+      node.textContent = String(totals.qty);
+      node.toggleAttribute("hidden", totals.qty === 0);
+    });
+    document.querySelectorAll(".tilda-cart-icon").forEach((node) => {
+      node.classList.toggle("is-visible", totals.qty > 0);
+    });
+  }
 
-    const itemsRoot = page.querySelector("[data-cart-items]");
-    const empty = page.querySelector("[data-cart-empty]");
-    const totalQty = page.querySelector("[data-cart-total-qty]");
-    const totalSum = page.querySelector("[data-cart-total-sum]");
-    const message = page.querySelector("[data-cart-message]");
-    const comment = page.querySelector("[data-cart-comment]");
-    const status = page.querySelector("[data-cart-status]");
-    const submit = page.querySelector("[data-cart-submit]");
+  function renderCart() {
     const items = readCart();
     const totals = cartTotals(items);
+    const modal = document.querySelector("[data-cart-modal]");
+    const page = document.querySelector("[data-cart-page]");
+    const itemsRoot = document.querySelector("[data-cart-items]");
+    const empty = document.querySelector("[data-cart-empty]");
+    const totalSum = document.querySelector("[data-cart-total-sum]");
+    const message = document.querySelector("[data-cart-message]");
+    const comment = document.querySelector("[data-cart-comment]");
+    const status = document.querySelector("[data-cart-status]");
 
     if (empty) empty.hidden = items.length > 0;
-    if (totalQty) totalQty.textContent = String(totals.qty);
     if (totalSum) totalSum.textContent = money(totals.sum);
+
     if (itemsRoot) {
       itemsRoot.innerHTML = items
         .map((item) => {
-          const itemQty = normalizeQty(item.qty);
-          const url = escapeHtml(item.url || "");
-          const name = escapeHtml(item.name);
-          const image = escapeHtml(item.image || "");
-          const plantId = escapeHtml(item.plantId);
           const key = escapeHtml(cartItemKey(item));
-          const imageMarkup = image
-            ? `<a class="cart-item-image" href="${url || "#"}"><img src="${image}" alt="" loading="lazy"></a>`
-            : `<div class="cart-item-image cart-item-image-empty" aria-hidden="true"></div>`;
-
+          const qty = normalizeQty(item.qty);
+          const image = escapeHtml(item.image || "");
           return `
-            <article class="cart-item" data-cart-item="${key}">
-              ${imageMarkup}
-              <div class="cart-item-main">
-                <strong>${url ? `<a href="${url}">${name}</a>` : name}</strong>
-                <span>${plantId}</span>
-                <small>${escapeHtml(item.container)}</small>
+            <article class="tilda-cart-item" data-cart-item="${key}">
+              ${image ? `<img src="${image}" alt="">` : `<span></span>`}
+              <div>
+                <h3>${escapeHtml(item.name)}</h3>
+                <p>${escapeHtml(item.container)}</p>
+                <p>${money(qty * Number(item.price || 0))}</p>
               </div>
-              <div class="quantity-control" aria-label="Кількість">
-                <button type="button" data-cart-decrease="${key}" aria-label="Зменшити кількість">−</button>
-                <input type="number" min="1" max="9999" step="1" value="${itemQty}" data-cart-qty="${key}">
-                <button type="button" data-cart-increase="${key}" aria-label="Збільшити кількість">+</button>
+              <div class="tilda-cart-qty">
+                <button type="button" data-cart-decrease="${key}" aria-label="Зменшити">−</button>
+                <input type="number" min="1" max="9999" value="${qty}" data-cart-qty="${key}">
+                <button type="button" data-cart-increase="${key}" aria-label="Збільшити">+</button>
               </div>
-              <div class="cart-item-price">
-                <strong>${money(itemQty * Number(item.price || 0))}</strong>
-                <span>${escapeHtml(item.price)} UAH/${escapeHtml(item.unit)}</span>
-              </div>
-              <button class="table-cart-button" type="button" data-cart-remove="${key}">Прибрати</button>
+              <button class="tilda-cart-remove" type="button" data-cart-remove="${key}" aria-label="Видалити">×</button>
             </article>
           `;
         })
@@ -212,37 +187,54 @@
     }
 
     if (message) {
-      message.value = items.length > 0 ? buildMessage(items, comment?.value || "", customerData(page)) : "";
+      message.value = items.length > 0 ? buildMessage(items, comment?.value || "", customerData(page || document)) : "";
     }
-    if (submit instanceof HTMLButtonElement) submit.disabled = items.length === 0;
-    if (status) {
+
+    if (status && !modal?.hasAttribute("hidden")) {
       status.textContent = "";
       status.classList.remove("is-success");
     }
+
+    updateCount();
+  }
+
+  function openCart() {
+    const modal = document.querySelector("[data-cart-modal]");
+    if (!(modal instanceof HTMLElement)) return;
+    renderCart();
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("tilda-cart-open");
+  }
+
+  function closeCart() {
+    const modal = document.querySelector("[data-cart-modal]");
+    if (!(modal instanceof HTMLElement)) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("tilda-cart-open");
   }
 
   async function submitOrder(button) {
     const page = document.querySelector("[data-cart-page]");
-    if (!page) return;
-
-    const status = page.querySelector("[data-cart-status]");
+    const status = document.querySelector("[data-cart-status]");
     const items = readCart();
-    const customer = customerData(page);
-    const comment = page.querySelector("[data-cart-comment]")?.value || "";
-    const website = page.querySelector("[data-cart-website]")?.value || "";
+    const customer = customerData(page || document);
+    const comment = document.querySelector("[data-cart-comment]")?.value || "";
+    const website = document.querySelector("[data-cart-website]")?.value || "";
 
     if (items.length === 0) {
       if (status) status.textContent = "Кошик порожній.";
       return;
     }
     if (!customer.name) {
-      page.querySelector("[data-cart-customer-name]")?.focus();
-      if (status) status.textContent = "Вкажіть ім'я.";
+      document.querySelector("[data-cart-customer-name]")?.focus();
+      if (status) status.textContent = "Вкажіть імʼя.";
       return;
     }
     if (!customer.contact) {
-      page.querySelector("[data-cart-customer-contact]")?.focus();
-      if (status) status.textContent = "Вкажіть телефон або Telegram/Viber.";
+      document.querySelector("[data-cart-customer-contact]")?.focus();
+      if (status) status.textContent = "Вкажіть телефон.";
       return;
     }
 
@@ -251,7 +243,6 @@
     if (status) status.textContent = "Передаємо заявку оператору.";
 
     try {
-      const submissionStorageKey = "flora-aroma-site-submission-id";
       let submissionId = window.localStorage.getItem(submissionStorageKey);
       if (!submissionId) {
         submissionId = window.crypto.randomUUID();
@@ -276,13 +267,11 @@
         })
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || "Не вдалося передати заявку.");
-      }
+      if (!response.ok || !result.ok) throw new Error(result.error || "Не вдалося передати заявку.");
 
       writeCart([]);
       window.localStorage.removeItem(submissionStorageKey);
-      renderCartPage();
+      renderCart();
       if (status) {
         status.textContent = `Заявку ${result.requestId} передано оператору. Очікуйте підтвердження.`;
         status.classList.add("is-success");
@@ -294,7 +283,7 @@
       }
     } finally {
       button.disabled = readCart().length === 0;
-      button.textContent = "Надіслати заявку оператору";
+      button.textContent = "Оформити замовлення";
     }
   }
 
@@ -304,118 +293,68 @@
 
     const addButton = target.closest("[data-cart-add]");
     if (addButton instanceof HTMLElement) {
-      addItem(addButton.dataset);
-      addButton.textContent = "Додано";
-      window.setTimeout(() => {
-        addButton.textContent = addButton.classList.contains("table-cart-button") ? "Додати" : "Додати в кошик";
-      }, 1200);
+      addItem(addButton);
       return;
     }
 
-    const decreaseButton = target.closest("[data-cart-decrease]");
-    if (decreaseButton instanceof HTMLElement) {
-      const key = decreaseButton.dataset.cartDecrease;
+    if (target.closest("[data-cart-open]")) {
+      openCart();
+      return;
+    }
+
+    if (target.closest("[data-cart-close]")) {
+      closeCart();
+      return;
+    }
+
+    const decrease = target.closest("[data-cart-decrease]");
+    if (decrease instanceof HTMLElement) {
+      const key = decrease.dataset.cartDecrease;
       const item = readCart().find((cartItem) => cartItemKey(cartItem) === key);
-      if (item) {
-        if (normalizeQty(item.qty) <= 1) {
-          writeCart(readCart().filter((cartItem) => cartItemKey(cartItem) !== key));
-        } else {
-          setQty(key, normalizeQty(item.qty) - 1);
-        }
-        renderCartPage();
-      }
+      if (item && normalizeQty(item.qty) <= 1) removeItem(key);
+      if (item && normalizeQty(item.qty) > 1) setQty(key, normalizeQty(item.qty) - 1);
+      renderCart();
       return;
     }
 
-    const increaseButton = target.closest("[data-cart-increase]");
-    if (increaseButton instanceof HTMLElement) {
-      const key = increaseButton.dataset.cartIncrease;
+    const increase = target.closest("[data-cart-increase]");
+    if (increase instanceof HTMLElement) {
+      const key = increase.dataset.cartIncrease;
       const item = readCart().find((cartItem) => cartItemKey(cartItem) === key);
-      if (item) {
-        setQty(key, normalizeQty(item.qty) + 1);
-        renderCartPage();
-      }
+      if (item) setQty(key, normalizeQty(item.qty) + 1);
+      renderCart();
       return;
     }
 
-    const removeButton = target.closest("[data-cart-remove]");
-    if (removeButton instanceof HTMLElement) {
-      const key = removeButton.dataset.cartRemove;
-      writeCart(readCart().filter((item) => cartItemKey(item) !== key));
-      renderCartPage();
+    const remove = target.closest("[data-cart-remove]");
+    if (remove instanceof HTMLElement) {
+      removeItem(remove.dataset.cartRemove);
+      renderCart();
       return;
     }
 
-    if (target.closest("[data-cart-clear]")) {
-      writeCart([]);
-      renderCartPage();
-      return;
-    }
-
-    if (target.closest("[data-cart-toast-close]")) {
-      const toast = document.querySelector("[data-cart-toast]");
-      if (toast instanceof HTMLElement) toast.hidden = true;
-      return;
-    }
-
-    if (target.closest("[data-cart-copy]")) {
-      const message = document.querySelector("[data-cart-message]");
-      const status = document.querySelector("[data-cart-status]");
-      if (message && message.value) {
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(message.value);
-        } else {
-          message.focus();
-          message.select();
-          document.execCommand("copy");
-        }
-        if (status) status.textContent = "Заявку скопійовано.";
-      } else if (status) {
-        status.textContent = "Кошик порожній.";
-      }
-      return;
-    }
-
-    const submitButton = target.closest("[data-cart-submit]");
-    if (submitButton instanceof HTMLButtonElement) {
-      await submitOrder(submitButton);
+    const submit = target.closest("[data-cart-submit]");
+    if (submit instanceof HTMLButtonElement) {
+      await submitOrder(submit);
     }
   });
 
   document.addEventListener("input", (event) => {
     const target = event.target;
-    if (
-      !(
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        target instanceof HTMLSelectElement
-      )
-    ) {
-      return;
-    }
-
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
     if (target.matches("[data-cart-qty]")) {
       setQty(target.dataset.cartQty, target.value);
-      renderCartPage();
     }
-
-    if (
-      target.matches(
-        "[data-cart-comment], [data-cart-customer-name], [data-cart-customer-contact], [data-cart-delivery], [data-cart-address]"
-      )
-    ) {
-      renderCartPage();
+    if (target.matches("[data-cart-qty], [data-cart-comment], [data-cart-customer-name], [data-cart-customer-email], [data-cart-customer-contact]")) {
+      renderCart();
     }
   });
 
-  document.addEventListener("focus", (event) => {
-    const target = event.target;
-    if (target instanceof HTMLInputElement && target.matches("[data-cart-qty]")) {
-      target.select();
-    }
-  }, true);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeCart();
+  });
 
-  window.addEventListener("flora-cart-updated", updateCount);
+  window.addEventListener("flora-cart-updated", renderCart);
   updateCount();
-  renderCartPage();
+  renderCart();
 })();

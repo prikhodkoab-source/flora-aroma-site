@@ -1,0 +1,70 @@
+<div class="tilda-cart-icon" data-cart-open role="button" tabindex="0" aria-label="Відкрити кошик">
+  <span class="tilda-cart-icon__text"></span>
+  <span class="tilda-cart-icon__bag" aria-hidden="true">
+    <svg viewBox="0 0 64 64" width="34" height="34">
+      <path fill="none" stroke="currentColor" stroke-width="2" d="M44 18h10v45H10V18h10z"></path>
+      <path fill="none" stroke="currentColor" stroke-width="2" d="M22 24V11c0-5.523 4.477-10 10-10s10 4.477 10 10v13"></path>
+    </svg>
+    <span class="tilda-cart-icon__counter" data-cart-count hidden>0</span>
+  </span>
+</div>
+
+<div class="tilda-cart-page" data-cart-modal hidden aria-hidden="true">
+  <div class="tilda-cart-page__top">
+    <button class="tilda-cart-page__back" type="button" data-cart-close aria-label="Назад">
+      <svg viewBox="0 0 26 26" width="24" height="24"><path d="m10.4142 5 1.4142 1.4142L5.829 12.414l17.5852.0002v2L5.829 14.414l5.9994 6.0002-1.4142 1.4142L2 13.4142 10.4142 5Z"></path></svg>
+    </button>
+    <div class="tilda-cart-page__heading">Ваше замовлення</div>
+    <button class="tilda-cart-page__close" type="button" data-cart-close aria-label="Закрити кошик">×</button>
+  </div>
+
+  <div class="tilda-cart-page__content">
+    <form class="tilda-cart-form" data-cart-page>
+      <div class="tilda-cart-empty" data-cart-empty>
+        <p>Кошик порожній.</p>
+      </div>
+
+      <div class="tilda-cart-form__fields">
+        <label>
+          <span>Ваше імʼя</span>
+          <input type="text" autocomplete="name" required data-cart-customer-name placeholder="Тарас Шевченко" />
+        </label>
+        <label>
+          <span>Ваш Email</span>
+          <input type="email" autocomplete="email" data-cart-customer-email placeholder="ShevchenkoTG@gmail.com" />
+        </label>
+        <label>
+          <span>Ваш телефон</span>
+          <input type="tel" autocomplete="tel" required data-cart-customer-contact placeholder="+380..." />
+        </label>
+        <label>
+          <span>Коментар</span>
+          <textarea rows="3" data-cart-comment placeholder="Побажання до замовлення"></textarea>
+        </label>
+        <label class="tilda-cart-honeypot" aria-hidden="true">
+          <span>Сайт</span>
+          <input type="text" tabindex="-1" autocomplete="off" data-cart-website />
+        </label>
+      </div>
+
+      <div class="tilda-payment">
+        <div class="tilda-input-title">Payment method</div>
+        <label><input type="radio" name="paymentsystem" value="cash" checked /> <span>Готівкою при отриманні</span></label>
+        <label><input type="radio" name="paymentsystem" value="banktransfer" /> <span>Безготівкова оплата</span></label>
+      </div>
+
+      <p class="tilda-cart-safety">Наявність, формат і можливість резерву підтвердить оператор.</p>
+      <button class="tilda-submit" type="button" data-cart-submit>Оформити замовлення</button>
+      <p class="tilda-cart-status" data-cart-status aria-live="polite"></p>
+      <textarea class="tilda-cart-message" data-cart-message readonly hidden></textarea>
+    </form>
+
+    <aside class="tilda-cart-info">
+      <div class="tilda-cart-products" data-cart-items></div>
+      <div class="tilda-cart-total">
+        <span>Разом:</span>
+        <strong data-cart-total-sum>0 грн.</strong>
+      </div>
+    </aside>
+  </div>
+</div>

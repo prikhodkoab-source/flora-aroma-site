@@ -1,97 +1,22 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import TildaCloneFooter from "../components/TildaCloneFooter.astro";
+import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
 ---
 
-<BaseLayout
-  title="Кошик | Flora & Aroma"
-  description="Кошик Flora & Aroma формує чернетку заявки для оператора без автоматичного резерву або списання складу."
->
-  <section class="page-title">
-    <p class="eyebrow">Чернетка заявки</p>
-    <h1>Кошик</h1>
-    <p>
-      Додані позиції не є підтвердженим замовленням. Оператор перевірить наявність,
-      кількість, формат і можливість резерву перед оформленням.
-    </p>
+<BaseLayout title="Кошик | Flora & Aroma">
+  <TildaCloneShopHeader />
+  <section class="tilda-cart-route">
+    <h1>Ваше замовлення</h1>
+    <p>Кошик відкривається у форматі Tilda. Заявка не створює резерв, оплату або списання складу без підтвердження оператора.</p>
+    <button class="tilda-buy-button" type="button" data-cart-open>Відкрити кошик</button>
+    <a class="tilda-back-link" href="/shop/">← Повернутися до асортименту</a>
   </section>
-
-  <section class="section compact-section">
-    <div class="cart-layout" data-cart-page>
-      <section class="cart-panel">
-        <div class="section-heading">
-          <h2>Позиції</h2>
-          <div class="cart-panel-actions">
-            <a class="button button-secondary" href="/catalog/">Продовжити покупки</a>
-            <button class="button button-secondary" type="button" data-cart-clear>Очистити</button>
-          </div>
-        </div>
-        <div class="cart-empty" data-cart-empty>
-          <p>Кошик порожній.</p>
-          <a class="button" href="/catalog/">Перейти до каталогу</a>
-        </div>
-        <div class="cart-items" data-cart-items></div>
-      </section>
-
-      <aside class="cart-summary">
-        <h2>Оформити заявку</h2>
-        <dl class="facts">
-          <div>
-            <dt>Позицій</dt>
-            <dd data-cart-total-qty>0</dd>
-          </div>
-          <div>
-            <dt>Попередня сума</dt>
-            <dd data-cart-total-sum>0 UAH</dd>
-          </div>
-        </dl>
-        <p>
-          Сума розрахована з публічного прайса. Наявність і резерв підтверджує оператор у день відповіді.
-        </p>
-        <div class="cart-customer-fields">
-          <label class="cart-comment">
-            Ім'я *
-            <input type="text" autocomplete="name" maxlength="80" required data-cart-customer-name placeholder="Як до вас звертатися">
-          </label>
-          <label class="cart-comment">
-            Телефон або Telegram/Viber *
-            <input type="text" autocomplete="tel" maxlength="100" required data-cart-customer-contact placeholder="+380... або @username">
-          </label>
-          <label class="cart-comment">
-            Спосіб отримання
-            <select data-cart-delivery>
-              <option value="Самовивіз">Самовивіз</option>
-              <option value="Нова пошта">Нова пошта</option>
-              <option value="Кур'єр або інше">Кур'єр або інше</option>
-            </select>
-          </label>
-          <label class="cart-comment">
-            Місто та адреса / відділення
-            <input type="text" autocomplete="street-address" maxlength="180" data-cart-address placeholder="Для самовивозу можна не заповнювати">
-          </label>
-          <label class="cart-honeypot" aria-hidden="true">
-            Сайт
-            <input type="text" tabindex="-1" autocomplete="off" data-cart-website>
-          </label>
-        </div>
-        <label class="cart-comment">
-          Коментар до заявки
-          <textarea data-cart-comment rows="4" maxlength="500" placeholder="Побажання по строках, замінах або інші уточнення"></textarea>
-        </label>
-        <details class="cart-message-preview">
-          <summary>Переглянути текст заявки</summary>
-          <label class="cart-comment">
-          Текст заявки
-          <textarea data-cart-message rows="10" readonly></textarea>
-          </label>
-        </details>
-        <div class="hero-actions">
-          <button class="button" type="button" data-cart-submit>Надіслати заявку оператору</button>
-          <button class="button button-secondary" type="button" data-cart-copy>Скопіювати</button>
-          <a class="button button-secondary" href="/catalog/">Продовжити покупки</a>
-          <a class="button button-secondary" href="tel:+380500272882">Зателефонувати</a>
-        </div>
-        <p class="cart-status" data-cart-status aria-live="polite"></p>
-      </aside>
-    </div>
-  </section>
+  <TildaCloneFooter showContacts={true} />
 </BaseLayout>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    document.querySelector("[data-cart-open]")?.click();
+  });
+</script>
