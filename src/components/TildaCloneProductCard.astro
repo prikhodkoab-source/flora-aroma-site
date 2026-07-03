@@ -1,0 +1,43 @@
+---
+const { product } = Astro.props;
+const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
+const hoverImage = product.image_paths?.[1] || image;
+const option = product.options?.[0] || {
+  variant_id: "default",
+  container: product.container,
+  price_uah: product.price_uah,
+  unit: product.unit
+};
+---
+
+<article class="tilda-product-card js-product">
+  <a class="tilda-product-card__link" href={`/plants/${product.slug}/`}>
+    <span class="tilda-product-card__image-wrap">
+      <span class="tilda-product-card__image tilda-product-card__image--first" style={`background-image:url('${image}')`}></span>
+      <span class="tilda-product-card__image tilda-product-card__image--second" style={`background-image:url('${hoverImage}')`}></span>
+    </span>
+    <span class="tilda-product-card__text">
+      <span class="tilda-product-card__title">{product.name_uk} ({product.latin_name})</span>
+      <span class="tilda-product-card__descr">{product.summary}</span>
+      <span class="tilda-product-card__price">
+        <span>{option.price_uah}</span><span>грн.</span>
+      </span>
+    </span>
+  </a>
+  <button
+    class="tilda-product-card__button"
+    type="button"
+    data-cart-add
+    data-plant-id={product.plant_id}
+    data-name={product.name_uk}
+    data-latin={product.latin_name}
+    data-container={option.container}
+    data-price={option.price_uah}
+    data-unit={option.unit}
+    data-option-id={option.variant_id}
+    data-url={`/plants/${product.slug}/`}
+    data-image={image}
+  >
+    Додати до кошика
+  </button>
+</article>

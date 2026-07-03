@@ -1,0 +1,59 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TildaCloneFooter from "../components/TildaCloneFooter.astro";
+import TildaCloneProductCard from "../components/TildaCloneProductCard.astro";
+import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
+import { getProducts } from "../lib/products";
+
+const products = getProducts();
+---
+
+<BaseLayout
+  title="Flora i Aroma - katalog sadzhantsiv"
+  description="Katalog sadzhantsiv. Nayavnist i hotovnist utochnyuyemo pered vidpravkoyu."
+  image="/images/tilda-clone/tilda-logo.png"
+>
+  <TildaCloneShopHeader />
+
+  <section class="tilda-shop-preface">
+    <div class="tilda-container tilda-container--narrow tilda-align-center">
+      <p><strong>Дім правильних рослин</strong><br />Рослини, вирощені за сучасними технологіями</p>
+    </div>
+  </section>
+
+  <section class="tilda-catalog-section">
+    <div class="tilda-products-grid">
+      {products.map((product) => <TildaCloneProductCard product={product} />)}
+    </div>
+  </section>
+
+  <section class="tilda-info-block">
+    <div class="tilda-container tilda-container--narrow tilda-align-center">
+      <h2>Оплата</h2>
+      <div>
+        Доступні способи оплати:<br /><br />
+        <ul>
+          <li>Готівкою при отриманні (Нова Пошта);</li>
+          <li>Онлайн-оплата карткою</li>
+          <li>Безготівкова оплата</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tilda-info-block">
+    <div class="tilda-container tilda-container--narrow tilda-align-center">
+      <h2>Інформація про доставку</h2>
+      <div>
+        <p>Доставка здійснюється по всій Україні.</p>
+        <br />
+        <ul>
+          <li>Нова Пошта — відправка у відділення або кур’єром;</li>
+          <li>Укрпошта - відправка у відділення.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <TildaCloneFooter showContacts={true} />
+</BaseLayout>

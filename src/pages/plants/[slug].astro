@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatFlowering, formatHeight, getProducts, getPublicAvailabilityLabel } from "../../lib/products";
+import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
+import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
+import { getProducts } from "../../lib/products";
 
 export function getStaticPaths() {
   return getProducts().map((product) => ({
@@ -10,294 +12,124 @@ export function getStaticPaths() {
 }
 
 const { product } = Astro.props;
-const description = product.seo_description;
-const imagePaths = product.image_paths;
-const winterHardiness = product.winter_hardiness_short;
+const imagePaths = product.image_paths.length > 0 ? product.image_paths : ["/images/tilda-clone/tilda-logo.png"];
 const selectedOption = product.options[0];
 ---
 
 <BaseLayout
   title={product.seo_title || `${product.name_uk} | Flora & Aroma`}
-  description={description}
-  image={product.primary_image_path}
+  description={product.seo_description || product.summary}
+  image={imagePaths[0]}
 >
-  <article class="product-page">
-    <a class="back-link" href="/catalog/">Назад до каталогу</a>
-    <div class="product-header">
-      <div>
-        <span class="plant-id">{product.category}</span>
+  <TildaCloneShopHeader />
+
+  <article class="tilda-product-page" data-product-page>
+    <a class="tilda-back-link" href="/shop/">← Назад до асортименту</a>
+    <div class="tilda-product-layout">
+      <section class="tilda-product-gallery" data-gallery>
+        <button class="tilda-product-gallery__stage" type="button" data-gallery-open aria-label="Переглянути фото">
+          <img src={imagePaths[0]} alt={product.name_uk} data-gallery-image />
+        </button>
+        {imagePaths.length > 1 && (
+          <div class="tilda-product-gallery__thumbs">
+            {imagePaths.map((path, index) => (
+              <button type="button" data-gallery-thumb data-src={path} data-index={index} aria-pressed={index === 0 ? "true" : "false"}>
+                <img src={path} alt="" loading="lazy" />
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section class="tilda-product-info">
         <h1>{product.name_uk}</h1>
-        <p><em>{product.latin_name}</em></p>
-        <a class="category-link" href={`/categories/${product.category_slug}/`}>{product.category}</a>
-        <div class="product-buy-panel">
-          <dl class="facts product-buy-facts">
-            <div>
-              <dt>Формат</dt>
-              <dd data-selected-container>{selectedOption.container}</dd>
-            </div>
-            <div>
-              <dt>Ціна</dt>
-              <dd data-selected-price>{selectedOption.price_uah} UAH/{selectedOption.unit}</dd>
-            </div>
-            <div>
-              <dt>Наявність</dt>
-              <dd>{getPublicAvailabilityLabel(product)}</dd>
-            </div>
-          </dl>
-          <div class="attribute-strip" aria-label="Короткі характеристики">
-            <span>сонце: {product.sun_labels.join(" / ")}</span>
-            <span>вологість: {product.moisture_labels.join(" / ")}</span>
-            <span>висота: {formatHeight(product)}</span>
-            <span>цвітіння: {formatFlowering(product)}</span>
-            <span>призначення: {product.use_case_labels.slice(0, 3).join(", ")}</span>
-            <span data-selected-format-chip>формат: {selectedOption.container}</span>
-            <span data-selected-price-chip>ціна: {selectedOption.price_uah} UAH/{selectedOption.unit}</span>
-            {winterHardiness && <span>{winterHardiness}</span>}
-          </div>
-          {product.has_multiple_options && (
-            <fieldset class="product-option-picker" data-product-options>
-              <legend>Оберіть формат</legend>
-              {product.options.map((option, index) => (
-                <label>
-                  <input
-                    type="radio"
-                    name={`option-${product.plant_id}`}
-                    value={option.variant_id}
-                    checked={index === 0}
-                    data-product-option
-                    data-option-id={option.variant_id}
-                    data-container={option.container}
-                    data-price={option.price_uah}
-                    data-unit={option.unit}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </fieldset>
-          )}
-          <div class="hero-actions">
-            <button
-              class="button"
-              type="button"
-              data-cart-add
-              data-plant-id={product.plant_id}
-              data-name={product.name_uk}
-              data-latin={product.latin_name}
-              data-container={selectedOption.container}
-              data-price={selectedOption.price_uah}
-              data-unit={selectedOption.unit}
-              data-option-id={selectedOption.variant_id}
-              data-url={`/plants/${product.slug}/`}
-              data-image={product.primary_image_path}
-            >
-              Додати в кошик
-            </button>
-            <a class="button" href="tel:+380500272882">Уточнити наявність</a>
-            <a class="button button-secondary" href="/how-to-order/">Як замовити</a>
-          </div>
+        <p class="tilda-product-latin"><em>{product.latin_name}</em></p>
+        <div class="tilda-product-price" data-selected-price>{selectedOption.price_uah} грн.</div>
+        <p class="tilda-product-summary">{product.summary}</p>
+
+        <div class="tilda-product-options">
+          <div class="tilda-input-title">Формат</div>
+          {product.options.map((option, index) => (
+            <label>
+              <input
+                type="radio"
+                name={`option-${product.plant_id}`}
+                checked={index === 0}
+                data-product-option
+                data-option-id={option.variant_id}
+                data-container={option.container}
+                data-price={option.price_uah}
+                data-unit={option.unit}
+              />
+              <span>{option.container}</span>
+            </label>
+          ))}
         </div>
-      </div>
-      {imagePaths.length > 0 && (
-        <div class="product-media" data-gallery>
-          <div class="gallery-stage">
-            <button
-              class="gallery-nav gallery-nav-prev"
-              type="button"
-              aria-label="Попереднє фото"
-              data-gallery-prev
-              hidden={imagePaths.length < 2}
-            >
-              ‹
-            </button>
-            <button class="gallery-image-button" type="button" aria-label={`Переглянути фото: ${product.name_uk}`} data-gallery-open>
-              <img src={imagePaths[0]} alt={`${product.name_uk} - фото`} loading="eager" data-gallery-image />
-            </button>
-            <button
-              class="gallery-nav gallery-nav-next"
-              type="button"
-              aria-label="Наступне фото"
-              data-gallery-next
-              hidden={imagePaths.length < 2}
-            >
-              ›
-            </button>
-          </div>
-          {imagePaths.length > 1 && (
-            <div class="gallery-thumbs" aria-label="Фото рослини">
-              {imagePaths.map((path, index) => (
-                <button
-                  class="gallery-thumb"
-                  type="button"
-                  aria-label={`Фото ${index + 1}`}
-                  aria-pressed={index === 0 ? "true" : "false"}
-                  data-gallery-thumb
-                  data-src={path}
-                  data-index={index}
-                >
-                  <img src={path} alt="" loading="lazy" />
-                </button>
-              ))}
-            </div>
-          )}
-          <dialog class="gallery-dialog" data-gallery-dialog>
-            <button class="gallery-close" type="button" aria-label="Закрити перегляд" data-gallery-close>×</button>
-            <button
-              class="gallery-dialog-nav gallery-dialog-prev"
-              type="button"
-              aria-label="Попереднє фото"
-              data-gallery-prev
-              hidden={imagePaths.length < 2}
-            >
-              ‹
-            </button>
-            <img src={imagePaths[0]} alt={`${product.name_uk} - фото`} data-gallery-dialog-image />
-            <button
-              class="gallery-dialog-nav gallery-dialog-next"
-              type="button"
-              aria-label="Наступне фото"
-              data-gallery-next
-              hidden={imagePaths.length < 2}
-            >
-              ›
-            </button>
-          </dialog>
-        </div>
-      )}
+
+        <label class="tilda-quantity">
+          <span>Кількість</span>
+          <input type="number" min="1" step="1" value="1" data-product-qty />
+        </label>
+
+        <button
+          class="tilda-buy-button"
+          type="button"
+          data-cart-add
+          data-plant-id={product.plant_id}
+          data-name={product.name_uk}
+          data-latin={product.latin_name}
+          data-container={selectedOption.container}
+          data-price={selectedOption.price_uah}
+          data-unit={selectedOption.unit}
+          data-option-id={selectedOption.variant_id}
+          data-url={`/plants/${product.slug}/`}
+          data-image={imagePaths[0]}
+        >
+          Додати до кошика
+        </button>
+      </section>
     </div>
 
-    <section class="plant-summary">
-      <p>{product.summary}</p>
-    </section>
-
-    <section class="plant-details" aria-label="Опис рослини">
-      <dl class="facts plant-attributes">
-        <div>
-          <dt>Освітлення</dt>
-          <dd>{product.sun_labels.join(" / ")}</dd>
-        </div>
-        <div>
-          <dt>Волога</dt>
-          <dd>{product.moisture_labels.join(" / ")}</dd>
-        </div>
-        <div>
-          <dt>Висота</dt>
-          <dd>{formatHeight(product)}</dd>
-        </div>
-        <div>
-          <dt>Цвітіння</dt>
-          <dd>{formatFlowering(product)}</dd>
-        </div>
-        <div>
-          <dt>Колір</dt>
-          <dd>{product.flower_color_labels.join(" / ")}</dd>
-        </div>
-        <div>
-          <dt>Зимостійкість</dt>
-          <dd>{product.winter_hardiness}</dd>
-        </div>
-        <div>
-          <dt>Крок посадки</dt>
-          <dd>{product.spacing_cm} см</dd>
-        </div>
-        <div>
-          <dt>Використання</dt>
-          <dd>{product.use_case_labels.slice(0, 4).join(", ")}</dd>
-        </div>
+    <section class="tilda-product-description">
+      <h2>Опис</h2>
+      <p>{product.full_description || product.summary}</p>
+      <dl>
+        <div><dt>Освітлення</dt><dd>{product.sun_labels.join(" / ")}</dd></div>
+        <div><dt>Волога</dt><dd>{product.moisture_labels.join(" / ")}</dd></div>
+        <div><dt>Висота</dt><dd>{product.height_cm_min}-{product.height_cm_max} см</dd></div>
+        <div><dt>Цвітіння</dt><dd>{product.flowering_labels.join(", ")}</dd></div>
+        <div><dt>Зимостійкість</dt><dd>{product.winter_hardiness_short}</dd></div>
       </dl>
-      <div class="detail-grid">
-        <section>
-          <h3>Екологічні характеристики</h3>
-          <p>{product.ecology_text}</p>
-        </section>
-        <section>
-          <h3>Агротехніка</h3>
-          <p>{product.agrotechnics_text}</p>
-        </section>
-        <section>
-          <h3>Господарське застосування</h3>
-          <p>{product.use_text}</p>
-        </section>
-      </div>
-    </section>
-
-    <section class="notice">
-      <h2>Замовлення</h2>
-      <p>
-        Додайте рослину в кошик або напишіть нам. Кошик формує тільки чернетку заявки; наявність, кількість і резерв підтверджує оператор.
-      </p>
-      <a class="button" href="/cart/">Перейти до кошика</a>
     </section>
   </article>
+
+  <TildaCloneFooter showContacts={true} />
 </BaseLayout>
 
 <script>
-  document.querySelectorAll<HTMLElement>("[data-gallery]").forEach((gallery) => {
-    const image = gallery.querySelector<HTMLImageElement>("[data-gallery-image]");
-    const dialog = gallery.querySelector<HTMLDialogElement>("[data-gallery-dialog]");
-    const dialogImage = gallery.querySelector<HTMLImageElement>("[data-gallery-dialog-image]");
-    const thumbs = Array.from(gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-thumb]"));
-    const openButton = gallery.querySelector<HTMLButtonElement>("[data-gallery-open]");
-    const closeButton = gallery.querySelector<HTMLButtonElement>("[data-gallery-close]");
-    const paths = thumbs.length > 0 ? thumbs.map((thumb) => thumb.dataset.src || "") : image?.src ? [image.getAttribute("src") || image.src] : [];
-    let current = 0;
-
-    function setCurrent(index: number) {
-      if (!image || paths.length === 0) return;
-      current = (index + paths.length) % paths.length;
-      image.src = paths[current];
-      if (dialogImage) dialogImage.src = paths[current];
-      thumbs.forEach((thumb, thumbIndex) => {
-        thumb.setAttribute("aria-pressed", thumbIndex === current ? "true" : "false");
-      });
-    }
-
-    gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-prev]").forEach((button) => {
-      button.addEventListener("click", () => setCurrent(current - 1));
-    });
-
-    gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-next]").forEach((button) => {
-      button.addEventListener("click", () => setCurrent(current + 1));
-    });
-
+  document.querySelectorAll("[data-gallery]").forEach((gallery) => {
+    const image = gallery.querySelector("[data-gallery-image]");
+    const thumbs = Array.from(gallery.querySelectorAll("[data-gallery-thumb]"));
     thumbs.forEach((thumb) => {
-      thumb.addEventListener("click", () => setCurrent(Number(thumb.dataset.index || 0)));
-    });
-
-    openButton?.addEventListener("click", () => {
-      if (!dialog) return;
-      setCurrent(current);
-      dialog.showModal();
-    });
-
-    closeButton?.addEventListener("click", () => dialog?.close());
-    dialog?.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close();
+      thumb.addEventListener("click", () => {
+        if (!(image instanceof HTMLImageElement)) return;
+        image.src = thumb.dataset.src || image.src;
+        thumbs.forEach((item) => item.setAttribute("aria-pressed", item === thumb ? "true" : "false"));
+      });
     });
   });
 
-  document.querySelectorAll<HTMLElement>("[data-product-options]").forEach((picker) => {
-    const panel = picker.closest<HTMLElement>(".product-buy-panel");
-    const container = panel?.querySelector<HTMLElement>("[data-selected-container]");
-    const price = panel?.querySelector<HTMLElement>("[data-selected-price]");
-    const formatChip = panel?.querySelector<HTMLElement>("[data-selected-format-chip]");
-    const priceChip = panel?.querySelector<HTMLElement>("[data-selected-price-chip]");
-    const addButton = panel?.querySelector<HTMLButtonElement>("[data-cart-add]");
-
-    picker.querySelectorAll<HTMLInputElement>("[data-product-option]").forEach((input) => {
+  document.querySelectorAll("[data-product-page]").forEach((page) => {
+    const addButton = page.querySelector("[data-cart-add]");
+    const price = page.querySelector("[data-selected-price]");
+    page.querySelectorAll("[data-product-option]").forEach((input) => {
       input.addEventListener("change", () => {
-        if (!input.checked || !addButton) return;
-        const nextContainer = input.dataset.container || "";
-        const nextPrice = input.dataset.price || "";
-        const nextUnit = input.dataset.unit || "шт.";
-
-        addButton.dataset.container = nextContainer;
-        addButton.dataset.price = nextPrice;
-        addButton.dataset.unit = nextUnit;
+        if (!(input instanceof HTMLInputElement) || !input.checked || !(addButton instanceof HTMLElement)) return;
+        addButton.dataset.container = input.dataset.container || "";
+        addButton.dataset.price = input.dataset.price || "";
+        addButton.dataset.unit = input.dataset.unit || "шт.";
         addButton.dataset.optionId = input.dataset.optionId || "";
-        if (container) container.textContent = nextContainer;
-        if (price) price.textContent = `${nextPrice} UAH/${nextUnit}`;
-        if (formatChip) formatChip.textContent = `формат: ${nextContainer}`;
-        if (priceChip) priceChip.textContent = `ціна: ${nextPrice} UAH/${nextUnit}`;
+        if (price) price.textContent = `${input.dataset.price || ""} грн.`;
       });
     });
   });
