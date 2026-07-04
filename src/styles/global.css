@@ -107,13 +107,6 @@ select {
   text-align: center;
 }
 
-.tilda-hero-logo {
-  display: block;
-  width: 132px;
-  height: auto;
-  margin: 0 auto 34px;
-}
-
 .tilda-hero-content__uptitle {
   margin-bottom: 34px;
   font-size: 24px;
@@ -1049,11 +1042,6 @@ select {
   .tilda-cover__wrapper {
     padding-right: 18px;
     padding-left: 18px;
-  }
-
-  .tilda-hero-logo {
-    width: 112px;
-    margin-bottom: 28px;
   }
 
   .tilda-hero-content h1 {
