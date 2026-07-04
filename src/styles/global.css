@@ -1065,7 +1065,7 @@ select {
 
   .tilda-products-grid {
     grid-template-columns: minmax(0, 1fr);
-    width: min(280px, calc(100% - 40px));
+    width: min(520px, calc(100% - 44px));
     gap: 46px;
   }
 
