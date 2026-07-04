@@ -333,7 +333,7 @@
 
   document.addEventListener("click", async (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
+    if (!(target instanceof Element)) return;
 
     const addButton = target.closest("[data-cart-add]");
     if (addButton instanceof HTMLElement) {
