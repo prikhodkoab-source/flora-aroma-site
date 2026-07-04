@@ -216,6 +216,29 @@
     document.body.classList.remove("tilda-cart-open");
   }
 
+  function hasSameSiteReferrer() {
+    try {
+      if (!document.referrer) return false;
+      const referrer = new URL(document.referrer);
+      return referrer.origin === window.location.origin && referrer.pathname !== window.location.pathname;
+    } catch {
+      return false;
+    }
+  }
+
+  function backFromCart() {
+    const normalizedPath = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (normalizedPath !== "/cart") {
+      closeCart();
+      return;
+    }
+    if (window.history.length > 1 && hasSameSiteReferrer()) {
+      window.history.back();
+      return;
+    }
+    window.location.href = "/shop/";
+  }
+
   function showSuccessDialog(requestId) {
     const dialogRoot = document.querySelector("[data-order-success]");
     const dialog = dialogRoot?.querySelector(".tilda-order-success__dialog");
@@ -320,6 +343,11 @@
 
     if (target.closest("[data-cart-open]")) {
       openCart();
+      return;
+    }
+
+    if (target.closest("[data-cart-back]")) {
+      backFromCart();
       return;
     }
 
