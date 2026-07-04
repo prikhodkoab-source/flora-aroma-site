@@ -285,15 +285,15 @@ select {
 
 .tilda-shop-header {
   display: grid;
-  height: 150px;
+  height: 170px;
   place-items: center;
   background: #ffffff;
 }
 
 .tilda-shop-header img {
   display: block;
-  width: 150px;
-  max-width: 150px;
+  width: 170px;
+  max-width: 170px;
   height: auto;
 }
 
@@ -1048,11 +1048,12 @@ select {
   }
 
   .tilda-shop-header {
-    height: 128px;
+    height: 158px;
   }
 
   .tilda-shop-header img {
-    width: 86px;
+    width: 118px;
+    max-width: 118px;
   }
 
   .tilda-shop-preface {
