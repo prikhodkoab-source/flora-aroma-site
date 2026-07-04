@@ -24,7 +24,12 @@ const selectedOption = product.options[0];
   <TildaCloneShopHeader />
 
   <article class="tilda-product-page" data-product-page>
-    <a class="tilda-back-link" href="/shop/"><span aria-hidden="true">←</span><span>Назад до асортименту</span></a>
+    <a class="tilda-back-link" href="/shop/">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10.7 6.3 5 12l5.7 5.7 1.4-1.4L8.8 13H19v-2H8.8l3.3-3.3-1.4-1.4Z"></path>
+      </svg>
+      <span>Назад до асортименту</span>
+    </a>
     <div class="tilda-product-layout">
       <section class="tilda-product-gallery" data-gallery>
         <button class="tilda-product-gallery__stage" type="button" data-gallery-open aria-label="Переглянути фото">

@@ -505,7 +505,7 @@ select {
 .tilda-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   margin-bottom: 28px;
   color: #000000;
   font-size: 16px;
@@ -514,12 +514,12 @@ select {
   text-decoration: none;
 }
 
-.tilda-back-link span[aria-hidden="true"] {
-  display: inline-grid;
-  width: 18px;
-  place-items: center;
-  font-size: 18px;
-  line-height: 1;
+.tilda-back-link svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: currentColor;
 }
 
 .tilda-product-layout {
