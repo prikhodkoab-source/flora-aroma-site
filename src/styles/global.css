@@ -503,12 +503,23 @@ select {
 }
 
 .tilda-back-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   margin-bottom: 28px;
   color: #000000;
   font-size: 16px;
   font-weight: 700;
+  line-height: 1.2;
   text-decoration: none;
+}
+
+.tilda-back-link span[aria-hidden="true"] {
+  display: inline-grid;
+  width: 18px;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .tilda-product-layout {
