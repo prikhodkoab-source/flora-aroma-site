@@ -356,6 +356,13 @@
       return;
     }
 
+    if (target.closest("[data-order-success-return]")) {
+      hideSuccessDialog();
+      closeCart();
+      window.location.href = "/shop/";
+      return;
+    }
+
     if (target.closest("[data-order-success-close]")) {
       hideSuccessDialog();
       closeCart();
