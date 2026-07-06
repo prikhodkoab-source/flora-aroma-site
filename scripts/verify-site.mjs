@@ -84,8 +84,8 @@ const rows = parseCsvRows(productsCsv.trim());
 const headers = rows[0].map((header) => header.replace(/^\uFEFF/, ""));
 const productRows = rows.slice(1);
 
-if (productRows.length !== 42) {
-  fail(`Expected 42 product rows, found ${productRows.length}.`);
+if (productRows.length !== 43) {
+  fail(`Expected 43 product rows, found ${productRows.length}.`);
 }
 
 for (const requiredColumn of [
@@ -233,5 +233,5 @@ for (const forbiddenPublicSecret of ["CF_ANALYTICS_API_TOKEN", "replace_with_acc
 }
 
 if (!failed) {
-  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 42 products, local images, and SEO markers are present.");
+  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 43 products, local images, and SEO markers are present.");
 }

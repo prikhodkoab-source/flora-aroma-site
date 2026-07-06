@@ -474,5 +474,15 @@ export const productCatalog = {
         "unit": "шт."
       }
     ]
+  },
+  "PLANT-0009": {
+    "name": "Ехінацея пурпурова",
+    "variants": [
+      {
+        "container": "Касета Hiko V-120ss",
+        "price": 40,
+        "unit": "шт."
+      }
+    ]
   }
 };
