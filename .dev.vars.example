@@ -1,2 +1,6 @@
 TELEGRAM_TOKEN=replace_with_local_test_token
 TELEGRAM_CHAT_ID=replace_with_operator_chat_id
+CF_ACCOUNT_ID=replace_with_cloudflare_account_id
+CF_ANALYTICS_API_TOKEN=replace_with_account_analytics_read_token
+CF_ANALYTICS_DATASET=flora_aroma_site_events
+FLORA_SITE_ORIGIN=http://localhost:8788

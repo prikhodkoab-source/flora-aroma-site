@@ -23,7 +23,12 @@ const selectedOption = product.options[0];
 >
   <TildaCloneShopHeader />
 
-  <article class="tilda-product-page" data-product-page>
+  <article
+    class="tilda-product-page"
+    data-product-page
+    data-analytics-plant-id={product.plant_id}
+    data-analytics-plant-name={product.name_uk}
+  >
     <a class="tilda-back-link" href="/shop/">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M10.7 6.3 5 12l5.7 5.7 1.4-1.4L8.8 13H19v-2H8.8l3.3-3.3-1.4-1.4Z"></path>
@@ -64,6 +69,7 @@ const selectedOption = product.options[0];
                 data-option-id={option.variant_id}
                 data-container={option.container}
                 data-price={option.price_uah}
+                data-currency="UAH"
                 data-unit={option.unit}
               />
               <span>{option.container}</span>
@@ -85,6 +91,7 @@ const selectedOption = product.options[0];
           data-latin={product.latin_name}
           data-container={selectedOption.container}
           data-price={selectedOption.price_uah}
+          data-currency="UAH"
           data-unit={selectedOption.unit}
           data-option-id={selectedOption.variant_id}
           data-url={`/plants/${product.slug}/`}

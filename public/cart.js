@@ -56,6 +56,27 @@
     );
   }
 
+  function analyticsPayload(item, overrides = {}) {
+    return {
+      plant_id: item.plantId,
+      plant_name: item.name,
+      product_option: item.optionId || "default",
+      container: item.container,
+      quantity: normalizeQty(item.qty),
+      public_unit_price: Number(item.price || 0),
+      currency: "UAH",
+      ...overrides
+    };
+  }
+
+  function emitAnalytics(eventName, properties = {}) {
+    if (window.FloraAnalytics?.trackEvent) {
+      window.FloraAnalytics.trackEvent(eventName, properties);
+      return;
+    }
+    window.dispatchEvent(new CustomEvent("flora-analytics-event", { detail: { eventName, properties } }));
+  }
+
   function qtyFromContext(button) {
     const page = button.closest("[data-product-page]");
     const input = page?.querySelector("[data-product-qty]");
@@ -93,18 +114,33 @@
     }
 
     writeCart(cart);
+    emitAnalytics("add_to_cart", {
+      plant_id: plantId,
+      plant_name: dataset.name || plantId,
+      product_option: optionId,
+      container: dataset.container || "",
+      quantity: qty,
+      public_unit_price: Number(dataset.price || 0),
+      currency: dataset.currency || "UAH"
+    });
     openCart();
   }
 
   function setQty(cartKey, qty) {
+    const normalizedQty = normalizeQty(qty);
     const next = readCart()
-      .map((item) => (cartItemKey(item) === cartKey ? { ...item, qty: normalizeQty(qty) } : item))
+      .map((item) => (cartItemKey(item) === cartKey ? { ...item, qty: normalizedQty } : item))
       .filter((item) => normalizeQty(item.qty) > 0);
     writeCart(next);
+    const changed = next.find((item) => cartItemKey(item) === cartKey);
+    if (changed) emitAnalytics("change_cart_quantity", analyticsPayload(changed, { quantity: normalizedQty }));
   }
 
   function removeItem(cartKey) {
-    writeCart(readCart().filter((item) => cartItemKey(item) !== cartKey));
+    const items = readCart();
+    const removed = items.find((item) => cartItemKey(item) === cartKey);
+    writeCart(items.filter((item) => cartItemKey(item) !== cartKey));
+    if (removed) emitAnalytics("remove_from_cart", analyticsPayload(removed));
   }
 
   function customerData(root = document) {
@@ -205,6 +241,7 @@
     modal.hidden = false;
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("tilda-cart-open");
+    emitAnalytics("open_cart", { quantity: cartTotals().qty });
   }
 
   function closeCart() {
@@ -312,6 +349,7 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.ok) throw new Error(result.error || "Не вдалося передати заявку.");
 
+      emitAnalytics("copy_order_request", { quantity: cartTotals(items).qty });
       writeCart([]);
       window.localStorage.removeItem(submissionStorageKey);
       renderCart();

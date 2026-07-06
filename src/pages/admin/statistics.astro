@@ -1,0 +1,163 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Статистика сайту | Flora & Aroma" showCart={false}>
+  <section class="flora-admin-stats" data-admin-statistics>
+    <header class="flora-admin-stats__header">
+      <p class="flora-admin-stats__eyebrow">Flora & Aroma</p>
+      <h1>Статистика сайту</h1>
+      <p>Власна privacy-safe аналітика: без контактів клієнтів, текстів заявок, точного складу або live-проводок.</p>
+    </header>
+
+    <div class="flora-admin-stats__notice" data-analytics-notice hidden></div>
+
+    <div class="flora-admin-stats__controls" aria-label="Період статистики">
+      <button type="button" data-period="7d">7 днів</button>
+      <button type="button" data-period="30d" class="is-active">30 днів</button>
+      <button type="button" data-period="365d">365 днів</button>
+    </div>
+
+    <div class="flora-admin-stats__grid">
+      <article><span>Сесії</span><strong data-stat="sessions">0</strong></article>
+      <article><span>Перегляди</span><strong data-stat="page_views">0</strong></article>
+      <article><span>Картки рослин</span><strong data-stat="product_views">0</strong></article>
+      <article><span>Додано в кошик</span><strong data-stat="add_to_cart">0</strong></article>
+      <article><span>Заявки оператору</span><strong data-stat="copied_requests">0</strong></article>
+      <article><span>Конверсія</span><strong data-stat="conversions">0%</strong></article>
+    </div>
+
+    <section class="flora-admin-stats__panel">
+      <h2>Динаміка</h2>
+      <div class="flora-admin-stats__bars" data-daily-series></div>
+    </section>
+
+    <section class="flora-admin-stats__columns">
+      <div class="flora-admin-stats__panel">
+        <h2>Популярні рослини</h2>
+        <ol class="flora-admin-stats__list" data-top-products></ol>
+      </div>
+
+      <div class="flora-admin-stats__panel">
+        <h2>Джерела переходів</h2>
+        <ol class="flora-admin-stats__list" data-traffic-sources></ol>
+      </div>
+
+      <div class="flora-admin-stats__panel">
+        <h2>Пристрої</h2>
+        <ol class="flora-admin-stats__list" data-device-classes></ol>
+      </div>
+
+      <div class="flora-admin-stats__panel">
+        <h2>Воронка</h2>
+        <ol class="flora-admin-stats__list" data-funnel></ol>
+      </div>
+    </section>
+
+    <p class="flora-admin-stats__access">
+      Доступ до цієї сторінки та <code>/api/analytics/summary</code> має бути закритий Cloudflare Access.
+      Public endpoint збору подій: <code>/api/analytics/event</code>.
+    </p>
+  </section>
+</BaseLayout>
+
+<script>
+  const root = document.querySelector("[data-admin-statistics]");
+  const notice = document.querySelector("[data-analytics-notice]");
+  const numberFormat = new Intl.NumberFormat("uk-UA");
+
+  function setNotice(message, type = "info") {
+    if (!(notice instanceof HTMLElement)) return;
+    notice.textContent = message;
+    notice.dataset.type = type;
+    notice.hidden = !message;
+  }
+
+  function setMetric(name, value) {
+    const target = document.querySelector(`[data-stat="${name}"]`);
+    if (!target) return;
+    target.textContent = name === "conversions" ? `${value || 0}%` : numberFormat.format(value || 0);
+  }
+
+  function renderList(selector, rows, formatter) {
+    const list = document.querySelector(selector);
+    if (!(list instanceof HTMLElement)) return;
+    list.innerHTML = "";
+    if (!rows || rows.length === 0) {
+      list.innerHTML = "<li><span>Даних ще немає</span><strong>0</strong></li>";
+      return;
+    }
+    list.innerHTML = rows.map(formatter).join("");
+  }
+
+  function renderDaily(rows) {
+    const container = document.querySelector("[data-daily-series]");
+    if (!(container instanceof HTMLElement)) return;
+    const pageViews = (rows || []).filter((row) => row.event_name === "page_view");
+    const max = Math.max(...pageViews.map((row) => Number(row.count || 0)), 1);
+    container.innerHTML = pageViews
+      .slice(-30)
+      .map((row) => {
+        const height = Math.max(6, Math.round((Number(row.count || 0) / max) * 100));
+        return `<span title="${row.day}: ${row.count}" style="height:${height}%"><em>${row.count}</em></span>`;
+      })
+      .join("");
+  }
+
+  function render(data) {
+    const metrics = data.metrics || {};
+    for (const name of ["sessions", "page_views", "product_views", "add_to_cart", "copied_requests", "conversions"]) {
+      setMetric(name, metrics[name]);
+    }
+
+    renderDaily(data.daily_series || []);
+    renderList("[data-top-products]", data.top_products, (row) =>
+      `<li><span>${row.plant_name || row.plant_id}</span><strong>${numberFormat.format(row.views || 0)}</strong></li>`
+    );
+    renderList("[data-traffic-sources]", data.traffic_sources, (row) =>
+      `<li><span>${row.source || "direct"}</span><strong>${numberFormat.format(row.page_views || 0)}</strong></li>`
+    );
+    renderList("[data-device-classes]", data.device_classes, (row) =>
+      `<li><span>${row.device_class || "unknown"}</span><strong>${numberFormat.format(row.sessions || 0)}</strong></li>`
+    );
+    renderList("[data-funnel]", data.funnel, (row) =>
+      `<li><span>${row.step}</span><strong>${numberFormat.format(row.value || 0)}</strong></li>`
+    );
+  }
+
+  async function load(period = "30d") {
+    if (!(root instanceof HTMLElement)) return;
+    root.classList.add("is-loading");
+    setNotice("Завантажуємо статистику...", "info");
+
+    try {
+      const response = await fetch(`/api/analytics/summary?preset=${encodeURIComponent(period)}`, {
+        credentials: "same-origin"
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.configured === false) {
+        render(data);
+        setNotice(data.message || "Аналітику ще не підключено до Cloudflare. Дані не збираються.", "warning");
+        return;
+      }
+
+      render(data);
+      setNotice("", "info");
+    } catch {
+      setNotice("Не вдалося отримати статистику. Перевірте Cloudflare Access та Analytics Engine.", "warning");
+    } finally {
+      root.classList.remove("is-loading");
+    }
+  }
+
+  document.querySelectorAll("[data-period]").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll("[data-period]").forEach((item) => item.classList.remove("is-active"));
+      button.classList.add("is-active");
+      load(button.dataset.period || "30d");
+    });
+  });
+
+  load("30d");
+</script>

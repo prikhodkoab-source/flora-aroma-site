@@ -59,7 +59,7 @@ if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
 }
 
-for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html", "cart/index.html"]) {
+for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html", "cart/index.html", "admin/statistics/index.html"]) {
   if (!existsSync(join(root, "dist", requiredPage))) {
     fail(`Missing required Tilda clone page: ${requiredPage}`);
   }
@@ -68,7 +68,11 @@ for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html
 for (const requiredAsset of [
   "public/images/tilda-clone/hero-greenhouse.jpg",
   "public/images/tilda-clone/tilda-logo.png",
-  "public/cart.js"
+  "public/cart.js",
+  "functions/_analytics.js",
+  "functions/api/analytics/event.js",
+  "functions/api/analytics/summary.js",
+  "src/lib/analytics.ts"
 ]) {
   if (!existsSync(join(root, requiredAsset))) {
     fail(`Missing required Tilda clone asset: ${requiredAsset}`);
@@ -150,7 +154,9 @@ for (const requiredPhrase of [
   "Ваше замовлення",
   "Оформити замовлення",
   "Оплата",
-  "Інформація про доставку"
+  "Інформація про доставку",
+  "Статистика сайту",
+  "Аналітику ще не підключено до Cloudflare"
 ]) {
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected Tilda clone phrase: ${requiredPhrase}`);
@@ -189,7 +195,7 @@ for (const forbidden of [
   "Джерела картки",
   "Джерела зображень",
   "Розширений опис",
-  "plant_id:"
+  "Flora plant_id:"
 ]) {
   if (publicHtml.includes(forbidden)) {
     fail(`Forbidden public phrase found: ${forbidden}`);
@@ -205,6 +211,8 @@ for (const requiredCartScriptMarker of [
   'fetch("/api/site-order"',
   "optionId",
   "cartItemKey",
+  "flora-analytics-event",
+  "copy_order_request",
   "Наявність, формат і можливість резерву підтвердить оператор"
 ]) {
   if (!cartScript.includes(requiredCartScriptMarker)) {
@@ -218,6 +226,12 @@ for (const forbiddenCartScriptMarker of ["confirmed", "reserved", "paid", "stock
   }
 }
 
+for (const forbiddenPublicSecret of ["CF_ANALYTICS_API_TOKEN", "replace_with_account_analytics_read_token"]) {
+  if (publicHtml.includes(forbiddenPublicSecret)) {
+    fail(`Forbidden analytics secret marker in public bundle: ${forbiddenPublicSecret}`);
+  }
+}
+
 if (!failed) {
-  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, 42 products, local images, and SEO markers are present.");
+  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 42 products, local images, and SEO markers are present.");
 }

@@ -514,6 +514,227 @@ select {
   text-decoration: none;
 }
 
+.flora-admin-stats {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 72px 0 90px;
+  color: #171717;
+}
+
+.flora-admin-stats__header {
+  max-width: 760px;
+  margin-bottom: 34px;
+}
+
+.flora-admin-stats__eyebrow {
+  margin: 0 0 10px;
+  color: #4b7b59;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.flora-admin-stats h1,
+.flora-admin-stats h2 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.flora-admin-stats h1 {
+  font-size: 46px;
+  line-height: 1.08;
+}
+
+.flora-admin-stats h2 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.flora-admin-stats__header p:last-child {
+  margin: 18px 0 0;
+  color: #606060;
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.flora-admin-stats__notice {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  background: #fff7d7;
+  border: 1px solid #ead78e;
+  color: #5c4a00;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.flora-admin-stats__notice[data-type="info"] {
+  background: #eef6ef;
+  border-color: #c7dccb;
+  color: #24492e;
+}
+
+.flora-admin-stats__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.flora-admin-stats__controls button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid #171717;
+  border-radius: 0;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flora-admin-stats__controls button.is-active,
+.flora-admin-stats__controls button:hover {
+  background: #171717;
+  color: #fff;
+}
+
+.flora-admin-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.flora-admin-stats__grid article,
+.flora-admin-stats__panel {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+}
+
+.flora-admin-stats__grid article {
+  min-height: 130px;
+  padding: 22px;
+}
+
+.flora-admin-stats__grid span {
+  display: block;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.flora-admin-stats__grid strong {
+  display: block;
+  margin-top: 20px;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.flora-admin-stats__panel {
+  padding: 26px;
+}
+
+.flora-admin-stats__columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.flora-admin-stats__bars {
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  height: 210px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-bottom: 1px solid #cfcfcf;
+}
+
+.flora-admin-stats__bars span {
+  position: relative;
+  flex: 1;
+  min-width: 8px;
+  background: #4b7b59;
+}
+
+.flora-admin-stats__bars em {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #666;
+  font-size: 10px;
+  font-style: normal;
+}
+
+.flora-admin-stats__list {
+  display: grid;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flora-admin-stats__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eeeeee;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.flora-admin-stats__list span {
+  color: #4b4b4b;
+}
+
+.flora-admin-stats__list strong {
+  white-space: nowrap;
+}
+
+.flora-admin-stats__access {
+  margin: 28px 0 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.flora-admin-stats code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.95em;
+}
+
+@media (max-width: 1024px) {
+  .flora-admin-stats__grid,
+  .flora-admin-stats__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .flora-admin-stats {
+    width: calc(100% - 32px);
+    padding: 46px 0 64px;
+  }
+
+  .flora-admin-stats h1 {
+    font-size: 34px;
+  }
+
+  .flora-admin-stats__grid,
+  .flora-admin-stats__columns {
+    grid-template-columns: 1fr;
+  }
+
+  .flora-admin-stats__grid article {
+    min-height: 108px;
+  }
+}
+
 .tilda-back-link svg {
   display: block;
   width: 20px;

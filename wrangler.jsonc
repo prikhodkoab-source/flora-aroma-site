@@ -10,5 +10,16 @@
       "database_id": "cc1c393b-54bf-4d7b-806c-349f9800e3af",
       "migrations_dir": "migrations"
     }
-  ]
+  ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "FLORA_ANALYTICS",
+      "dataset": "flora_aroma_site_events"
+    }
+  ],
+  "vars": {
+    "CF_ANALYTICS_DATASET": "flora_aroma_site_events",
+    "CF_ACCOUNT_ID": "REPLACE_WITH_CLOUDFLARE_ACCOUNT_ID",
+    "FLORA_SITE_ORIGIN": "https://flora-aroma.com.ua"
+  }
 }

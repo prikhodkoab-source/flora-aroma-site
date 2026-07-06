@@ -43,6 +43,10 @@ const socialImageUrl = new URL(image, Astro.site);
       <slot />
     </main>
     {showCart && <TildaCloneCart />}
-    <script src="/cart.js" defer></script>
+    <script>
+      import { initializeAnalytics } from "../lib/analytics";
+      initializeAnalytics();
+    </script>
+    {showCart && <script src="/cart.js" defer></script>}
   </body>
 </html>
