@@ -5,8 +5,8 @@ Website Gate D5 adds first-party site statistics for Flora & Aroma.
 Status after this implementation:
 
 - Local MVP is ready in code.
-- Cloudflare Analytics Engine binding is not declared in `wrangler.jsonc` yet.
-- Production collection requires adding the `FLORA_ANALYTICS` binding in Cloudflare after verifying Pages deployment support.
+- Cloudflare Analytics Engine binding is declared in `wrangler.jsonc` as `FLORA_ANALYTICS`.
+- Preview collection requires a deployment that includes this `wrangler.jsonc` config.
 - Cloudflare Access for `/admin/statistics/` and `/api/analytics/summary` is not configured by code.
 - Production data collection must not be considered started until Cloudflare preview is checked by the operator.
 
@@ -101,11 +101,7 @@ Aggregate event counts use `SUM(_sample_interval)`.
 
 ## Cloudflare Binding
 
-`wrangler.jsonc` intentionally does not declare the Analytics Engine binding yet. A Git-triggered Pages deploy failed
-when the binding was added before the Cloudflare project configuration was verified.
-
-When Cloudflare Pages is ready for Analytics Engine, add this binding in the Cloudflare dashboard first, redeploy, and
-only then consider mirroring it into `wrangler.jsonc`:
+`wrangler.jsonc` declares the Analytics Engine binding used by Pages Functions:
 
 ```jsonc
 "analytics_engine_datasets": [
@@ -116,8 +112,8 @@ only then consider mirroring it into `wrangler.jsonc`:
 ]
 ```
 
-Cloudflare must apply this binding for the Pages project before production collection works. Until then,
-`POST /api/analytics/event` should degrade to `503 analytics_not_configured`.
+Cloudflare must apply this binding in a new Pages deployment before collection works. Until then,
+`POST /api/analytics/event` degrades to `503 analytics_not_configured`.
 
 ## Required Secrets And Variables
 

@@ -11,9 +11,15 @@
       "migrations_dir": "migrations"
     }
   ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "FLORA_ANALYTICS",
+      "dataset": "flora_aroma_site_events"
+    }
+  ],
   "vars": {
     "CF_ANALYTICS_DATASET": "flora_aroma_site_events",
-    "CF_ACCOUNT_ID": "REPLACE_WITH_CLOUDFLARE_ACCOUNT_ID",
+    "CF_ACCOUNT_ID": "32706aac6cb13fd96a8b318b0e5c99d9",
     "FLORA_SITE_ORIGIN": "https://flora-aroma.com.ua"
   }
 }
