@@ -10,6 +10,7 @@ export function GET() {
     "/price/",
     "/how-to-order/",
     "/contacts/",
+    "/aromatnyi-bordiur-priani-zapashni-roslyny/",
     ...getCategories().map((category) => `/categories/${category.slug}/`),
     ...getSelections().map((selection) => `/selections/${selection.slug}/`),
     ...getProducts().map((product) => `/plants/${product.slug}/`)

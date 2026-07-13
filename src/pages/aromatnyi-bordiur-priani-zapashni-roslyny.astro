@@ -1,0 +1,380 @@
+---
+import TildaCloneFooter from "../components/TildaCloneFooter.astro";
+import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
+import { aromaticBorderContent } from "../data/aromaticBorderContent";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProducts } from "../lib/products";
+
+type ContentBlock =
+  | { type: "h1"; text: string }
+  | { type: "h2"; text: string }
+  | { type: "paragraph"; text: string }
+  | { type: "list"; items: string[] };
+
+function markdownBlocks(markdown: string): ContentBlock[] {
+  return markdown
+    .trim()
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block): ContentBlock => {
+      if (block.startsWith("# ")) {
+        return { type: "h1", text: block.slice(2).trim() };
+      }
+      if (block.startsWith("## ")) {
+        return { type: "h2", text: block.slice(3).trim() };
+      }
+      if (block.startsWith("- ")) {
+        return {
+          type: "list",
+          items: block
+            .split("\n")
+            .map((line) => line.replace(/^- /, "").trim())
+            .filter(Boolean)
+        };
+      }
+      return { type: "paragraph", text: block };
+    });
+}
+
+const products = getProducts();
+const productById = new Map(products.map((product) => [product.plant_id, product]));
+const collectionProducts = aromaticBorderContent.plantIds
+  .map((plantId) => productById.get(plantId))
+  .filter(Boolean);
+const blocks = markdownBlocks(aromaticBorderContent.bodyMarkdown);
+const bodyBlocks = blocks.filter((block) => block.type !== "h1");
+---
+
+<BaseLayout
+  title={aromaticBorderContent.metaTitle}
+  description={aromaticBorderContent.metaDescription}
+  image={collectionProducts[0]?.primary_image_path || "/images/tilda-clone/hero-greenhouse.jpg"}
+>
+  <TildaCloneShopHeader />
+
+  <section class="collection-hero">
+    <div class="collection-shell">
+      <p class="collection-eyebrow">Тематична добірка Flora & Aroma</p>
+      <h1>{aromaticBorderContent.title}</h1>
+      <p class="collection-lead">
+        Готова ідея ароматного бордюру з поточного асортименту: постійна основа,
+        декоративні акценти, окрема свіжа зона і сезонні пряні доповнення.
+      </p>
+    </div>
+  </section>
+
+  <section class="collection-content">
+    <div class="collection-shell collection-grid">
+      <article class="collection-article">
+        {
+          bodyBlocks.map((block) => {
+            if (block.type === "h2") {
+              return <h2>{block.text}</h2>;
+            }
+            if (block.type === "list") {
+              return (
+                <ul>
+                  {block.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              );
+            }
+            return <p>{block.text}</p>;
+          })
+        }
+      </article>
+
+      <aside class="collection-plants" aria-label="Рослини в добірці">
+        <h2>Рослини в добірці</h2>
+        <p>
+          Показуємо актуальні публічні картки рослин. Наявність і формат уточнюємо
+          під час замовлення.
+        </p>
+        <div class="collection-plant-list">
+          {
+            collectionProducts.map((product) => {
+              const option = product.options?.[0] || {
+                container: product.container,
+                price_uah: product.price_uah,
+                unit: product.unit
+              };
+              const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
+              return (
+                <a class="collection-plant-card" href={`/plants/${product.slug}/`}>
+                  <img src={image} alt={`${product.name_uk} (${product.latin_name})`} loading="lazy" />
+                  <span>
+                    <strong>{product.name_uk}</strong>
+                    <em>{product.latin_name}</em>
+                    <small>
+                      {option.container} · {option.price_uah} грн
+                    </small>
+                  </span>
+                </a>
+              );
+            })
+          }
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="collection-cta">
+    <div class="collection-shell">
+      <h2>Хочете створити ароматний бордюр?</h2>
+      <p>
+        Напишіть нам, який варіант вам ближчий — декоративний, пряний чи змішаний.
+        Ми допоможемо підібрати рослини під умови вашої ділянки.
+      </p>
+      <a href="/contacts/">Зв’язатися з Flora & Aroma</a>
+    </div>
+  </section>
+
+  <TildaCloneFooter showContacts={true} />
+</BaseLayout>
+
+<style>
+  .collection-shell {
+    width: min(1120px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .collection-hero {
+    padding: 96px 0 72px;
+    background: #eef4ea;
+  }
+
+  .collection-eyebrow {
+    margin: 0 0 18px;
+    color: #4d6b45;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .collection-hero h1 {
+    max-width: 880px;
+    margin: 0;
+    color: #1d2819;
+    font-size: 58px;
+    line-height: 1.08;
+  }
+
+  .collection-lead {
+    max-width: 740px;
+    margin: 28px 0 0;
+    color: #3b4536;
+    font-size: 22px;
+    line-height: 1.55;
+  }
+
+  .collection-content {
+    padding: 72px 0;
+    background: #ffffff;
+  }
+
+  .collection-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 56px;
+    align-items: start;
+  }
+
+  .collection-article {
+    min-width: 0;
+  }
+
+  .collection-article h2 {
+    margin: 48px 0 16px;
+    color: #1d2819;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .collection-article h2:first-child {
+    margin-top: 0;
+  }
+
+  .collection-article p,
+  .collection-article li {
+    color: #2f352c;
+    font-size: 19px;
+    line-height: 1.68;
+  }
+
+  .collection-article p {
+    margin: 0 0 22px;
+  }
+
+  .collection-article ul {
+    display: grid;
+    gap: 14px;
+    margin: 0 0 26px;
+    padding-left: 22px;
+  }
+
+  .collection-plants {
+    position: sticky;
+    top: 28px;
+    padding: 28px;
+    border: 1px solid #dbe5d6;
+    background: #f8fbf5;
+  }
+
+  .collection-plants h2 {
+    margin: 0 0 12px;
+    color: #1d2819;
+    font-size: 28px;
+    line-height: 1.2;
+  }
+
+  .collection-plants p {
+    margin: 0 0 22px;
+    color: #4b5547;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .collection-plant-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .collection-plant-card {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    color: #20241d;
+    text-decoration: none;
+  }
+
+  .collection-plant-card img {
+    width: 82px;
+    height: 82px;
+    object-fit: cover;
+    background: #e5eadf;
+  }
+
+  .collection-plant-card strong,
+  .collection-plant-card em,
+  .collection-plant-card small {
+    display: block;
+  }
+
+  .collection-plant-card strong {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .collection-plant-card em {
+    margin-top: 4px;
+    color: #596254;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .collection-plant-card small {
+    margin-top: 6px;
+    color: #304a29;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .collection-cta {
+    padding: 72px 0;
+    background: #263820;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .collection-cta h2 {
+    margin: 0;
+    font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .collection-cta p {
+    max-width: 700px;
+    margin: 22px auto 30px;
+    font-size: 20px;
+    line-height: 1.55;
+  }
+
+  .collection-cta a {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 28px;
+    background: #ffffff;
+    color: #1d2819;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .collection-hero {
+      padding: 68px 0 52px;
+    }
+
+    .collection-hero h1 {
+      font-size: 38px;
+    }
+
+    .collection-lead {
+      font-size: 19px;
+    }
+
+    .collection-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 42px;
+    }
+
+    .collection-plants {
+      position: static;
+      padding: 22px;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .collection-shell {
+      width: min(100% - 28px, 1120px);
+    }
+
+    .collection-hero h1 {
+      font-size: 32px;
+    }
+
+    .collection-content,
+    .collection-cta {
+      padding: 48px 0;
+    }
+
+    .collection-article h2 {
+      font-size: 26px;
+    }
+
+    .collection-article p,
+    .collection-article li {
+      font-size: 17px;
+    }
+
+    .collection-plant-card {
+      grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    .collection-plant-card img {
+      width: 72px;
+      height: 72px;
+    }
+
+    .collection-cta h2 {
+      font-size: 30px;
+    }
+  }
+</style>
