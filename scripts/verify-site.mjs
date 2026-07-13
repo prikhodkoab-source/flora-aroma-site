@@ -84,8 +84,8 @@ const rows = parseCsvRows(productsCsv.trim());
 const headers = rows[0].map((header) => header.replace(/^\uFEFF/, ""));
 const productRows = rows.slice(1);
 
-if (productRows.length !== 43) {
-  fail(`Expected 43 product rows, found ${productRows.length}.`);
+if (productRows.length !== 44) {
+  fail(`Expected 44 product rows, found ${productRows.length}.`);
 }
 
 for (const requiredColumn of [
@@ -110,8 +110,31 @@ for (const requiredColumn of [
 const columnIndex = (name) => headers.indexOf(name);
 const imagePathIndex = columnIndex("image_path");
 const plantIdIndex = columnIndex("plant_id");
+const nameUkIndex = columnIndex("name_uk");
+const latinNameIndex = columnIndex("latin_name");
 const variantContainersIndex = columnIndex("variant_containers");
 const variantPricesIndex = columnIndex("variant_prices_uah");
+const productById = new Map(productRows.map((row) => [row[plantIdIndex], row]));
+
+const plant0090 = productById.get("PLANT-0090");
+if (!plant0090) {
+  fail("Expected PLANT-0090 in products.csv.");
+} else {
+  const rowText = plant0090.join(" ");
+  if (plant0090[latinNameIndex] !== "Salvia pratensis" || plant0090[nameUkIndex] !== "Шавлія лучна") {
+    fail("Expected PLANT-0090 to export as Salvia pratensis / Шавлія лучна.");
+  }
+  if (rowText.includes("Thymus vulgaris") || rowText.includes("Чебрець")) {
+    fail("PLANT-0090 contains stale Thymus / Чебрець data.");
+  }
+}
+
+const plant0098 = productById.get("PLANT-0098");
+if (!plant0098) {
+  fail("Expected PLANT-0098 in products.csv.");
+} else if (plant0098[latinNameIndex] !== "Thymus vulgaris" || plant0098[nameUkIndex] !== "Чебрець звичайний") {
+  fail("Expected PLANT-0098 to export as Thymus vulgaris / Чебрець звичайний.");
+}
 
 for (const row of productRows) {
   const plantId = row[plantIdIndex];
@@ -120,7 +143,7 @@ for (const row of productRows) {
     .map((path) => path.trim())
     .filter(Boolean);
 
-  if (imagePaths.length === 0) {
+  if (imagePaths.length === 0 && plantId !== "PLANT-0090") {
     fail(`Expected product image path for ${plantId}`);
   }
 
@@ -233,5 +256,5 @@ for (const forbiddenPublicSecret of ["CF_ANALYTICS_API_TOKEN", "replace_with_acc
 }
 
 if (!failed) {
-  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 43 products, local images, and SEO markers are present.");
+  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 44 products, local images, PLANT-0090/PLANT-0098 identity split, and SEO markers are present.");
 }

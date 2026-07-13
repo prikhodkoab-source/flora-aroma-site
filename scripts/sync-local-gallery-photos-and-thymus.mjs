@@ -26,9 +26,9 @@ const localGalleryPlan = [
 ];
 
 const thymusCommons = {
-  plantId: "PLANT-0090",
-  imagePath: "/images/plants/plant-0090-commons.jpg",
-  fileName: "plant-0090-commons.jpg",
+  plantId: "PLANT-0098",
+  imagePath: "/images/plants/plant-0098-commons.jpg",
+  fileName: "plant-0098-commons.jpg",
   pageTitle: "File:Thymus vulgaris 002.JPG",
   sourcePage: "https://commons.wikimedia.org/wiki/File:Thymus_vulgaris_002.JPG"
 };
@@ -379,7 +379,7 @@ addSourceStatus("PLANT-0049", "/images/plants/plant-0049.jpg", "container_photo_
 addSourceStatus("PLANT-0002", "/images/plants/plant-0002.jpg", "container_photo_not_primary", "Immortelle pot photo kept as non-primary gallery image");
 addSourceStatus("PLANT-0058", "/images/plants/local/plant-0058-local-gallery-04.jpg", "duplicate_hidden_from_product_gallery", "Duplicate aquilegia pot photo removed from public product gallery");
 
-if (!productById.has("PLANT-0090")) {
+if (!productById.has("PLANT-0098")) {
   const summary =
     "Ароматичний напівкущик і класичний кулінарний чебрець для сонячних, добре дренованих місць. Має дрібне запашне сіро-зелене листя, літнє цвітіння і підходить для пряно-ароматичних посадок, контейнерів, рокаріїв та сухіших бордюрів. Добре зимує в умовах Києва (USDA 5-9).";
   const ecology =
@@ -390,7 +390,7 @@ if (!productById.has("PLANT-0090")) {
     "Господарське застосування: пряні грядки, ароматичні бордюри, рокарії, сухі сонячні квітники, контейнерні посадки і невеликі товарні партії для роздрібного продажу. Харчове використання згадується як довідкова характеристика культури, не як медична рекомендація.";
   const row = Object.fromEntries(productHeaders.map((header) => [header, ""]));
   Object.assign(row, {
-    plant_id: "PLANT-0090",
+    plant_id: "PLANT-0098",
     name_uk: "Чебрець звичайний",
     latin_name: "Thymus vulgaris",
     category: "Пряні рослини",
@@ -460,4 +460,4 @@ writeCsv(productCsvPath, productHeaders, products);
 writeCsv(imageSourcesCsvPath, sourceHeaders, imageSources);
 
 console.log(`Products now: ${products.length}`);
-console.log("Synced local gallery photos and added PLANT-0090.");
+console.log("Synced local gallery photos and added PLANT-0098.");

@@ -406,11 +406,21 @@ export const productCatalog = {
     ]
   },
   "PLANT-0090": {
+    "name": "Шавлія лучна",
+    "variants": [
+      {
+        "container": "Касета Hiko V-120ss",
+        "price": 40,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0098": {
     "name": "Чебрець звичайний",
     "variants": [
       {
-        "container": "Горщик P9",
-        "price": 50,
+        "container": "Касета Hiko V-120ss",
+        "price": 30,
         "unit": "шт."
       }
     ]
