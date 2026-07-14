@@ -15,5 +15,28 @@
     "CF_ANALYTICS_DATASET": "flora_aroma_site_events",
     "CF_ACCOUNT_ID": "32706aac6cb13fd96a8b318b0e5c99d9",
     "FLORA_SITE_ORIGIN": "https://flora-aroma.com.ua"
+  },
+  "env": {
+    "preview": {
+      "d1_databases": [
+        {
+          "binding": "SITE_REQUESTS_DB",
+          "database_name": "flora-aroma-site-requests",
+          "database_id": "cc1c393b-54bf-4d7b-806c-349f9800e3af",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "analytics_engine_datasets": [
+        {
+          "binding": "FLORA_ANALYTICS",
+          "dataset": "flora_aroma_analytics_preview"
+        }
+      ],
+      "vars": {
+        "CF_ANALYTICS_DATASET": "flora_aroma_analytics_preview",
+        "CF_ACCOUNT_ID": "32706aac6cb13fd96a8b318b0e5c99d9",
+        "FLORA_SITE_ORIGIN": "https://flora-aroma.com.ua"
+      }
+    }
   }
 }
