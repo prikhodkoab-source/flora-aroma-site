@@ -61,12 +61,16 @@ function validatePayload(payload) {
   const items = [];
   for (const raw of rawItems) {
     const plantId = cleanText(raw?.plantId, 40);
+    const variantId = cleanText(raw?.variantId, 80);
     const container = cleanText(raw?.container, 100);
     const qty = normalizeQty(raw?.qty);
     const price = normalizePrice(raw?.price);
     const catalogProduct = productCatalog[plantId];
     const catalogVariant = catalogProduct?.variants.find(
-      (variant) => variant.container === container && Number(variant.price) === price
+      (variant) =>
+        variant.container === container
+        && Number(variant.price) === price
+        && (!variantId || !variant.variant_id || variant.variant_id === variantId)
     );
 
     if (
@@ -82,6 +86,7 @@ function validatePayload(payload) {
 
     items.push({
       plantId,
+      variantId: catalogVariant.variant_id || variantId,
       name: catalogProduct.name,
       container: catalogVariant.container,
       unit: catalogVariant.unit,
@@ -107,7 +112,7 @@ function buildTelegramMessage(requestId, order) {
     "Позиції:",
     ...order.items.map(
       (item) =>
-        `- ${item.name} (${item.plantId}), ${item.container}: ${item.qty} ${item.unit} x ${item.price} UAH = ${Math.round(item.qty * item.price)} UAH`
+        `- ${item.name} (${item.plantId}${item.variantId ? `, ${item.variantId}` : ""}), ${item.container}: ${item.qty} ${item.unit} x ${item.price} UAH = ${Math.round(item.qty * item.price)} UAH`
     ),
     "",
     `Попередня сума: ${Math.round(total)} UAH`,

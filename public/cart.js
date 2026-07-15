@@ -338,6 +338,7 @@
           website,
           items: items.map((item) => ({
             plantId: item.plantId,
+            variantId: item.optionId || "default",
             name: item.name,
             container: item.container,
             price: Number(item.price || 0),

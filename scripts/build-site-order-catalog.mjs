@@ -47,16 +47,22 @@ const rows = parseCsv(readFileSync("data/products.csv", "utf8"));
 const catalog = {};
 
 for (const row of rows) {
+  const variantIds = split(row.variant_ids);
+  const containerTypeIds = split(row.variant_container_type_ids);
+  const formatCodes = split(row.variant_format_codes);
   const containers = split(row.variant_containers);
   const prices = split(row.variant_prices_uah);
   const units = split(row.variant_units);
   const variants = containers.length
     ? containers.map((container, index) => ({
+        variant_id: variantIds[index] || "",
+        container_type_id: containerTypeIds[index] || "",
+        format_code: formatCodes[index] || "",
         container,
         price: Number(prices[index] || row.price_uah),
         unit: units[index] || row.unit
       }))
-    : [{ container: row.container, price: Number(row.price_uah), unit: row.unit }];
+    : [{ variant_id: row.variant_id || "", container_type_id: row.container_type_id || "", format_code: row.format_code || "", container: row.container, price: Number(row.price_uah), unit: row.unit }];
 
   catalog[row.plant_id] = {
     name: row.name_uk,

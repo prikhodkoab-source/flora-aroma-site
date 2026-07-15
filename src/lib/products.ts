@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 export type ProductOption = {
   variant_id: string;
+  container_type_id: string;
+  format_code: string;
   container: string;
   price_uah: number;
   unit: string;
@@ -324,6 +326,9 @@ function optionIdFrom(container: string, index: number): string {
 }
 
 function productOptionsFrom(row: Record<string, string>): ProductOption[] {
+  const variantIds = splitList(row.variant_ids || "");
+  const containerTypeIds = splitList(row.variant_container_type_ids || "");
+  const formatCodes = splitList(row.variant_format_codes || "");
   const containers = splitList(row.variant_containers || "");
   const prices = splitList(row.variant_prices_uah || "");
   const units = splitList(row.variant_units || "");
@@ -332,7 +337,9 @@ function productOptionsFrom(row: Record<string, string>): ProductOption[] {
   if (containers.length === 0) {
     return [
       {
-        variant_id: "default",
+        variant_id: row.variant_id || "default",
+        container_type_id: row.container_type_id || "",
+        format_code: row.format_code || "",
         container: row.container,
         price_uah: Number(row.price_uah),
         unit: row.unit,
@@ -346,7 +353,9 @@ function productOptionsFrom(row: Record<string, string>): ProductOption[] {
     const unit = units[index] || row.unit;
 
     return {
-      variant_id: optionIdFrom(container, index),
+      variant_id: variantIds[index] || optionIdFrom(container, index),
+      container_type_id: containerTypeIds[index] || "",
+      format_code: formatCodes[index] || "",
       container,
       price_uah: price,
       unit,
@@ -381,7 +390,8 @@ export function getProducts(): Product[] {
         .map((path) => path.trim())
         .filter(Boolean);
       const options = productOptionsFrom(row);
-      const primaryOption = options[0];
+      const optionsByPrice = [...options].sort((a, b) => a.price_uah - b.price_uah);
+      const primaryOption = optionsByPrice[0] ?? options[0];
       const kyivWinterHardiness = getKyivWinterHardiness(row.winter_hardiness);
 
       return {
