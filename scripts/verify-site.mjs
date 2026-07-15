@@ -179,7 +179,7 @@ for (const requiredPhrase of [
   "Оплата",
   "Інформація про доставку",
   "Статистика сайту",
-  "Аналітику ще не підключено до Cloudflare"
+  "Confirmed order analytics not connected."
 ]) {
   if (!publicHtml.includes(requiredPhrase)) {
     fail(`Expected Tilda clone phrase: ${requiredPhrase}`);

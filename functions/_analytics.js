@@ -275,7 +275,6 @@ export function parseAnalyticsPeriod(url, now = new Date()) {
   const preset = params.get("preset");
   const from = params.get("from");
   const to = params.get("to");
-  const presetDays = { "7d": 7, "30d": 30, "365d": 365 };
 
   if (from || to) {
     if (!from || !to) return { ok: false, error: "period_from_to_required" };
@@ -291,22 +290,85 @@ export function parseAnalyticsPeriod(url, now = new Date()) {
       ok: true,
       preset: "custom",
       from: fromDate.toISOString(),
-      to: toDate.toISOString()
+      to: toDate.toISOString(),
+      label: labelPeriod(fromDate, toDate)
     };
   }
 
   const selectedPreset = preset || "30d";
-  if (!Object.hasOwn(presetDays, selectedPreset)) {
-    return { ok: false, error: "period_invalid" };
+  const todayStart = startOfUtcDay(now);
+  const todayEnd = endOfUtcDay(now);
+
+  if (selectedPreset === "today") {
+    return periodResult(selectedPreset, todayStart, todayEnd);
   }
+
+  if (selectedPreset === "yesterday") {
+    const day = addDays(todayStart, -1);
+    return periodResult(selectedPreset, day, endOfUtcDay(day));
+  }
+
+  if (selectedPreset === "current_month") {
+    return periodResult(selectedPreset, startOfUtcMonth(now), now);
+  }
+
+  if (selectedPreset === "previous_month") {
+    const currentMonth = startOfUtcMonth(now);
+    const previousMonth = new Date(Date.UTC(currentMonth.getUTCFullYear(), currentMonth.getUTCMonth() - 1, 1));
+    return periodResult(selectedPreset, previousMonth, new Date(currentMonth.getTime() - 1));
+  }
+
+  const presetDays = { "7d": 7, "30d": 30, "90d": 90, "365d": 365 };
+  if (!Object.hasOwn(presetDays, selectedPreset)) return { ok: false, error: "period_invalid" };
 
   const toDate = now;
   const fromDate = new Date(toDate.getTime() - presetDays[selectedPreset] * 86_400_000);
+  return periodResult(selectedPreset, fromDate, toDate);
+}
+
+function startOfUtcDay(value) {
+  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()));
+}
+
+function endOfUtcDay(value) {
+  const start = startOfUtcDay(value);
+  return new Date(start.getTime() + 86_400_000 - 1);
+}
+
+function startOfUtcMonth(value) {
+  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), 1));
+}
+
+function addDays(value, days) {
+  return new Date(value.getTime() + days * 86_400_000);
+}
+
+function periodResult(preset, fromDate, toDate) {
   return {
     ok: true,
-    preset: selectedPreset,
+    preset,
     from: fromDate.toISOString(),
-    to: toDate.toISOString()
+    to: toDate.toISOString(),
+    label: labelPeriod(fromDate, toDate)
+  };
+}
+
+function labelPeriod(fromDate, toDate) {
+  return `${fromDate.toISOString().slice(0, 10)} - ${toDate.toISOString().slice(0, 10)}`;
+}
+
+export function previousAnalyticsPeriod(range) {
+  const fromDate = new Date(range.from);
+  const toDate = new Date(range.to);
+  const duration = Math.max(0, toDate.getTime() - fromDate.getTime());
+  const previousTo = new Date(fromDate.getTime() - 1);
+  const previousFrom = new Date(previousTo.getTime() - duration);
+
+  return {
+    preset: "previous",
+    from: previousFrom.toISOString(),
+    to: previousTo.toISOString(),
+    label: labelPeriod(previousFrom, previousTo)
   };
 }
 
@@ -326,22 +388,33 @@ export function validateDatasetName(dataset) {
   return /^[A-Za-z_][A-Za-z0-9_]*$/.test(dataset || "");
 }
 
-export function buildSummaryQueries(dataset, range) {
+export function buildSummaryQueries(dataset, range, options = {}) {
   if (!validateDatasetName(dataset)) {
     throw new Error("dataset_invalid");
   }
 
+  const includeDetails = options.includeDetails !== false;
   const from = sqlString(sqlDateTime(range.from));
   const to = sqlString(sqlDateTime(range.to));
   const where = `timestamp >= toDateTime('${from}') AND timestamp <= toDateTime('${to}')`;
+  const keyEvents =
+    "'page_view','view_plant','add_to_cart','open_cart','copy_order_request','catalog_search','select_variant','click_phone','click_messenger'";
+
+  const queries = {
+    overall: `SELECT count(DISTINCT index1) AS sessions, SUM(_sample_interval) AS events FROM ${dataset} WHERE ${where} FORMAT JSON`,
+    eventTotals: `SELECT blob1 AS event_name, SUM(_sample_interval) AS event_count, count(DISTINCT index1) AS unique_sessions, MAX(timestamp) AS last_seen FROM ${dataset} WHERE ${where} GROUP BY event_name ORDER BY event_count DESC FORMAT JSON`
+  };
+
+  if (!includeDetails) return queries;
 
   return {
-    sessions: `SELECT count(DISTINCT index1) AS sessions FROM ${dataset} WHERE ${where} FORMAT JSON`,
-    eventCounts: `SELECT blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} GROUP BY event_name FORMAT JSON`,
-    dailySeries: `SELECT toDate(timestamp) AS day, blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} AND blob1 IN ('page_view','view_plant','add_to_cart','copy_order_request') GROUP BY day, event_name ORDER BY day ASC FORMAT JSON`,
-    topProducts: `SELECT blob4 AS plant_id, blob5 AS plant_name, blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} AND blob4 != '' AND blob1 IN ('view_plant','add_to_cart','copy_order_request') GROUP BY plant_id, plant_name, event_name ORDER BY count DESC LIMIT 200 FORMAT JSON`,
-    trafficSources: `SELECT if(blob12 = '', 'direct', blob12) AS source, SUM(_sample_interval) AS page_views FROM ${dataset} WHERE ${where} AND blob1 = 'page_view' GROUP BY source ORDER BY page_views DESC LIMIT 20 FORMAT JSON`,
-    deviceClasses: `SELECT if(blob16 = '', 'unknown', blob16) AS device_class, SUM(_sample_interval) AS sessions FROM ${dataset} WHERE ${where} AND blob1 = 'page_view' GROUP BY device_class ORDER BY sessions DESC FORMAT JSON`
+    ...queries,
+    dailySessions: `SELECT toDate(timestamp) AS day, count(DISTINCT index1) AS sessions FROM ${dataset} WHERE ${where} GROUP BY day ORDER BY day ASC FORMAT JSON`,
+    dailyMetrics: `SELECT toDate(timestamp) AS day, blob1 AS event_name, SUM(_sample_interval) AS event_count, count(DISTINCT index1) AS unique_sessions FROM ${dataset} WHERE ${where} AND blob1 IN (${keyEvents}) GROUP BY day, event_name ORDER BY day ASC FORMAT JSON`,
+    topProducts: `SELECT blob4 AS plant_id, blob5 AS plant_name, blob6 AS product_option, blob7 AS container, blob1 AS event_name, SUM(_sample_interval) AS event_count, count(DISTINCT index1) AS unique_sessions FROM ${dataset} WHERE ${where} AND blob4 != '' AND blob1 IN ('view_plant','add_to_cart','copy_order_request') GROUP BY plant_id, plant_name, product_option, container, event_name ORDER BY event_count DESC LIMIT 300 FORMAT JSON`,
+    popularPages: `SELECT blob2 AS pathname, blob3 AS page_title, SUM(_sample_interval) AS views, count(DISTINCT index1) AS unique_sessions FROM ${dataset} WHERE ${where} AND blob1 = 'page_view' AND blob2 != '' GROUP BY pathname, page_title ORDER BY views DESC LIMIT 200 FORMAT JSON`,
+    sourceEvents: `SELECT blob12 AS referrer_host, blob13 AS utm_source, blob14 AS utm_medium, blob15 AS utm_campaign, blob1 AS event_name, SUM(_sample_interval) AS event_count, count(DISTINCT index1) AS unique_sessions FROM ${dataset} WHERE ${where} AND blob1 IN (${keyEvents}) GROUP BY referrer_host, utm_source, utm_medium, utm_campaign, event_name ORDER BY event_count DESC LIMIT 400 FORMAT JSON`,
+    deviceEvents: `SELECT if(blob16 = '', 'unknown', blob16) AS device_class, blob1 AS event_name, SUM(_sample_interval) AS event_count, count(DISTINCT index1) AS unique_sessions FROM ${dataset} WHERE ${where} AND blob1 IN (${keyEvents}) GROUP BY device_class, event_name ORDER BY event_count DESC FORMAT JSON`
   };
 }
 
@@ -361,31 +434,217 @@ export function emptyAnalyticsSummary(range, reason = "not_configured") {
       page_views: 0,
       product_views: 0,
       add_to_cart: 0,
+      open_cart: 0,
       copied_requests: 0,
-      conversions: 0
+      conversions: 0,
+      session_to_cart_conversion: 0,
+      session_to_copy_conversion: 0
     },
+    kpis: [],
     daily_series: [],
+    daily_table: [],
     top_products: [],
+    popular_pages: [],
     traffic_sources: [],
+    source_quality: [],
     device_classes: [],
-    funnel: []
+    event_table: [],
+    funnel: [],
+    commercial: commercialPlaceholder(),
+    geography: geographyStatus(),
+    search_analytics: searchAnalyticsStatus(),
+    meta: {
+      generated_at: new Date().toISOString(),
+      query_count: 0,
+      dashboard_api_request_count: 1,
+      p95_estimate_available: false
+    }
   };
 }
 
-function countFor(eventCounts, eventName) {
-  const row = eventCounts.find((item) => item.event_name === eventName);
-  return Math.round(Number(row?.count || 0));
+function valueFor(row, field) {
+  return Math.round(Number(row?.[field] || 0));
 }
 
-export function assembleAnalyticsSummary(range, rowsByQuery) {
-  const eventCounts = rowsByQuery.eventCounts || [];
-  const sessions = Math.round(Number(rowsByQuery.sessions?.[0]?.sessions || 0));
-  const pageViews = countFor(eventCounts, "page_view");
-  const productViews = countFor(eventCounts, "view_plant");
-  const addToCart = countFor(eventCounts, "add_to_cart");
-  const copiedRequests = countFor(eventCounts, "copy_order_request");
-  const conversions = pageViews > 0 ? Math.round((copiedRequests / pageViews) * 10_000) / 100 : 0;
+function percent(numerator, denominator) {
+  if (!denominator || denominator <= 0) return 0;
+  return Math.round((Number(numerator || 0) / Number(denominator)) * 10_000) / 100;
+}
 
+function delta(current, previous) {
+  const currentValue = Number(current || 0);
+  const previousValue = Number(previous || 0);
+  return {
+    absolute: Math.round((currentValue - previousValue) * 100) / 100,
+    percent: previousValue > 0 ? Math.round(((currentValue - previousValue) / previousValue) * 10_000) / 100 : null
+  };
+}
+
+function eventRow(rowsByQuery, eventName) {
+  return (rowsByQuery.eventTotals || []).find((row) => row.event_name === eventName) || {};
+}
+
+function baseMetrics(rowsByQuery) {
+  const sessions = valueFor(rowsByQuery.overall?.[0], "sessions");
+  const pageViews = valueFor(eventRow(rowsByQuery, "page_view"), "event_count");
+  const productViews = valueFor(eventRow(rowsByQuery, "view_plant"), "event_count");
+  const addToCart = valueFor(eventRow(rowsByQuery, "add_to_cart"), "event_count");
+  const openCart = valueFor(eventRow(rowsByQuery, "open_cart"), "event_count");
+  const copiedRequests = valueFor(eventRow(rowsByQuery, "copy_order_request"), "event_count");
+
+  return {
+    sessions,
+    visitors: sessions,
+    page_views: pageViews,
+    product_views: productViews,
+    add_to_cart: addToCart,
+    open_cart: openCart,
+    copied_requests: copiedRequests,
+    conversions: percent(copiedRequests, pageViews),
+    session_to_cart_conversion: percent(valueFor(eventRow(rowsByQuery, "add_to_cart"), "unique_sessions"), sessions),
+    session_to_copy_conversion: percent(valueFor(eventRow(rowsByQuery, "copy_order_request"), "unique_sessions"), sessions)
+  };
+}
+
+function kpiRows(current, previous) {
+  return [
+    ["sessions", "Сесії", current.sessions, previous.sessions, "number"],
+    ["visitors", "Відвідувачі (за сесіями)", current.visitors, previous.visitors, "number"],
+    ["page_views", "Перегляди сторінок", current.page_views, previous.page_views, "number"],
+    ["product_views", "Перегляди рослин", current.product_views, previous.product_views, "number"],
+    ["add_to_cart", "Додавання в кошик", current.add_to_cart, previous.add_to_cart, "number"],
+    ["open_cart", "Відкриття кошика", current.open_cart, previous.open_cart, "number"],
+    ["copied_requests", "Скопійовано заявок", current.copied_requests, previous.copied_requests, "number"],
+    [
+      "session_to_cart_conversion",
+      "Конверсія сесія -> кошик",
+      current.session_to_cart_conversion,
+      previous.session_to_cart_conversion,
+      "percent"
+    ],
+    [
+      "session_to_copy_conversion",
+      "Конверсія сесія -> заявка",
+      current.session_to_copy_conversion,
+      previous.session_to_copy_conversion,
+      "percent"
+    ]
+  ].map(([key, label, currentValue, previousValue, format]) => ({
+    key,
+    label,
+    current: currentValue,
+    previous: previousValue,
+    delta_absolute: delta(currentValue, previousValue).absolute,
+    delta_percent: delta(currentValue, previousValue).percent,
+    format
+  }));
+}
+
+function normalizePathname(pathname) {
+  const value = String(pathname || "/").split("?")[0].split("#")[0].trim();
+  if (!value) return "/";
+  return value.startsWith("/") ? value : `/${value}`;
+}
+
+function pageType(pathname) {
+  const path = normalizePathname(pathname);
+  if (path === "/") return "home";
+  if (path === "/shop" || path === "/catalog") return "catalog";
+  if (path.startsWith("/plants/")) return "plant";
+  if (path.startsWith("/categories/")) return "category";
+  if (path.startsWith("/selections/")) return "selection";
+  if (path.startsWith("/cart")) return "cart";
+  if (path.startsWith("/contacts")) return "contacts";
+  if (path.startsWith("/how-to-order")) return "how-to-order";
+  if (path.startsWith("/price")) return "price";
+  return "other";
+}
+
+function sourceInfo(row) {
+  const referrer = String(row.referrer_host || "").toLowerCase();
+  const utmSource = String(row.utm_source || "").toLowerCase();
+  const utmMedium = String(row.utm_medium || "").toLowerCase();
+  const utmCampaign = String(row.utm_campaign || "").toLowerCase();
+  const marker = `${referrer} ${utmSource} ${utmMedium} ${utmCampaign}`;
+
+  if (utmSource || utmMedium || utmCampaign) {
+    if (/facebook|instagram|threads|tiktok|telegram|t\.me/.test(marker)) {
+      return { channel: "Social", source: utmSource || referrer || "social" };
+    }
+    return { channel: "Campaign", source: utmSource || utmCampaign || utmMedium || "campaign" };
+  }
+
+  if (!referrer) return { channel: "Direct", source: "direct" };
+  if (/flora-aroma|flora_aroma|pages\.dev/.test(referrer)) return { channel: "Internal", source: referrer };
+  if (/google|bing|duckduckgo|yahoo|yandex/.test(referrer)) return { channel: "Search", source: referrer };
+  if (/facebook|instagram|threads|tiktok|telegram|t\.me/.test(referrer)) return { channel: "Social", source: referrer };
+  return { channel: "Referral", source: referrer };
+}
+
+function addEventMetric(target, eventName, eventCount, uniqueSessions) {
+  if (eventName === "page_view") {
+    target.page_views += eventCount;
+    target.sessions = Math.max(target.sessions, uniqueSessions);
+  }
+  if (eventName === "view_plant") {
+    target.plant_views += eventCount;
+    target.plant_view_sessions = Math.max(target.plant_view_sessions, uniqueSessions);
+  }
+  if (eventName === "add_to_cart") {
+    target.add_to_cart += eventCount;
+    target.add_to_cart_sessions = Math.max(target.add_to_cart_sessions, uniqueSessions);
+  }
+  if (eventName === "open_cart") target.open_cart += eventCount;
+  if (eventName === "copy_order_request") {
+    target.copied_requests += eventCount;
+    target.copy_request_sessions = Math.max(target.copy_request_sessions, uniqueSessions);
+  }
+}
+
+function dailyRows(rowsByQuery) {
+  const days = new Map();
+  for (const row of rowsByQuery.dailySessions || []) {
+    const day = String(row.day || "");
+    if (!day) continue;
+    days.set(day, {
+      day,
+      sessions: valueFor(row, "sessions"),
+      visitors: valueFor(row, "sessions"),
+      page_views: 0,
+      product_views: 0,
+      add_to_cart: 0,
+      copied_requests: 0,
+      conversion: 0
+    });
+  }
+
+  for (const row of rowsByQuery.dailyMetrics || []) {
+    const day = String(row.day || "");
+    if (!day) continue;
+    const current = days.get(day) || {
+      day,
+      sessions: 0,
+      visitors: 0,
+      page_views: 0,
+      product_views: 0,
+      add_to_cart: 0,
+      copied_requests: 0,
+      conversion: 0
+    };
+    const count = valueFor(row, "event_count");
+    if (row.event_name === "page_view") current.page_views += count;
+    if (row.event_name === "view_plant") current.product_views += count;
+    if (row.event_name === "add_to_cart") current.add_to_cart += count;
+    if (row.event_name === "copy_order_request") current.copied_requests += count;
+    days.set(day, current);
+  }
+
+  return Array.from(days.values())
+    .map((row) => ({ ...row, conversion: percent(row.copied_requests, row.sessions) }))
+    .sort((a, b) => a.day.localeCompare(b.day));
+}
+
+function plantRows(rowsByQuery) {
   const products = new Map();
   for (const row of rowsByQuery.topProducts || []) {
     const plantId = row.plant_id || "";
@@ -393,56 +652,230 @@ export function assembleAnalyticsSummary(range, rowsByQuery) {
     const current = products.get(plantId) || {
       plant_id: plantId,
       plant_name: row.plant_name || plantId,
+      product_option: row.product_option || "",
+      container: row.container || "",
       views: 0,
+      unique_sessions: 0,
       add_to_cart: 0,
-      copied_requests: 0
+      add_to_cart_sessions: 0,
+      copied_requests: 0,
+      copy_request_sessions: 0
     };
-    if (row.event_name === "view_plant") current.views += Number(row.count || 0);
-    if (row.event_name === "add_to_cart") current.add_to_cart += Number(row.count || 0);
-    if (row.event_name === "copy_order_request") current.copied_requests += Number(row.count || 0);
+    if (row.event_name === "view_plant") {
+      current.views += Number(row.event_count || 0);
+      current.unique_sessions += Number(row.unique_sessions || 0);
+    }
+    if (row.event_name === "add_to_cart") {
+      current.add_to_cart += Number(row.event_count || 0);
+      current.add_to_cart_sessions += Number(row.unique_sessions || 0);
+    }
+    if (row.event_name === "copy_order_request") {
+      current.copied_requests += Number(row.event_count || 0);
+      current.copy_request_sessions += Number(row.unique_sessions || 0);
+    }
     products.set(plantId, current);
   }
 
-  const topProducts = Array.from(products.values())
+  return Array.from(products.values())
     .map((item) => ({
       ...item,
       views: Math.round(item.views),
+      unique_sessions: Math.round(item.unique_sessions),
       add_to_cart: Math.round(item.add_to_cart),
-      copied_requests: Math.round(item.copied_requests)
+      copied_requests: Math.round(item.copied_requests),
+      view_to_cart_conversion: percent(item.add_to_cart_sessions, item.unique_sessions),
+      cart_to_copy_conversion: percent(item.copy_request_sessions, item.add_to_cart_sessions)
     }))
     .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
+    .slice(0, 30);
+}
+
+function pageRows(rowsByQuery, pageViews) {
+  return (rowsByQuery.popularPages || [])
+    .map((row) => {
+      const pathname = normalizePathname(row.pathname);
+      const views = valueFor(row, "views");
+      return {
+        pathname,
+        page_title: String(row.page_title || pathname),
+        page_type: pageType(pathname),
+        views,
+        unique_sessions: valueFor(row, "unique_sessions"),
+        share_of_views: percent(views, pageViews)
+      };
+    })
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 50);
+}
+
+function sourceRows(rowsByQuery) {
+  const grouped = new Map();
+  for (const row of rowsByQuery.sourceEvents || []) {
+    const { channel, source } = sourceInfo(row);
+    const key = `${channel}|${source}`;
+    const current = grouped.get(key) || {
+      channel,
+      source,
+      sessions: 0,
+      page_views: 0,
+      plant_views: 0,
+      plant_view_sessions: 0,
+      add_to_cart: 0,
+      add_to_cart_sessions: 0,
+      open_cart: 0,
+      copied_requests: 0,
+      copy_request_sessions: 0
+    };
+    addEventMetric(current, row.event_name, valueFor(row, "event_count"), valueFor(row, "unique_sessions"));
+    grouped.set(key, current);
+  }
+
+  const totalSessions = Array.from(grouped.values()).reduce((sum, row) => sum + row.sessions, 0);
+  return Array.from(grouped.values())
+    .map((row) => ({
+      ...row,
+      share: percent(row.sessions, totalSessions),
+      session_to_cart_conversion: percent(row.add_to_cart_sessions, row.sessions),
+      session_to_copy_conversion: percent(row.copy_request_sessions, row.sessions)
+    }))
+    .sort((a, b) => b.sessions - a.sessions)
+    .slice(0, 50);
+}
+
+function deviceRows(rowsByQuery) {
+  const grouped = new Map();
+  for (const row of rowsByQuery.deviceEvents || []) {
+    const device = String(row.device_class || "unknown");
+    const current = grouped.get(device) || {
+      device_class: device,
+      sessions: 0,
+      page_views: 0,
+      plant_views: 0,
+      plant_view_sessions: 0,
+      add_to_cart: 0,
+      add_to_cart_sessions: 0,
+      open_cart: 0,
+      copied_requests: 0,
+      copy_request_sessions: 0
+    };
+    addEventMetric(current, row.event_name, valueFor(row, "event_count"), valueFor(row, "unique_sessions"));
+    grouped.set(device, current);
+  }
+  const total = Array.from(grouped.values()).reduce((sum, row) => sum + row.sessions, 0);
+  return Array.from(grouped.values())
+    .map((row) => ({
+      ...row,
+      share: percent(row.sessions, total),
+      copy_request_conversion: percent(row.copy_request_sessions, row.sessions)
+    }))
+    .sort((a, b) => b.sessions - a.sessions);
+}
+
+function eventTable(rowsByQuery) {
+  const events = rowsByQuery.eventTotals || [];
+  const total = events.reduce((sum, row) => sum + valueFor(row, "event_count"), 0);
+  return events.map((row) => ({
+    event_name: String(row.event_name || "unknown"),
+    event_count: valueFor(row, "event_count"),
+    unique_sessions: valueFor(row, "unique_sessions"),
+    share: percent(valueFor(row, "event_count"), total),
+    last_seen: row.last_seen ? String(row.last_seen) : ""
+  }));
+}
+
+function funnelRows(rowsByQuery, metrics) {
+  const steps = [
+    ["sessions", "Сесії", metrics.sessions, metrics.sessions],
+    ["view_plant", "Перегляд рослини", valueFor(eventRow(rowsByQuery, "view_plant"), "event_count"), valueFor(eventRow(rowsByQuery, "view_plant"), "unique_sessions")],
+    ["add_to_cart", "Додавання в кошик", valueFor(eventRow(rowsByQuery, "add_to_cart"), "event_count"), valueFor(eventRow(rowsByQuery, "add_to_cart"), "unique_sessions")],
+    ["open_cart", "Відкриття кошика", valueFor(eventRow(rowsByQuery, "open_cart"), "event_count"), valueFor(eventRow(rowsByQuery, "open_cart"), "unique_sessions")],
+    ["copy_order_request", "Скопійовано заявку", valueFor(eventRow(rowsByQuery, "copy_order_request"), "event_count"), valueFor(eventRow(rowsByQuery, "copy_order_request"), "unique_sessions")]
+  ];
+
+  return steps.map(([key, label, eventCount, uniqueSessions], index) => {
+    const previousSessions = index === 0 ? uniqueSessions : steps[index - 1][3];
+    const conversionFromPrevious = index === 0 ? 100 : percent(uniqueSessions, previousSessions);
+    const conversionFromSession = index === 0 ? 100 : percent(uniqueSessions, metrics.sessions);
+    return {
+      key,
+      step: label,
+      event_count: eventCount,
+      unique_sessions: uniqueSessions,
+      conversion_from_previous: conversionFromPrevious,
+      conversion_from_session: conversionFromSession,
+      drop_off: index === 0 ? 0 : Math.max(0, Math.round((100 - conversionFromPrevious) * 100) / 100),
+      value: eventCount
+    };
+  });
+}
+
+function commercialPlaceholder() {
+  return {
+    connected: false,
+    status: "ORDER_SOURCE_NOT_CONNECTED",
+    message: "Confirmed order analytics not connected.",
+    fake_order_metrics_created: false
+  };
+}
+
+function geographyStatus() {
+  return {
+    country_analytics_available: false,
+    city_analytics_available: false,
+    privacy_safe: true,
+    reason: "Current event schema does not store Cloudflare country code, and the dashboard does not store IP addresses."
+  };
+}
+
+function searchAnalyticsStatus() {
+  return {
+    deferred: true,
+    reason: "Search terms need a separate privacy review before they are shown in admin reports."
+  };
+}
+
+export function assembleAnalyticsSummary(range, rowsByQuery, options = {}) {
+  const previousRows = options.previousRowsByQuery || {};
+  const previousRange = options.previousRange || previousAnalyticsPeriod(range);
+  const metrics = baseMetrics(rowsByQuery);
+  const previousMetrics = baseMetrics(previousRows);
+  const topProducts = plantRows(rowsByQuery);
+  const popularPages = pageRows(rowsByQuery, metrics.page_views);
+  const sources = sourceRows(rowsByQuery);
+  const devices = deviceRows(rowsByQuery);
 
   return {
     configured: true,
-    range,
-    metrics: {
-      sessions,
-      page_views: pageViews,
-      product_views: productViews,
-      add_to_cart: addToCart,
-      copied_requests: copiedRequests,
-      conversions
+    range: {
+      ...range,
+      previous: previousRange
     },
-    daily_series: (rowsByQuery.dailySeries || []).map((row) => ({
+    metrics,
+    previous_metrics: previousMetrics,
+    kpis: kpiRows(metrics, previousMetrics),
+    daily_series: (rowsByQuery.dailyMetrics || []).map((row) => ({
       day: String(row.day || ""),
       event_name: String(row.event_name || ""),
-      count: Math.round(Number(row.count || 0))
+      count: valueFor(row, "event_count"),
+      unique_sessions: valueFor(row, "unique_sessions")
     })),
+    daily_table: dailyRows(rowsByQuery),
     top_products: topProducts,
-    traffic_sources: (rowsByQuery.trafficSources || []).map((row) => ({
-      source: String(row.source || "direct"),
-      page_views: Math.round(Number(row.page_views || 0))
-    })),
-    device_classes: (rowsByQuery.deviceClasses || []).map((row) => ({
-      device_class: String(row.device_class || "unknown"),
-      sessions: Math.round(Number(row.sessions || 0))
-    })),
-    funnel: [
-      { step: "Перегляди сторінок", value: pageViews },
-      { step: "Перегляди рослин", value: productViews },
-      { step: "Додавання в кошик", value: addToCart },
-      { step: "Заявки оператору", value: copiedRequests }
-    ]
+    popular_pages: popularPages,
+    traffic_sources: sources,
+    source_quality: sources,
+    device_classes: devices,
+    event_table: eventTable(rowsByQuery),
+    funnel: funnelRows(rowsByQuery, metrics),
+    commercial: commercialPlaceholder(),
+    geography: geographyStatus(),
+    search_analytics: searchAnalyticsStatus(),
+    meta: {
+      generated_at: new Date().toISOString(),
+      query_count: options.queryCount || 0,
+      dashboard_api_request_count: 1,
+      p95_estimate_available: false,
+      summary_response_size: options.responseSize || null
+    }
   };
 }

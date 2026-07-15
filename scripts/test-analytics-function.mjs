@@ -6,8 +6,10 @@ import { onRequestGet as getSummary } from "../functions/api/analytics/summary.j
 import {
   ANALYTICS_COLUMN_MAP,
   analyticsDataPoint,
+  assembleAnalyticsSummary,
   buildSummaryQueries,
   parseAnalyticsPeriod,
+  previousAnalyticsPeriod,
   sanitizeAnalyticsPayload
 } from "../functions/_analytics.js";
 
@@ -139,11 +141,21 @@ const placeholderSummaryConfig = await getSummary({
 });
 assert.equal(placeholderSummaryConfig.status, 503);
 
-const invalidPeriod = await getSummary({
+const accepted90d = await getSummary({
   request: new Request("https://flora-aroma.com.ua/api/analytics/summary?preset=90d"),
   env: {}
 });
-assert.equal(invalidPeriod.status, 400);
+assert.equal(accepted90d.status, 503);
+
+for (const preset of ["today", "yesterday", "7d", "30d", "90d", "current_month", "previous_month"]) {
+  const parsed = parseAnalyticsPeriod(
+    `https://flora-aroma.com.ua/api/analytics/summary?preset=${preset}`,
+    new Date("2026-07-15T19:45:32.833Z")
+  );
+  assert.equal(parsed.ok, true, `${preset} should parse`);
+  assert.equal(parsed.preset, preset);
+  assert.ok(parsed.label);
+}
 
 assert.throws(
   () => buildSummaryQueries("flora;drop", { from: new Date().toISOString(), to: new Date().toISOString() }),
@@ -154,10 +166,14 @@ const summaryQueries = buildSummaryQueries("flora_aroma_analytics_preview", {
   from: "2026-07-08T19:45:32.833Z",
   to: "2026-07-15T19:45:32.833Z"
 });
-assert.equal(summaryQueries.sessions.includes("uniq("), false);
-assert.equal(summaryQueries.sessions.includes("count(DISTINCT index1)"), true);
-assert.match(summaryQueries.sessions, /toDateTime\('2026-07-08 19:45:32'\)/);
-assert.match(summaryQueries.sessions, /toDateTime\('2026-07-15 19:45:32'\)/);
+assert.equal(summaryQueries.overall.includes("uniq("), false);
+assert.equal(summaryQueries.overall.includes("count(DISTINCT index1)"), true);
+assert.match(summaryQueries.overall, /toDateTime\('2026-07-08 19:45:32'\)/);
+assert.match(summaryQueries.overall, /toDateTime\('2026-07-15 19:45:32'\)/);
+assert.ok(summaryQueries.dailyMetrics);
+assert.ok(summaryQueries.popularPages);
+assert.ok(summaryQueries.sourceEvents);
+assert.ok(summaryQueries.deviceEvents);
 for (const query of Object.values(summaryQueries)) {
   assert.equal(query.includes("T19:45:32"), false);
   assert.equal(query.includes(".833Z"), false);
@@ -171,8 +187,12 @@ const presetPeriod = parseAnalyticsPeriod(
 assert.equal(presetPeriod.ok, true);
 assert.equal(presetPeriod.preset, "7d");
 const presetQueries = buildSummaryQueries("flora_aroma_analytics_preview", presetPeriod);
-assert.match(presetQueries.sessions, /toDateTime\('2026-07-08 19:45:32'\)/);
-assert.match(presetQueries.sessions, /toDateTime\('2026-07-15 19:45:32'\)/);
+assert.match(presetQueries.overall, /toDateTime\('2026-07-08 19:45:32'\)/);
+assert.match(presetQueries.overall, /toDateTime\('2026-07-15 19:45:32'\)/);
+
+const previousPeriod = previousAnalyticsPeriod(presetPeriod);
+assert.equal(previousPeriod.from, "2026-07-01T19:45:32.832Z");
+assert.equal(previousPeriod.to, "2026-07-08T19:45:32.832Z");
 
 const customPeriod = parseAnalyticsPeriod(
   "https://flora-aroma.com.ua/api/analytics/summary?from=2026-07-01&to=2026-07-14"
@@ -180,8 +200,115 @@ const customPeriod = parseAnalyticsPeriod(
 assert.equal(customPeriod.ok, true);
 assert.equal(customPeriod.preset, "custom");
 const customQueries = buildSummaryQueries("flora_aroma_analytics_preview", customPeriod);
-assert.match(customQueries.sessions, /toDateTime\('2026-07-01 00:00:00'\)/);
-assert.match(customQueries.sessions, /toDateTime\('2026-07-14 23:59:59'\)/);
+assert.match(customQueries.overall, /toDateTime\('2026-07-01 00:00:00'\)/);
+assert.match(customQueries.overall, /toDateTime\('2026-07-14 23:59:59'\)/);
+
+const invalidPeriod = await getSummary({
+  request: new Request("https://flora-aroma.com.ua/api/analytics/summary?preset=invalid"),
+  env: {}
+});
+assert.equal(invalidPeriod.status, 400);
+
+const assembled = assembleAnalyticsSummary(
+  presetPeriod,
+  {
+    overall: [{ sessions: 3, events: 12 }],
+    eventTotals: [
+      { event_name: "page_view", event_count: 5, unique_sessions: 3, last_seen: "2026-07-15 10:00:00" },
+      { event_name: "view_plant", event_count: 4, unique_sessions: 2, last_seen: "2026-07-15 10:01:00" },
+      { event_name: "add_to_cart", event_count: 2, unique_sessions: 1, last_seen: "2026-07-15 10:02:00" },
+      { event_name: "open_cart", event_count: 2, unique_sessions: 1, last_seen: "2026-07-15 10:03:00" },
+      { event_name: "copy_order_request", event_count: 1, unique_sessions: 1, last_seen: "2026-07-15 10:04:00" }
+    ],
+    dailySessions: [{ day: "2026-07-15", sessions: 3 }],
+    dailyMetrics: [
+      { day: "2026-07-15", event_name: "page_view", event_count: 5, unique_sessions: 3 },
+      { day: "2026-07-15", event_name: "view_plant", event_count: 4, unique_sessions: 2 },
+      { day: "2026-07-15", event_name: "add_to_cart", event_count: 2, unique_sessions: 1 },
+      { day: "2026-07-15", event_name: "copy_order_request", event_count: 1, unique_sessions: 1 }
+    ],
+    topProducts: [
+      { plant_id: "PLANT-0084", plant_name: "Агастахе фенхельне", product_option: "V-120", container: "Касета Hiko V-120ss", event_name: "view_plant", event_count: 4, unique_sessions: 2 },
+      { plant_id: "PLANT-0084", plant_name: "Агастахе фенхельне", product_option: "V-120", container: "Касета Hiko V-120ss", event_name: "add_to_cart", event_count: 2, unique_sessions: 1 },
+      { plant_id: "PLANT-0084", plant_name: "Агастахе фенхельне", product_option: "V-120", container: "Касета Hiko V-120ss", event_name: "copy_order_request", event_count: 1, unique_sessions: 1 }
+    ],
+    popularPages: [
+      { pathname: "/plants/agastakhe-fenkhelne-plant-0084/?phone=hidden", page_title: "Агастахе", views: 5, unique_sessions: 3 }
+    ],
+    sourceEvents: [
+      { referrer_host: "google.com", utm_source: "", utm_medium: "", utm_campaign: "", event_name: "page_view", event_count: 5, unique_sessions: 3 },
+      { referrer_host: "google.com", utm_source: "", utm_medium: "", utm_campaign: "", event_name: "add_to_cart", event_count: 2, unique_sessions: 1 },
+      { referrer_host: "google.com", utm_source: "", utm_medium: "", utm_campaign: "", event_name: "copy_order_request", event_count: 1, unique_sessions: 1 }
+    ],
+    deviceEvents: [
+      { device_class: "mobile", event_name: "page_view", event_count: 5, unique_sessions: 3 },
+      { device_class: "mobile", event_name: "view_plant", event_count: 4, unique_sessions: 2 },
+      { device_class: "mobile", event_name: "add_to_cart", event_count: 2, unique_sessions: 1 },
+      { device_class: "mobile", event_name: "copy_order_request", event_count: 1, unique_sessions: 1 }
+    ]
+  },
+  {
+    previousRange: previousPeriod,
+    previousRowsByQuery: {
+      overall: [{ sessions: 0, events: 0 }],
+      eventTotals: []
+    },
+    queryCount: 9
+  }
+);
+assert.equal(assembled.configured, true);
+assert.equal(assembled.metrics.sessions, 3);
+assert.equal(assembled.metrics.session_to_cart_conversion, 33.33);
+assert.equal(assembled.kpis.find((row) => row.key === "sessions").delta_percent, null);
+assert.equal(assembled.funnel.find((row) => row.key === "copy_order_request").conversion_from_session, 33.33);
+assert.equal(assembled.top_products[0].plant_id, "PLANT-0084");
+assert.equal(assembled.popular_pages[0].pathname.includes("?"), false);
+assert.equal(assembled.popular_pages[0].page_type, "plant");
+assert.equal(assembled.traffic_sources[0].channel, "Search");
+assert.equal(assembled.device_classes[0].device_class, "mobile");
+assert.equal(assembled.event_table[0].event_name, "page_view");
+assert.equal(assembled.commercial.status, "ORDER_SOURCE_NOT_CONNECTED");
+assert.equal(assembled.commercial.fake_order_metrics_created, false);
+assert.equal(JSON.stringify(assembled).includes("customer_phone"), false);
+assert.equal(JSON.stringify(assembled).includes("exact_stock"), false);
+assert.equal(JSON.stringify(assembled).includes("confirmed_orders"), false);
+
+const originalFetch = globalThis.fetch;
+let sqlCalls = 0;
+globalThis.fetch = async (_url, init) => {
+  sqlCalls += 1;
+  const query = String(init?.body || "");
+  let data = [];
+  if (query.includes(" AS sessions, SUM(_sample_interval) AS events")) data = [{ sessions: 1, events: 2 }];
+  if (query.includes("GROUP BY event_name")) {
+    data = [
+      { event_name: "page_view", event_count: 1, unique_sessions: 1, last_seen: "2026-07-15 10:00:00" },
+      { event_name: "view_plant", event_count: 1, unique_sessions: 1, last_seen: "2026-07-15 10:00:01" }
+    ];
+  }
+  if (query.includes("GROUP BY day ORDER")) data = [{ day: "2026-07-15", sessions: 1 }];
+  if (query.includes("GROUP BY day, event_name")) data = [{ day: "2026-07-15", event_name: "page_view", event_count: 1, unique_sessions: 1 }];
+  if (query.includes("GROUP BY plant_id")) data = [{ plant_id: "PLANT-0084", plant_name: "Агастахе", product_option: "", container: "", event_name: "view_plant", event_count: 1, unique_sessions: 1 }];
+  if (query.includes("GROUP BY pathname")) data = [{ pathname: "/", page_title: "Flora & Aroma", views: 1, unique_sessions: 1 }];
+  if (query.includes("GROUP BY referrer_host")) data = [{ referrer_host: "", utm_source: "", utm_medium: "", utm_campaign: "", event_name: "page_view", event_count: 1, unique_sessions: 1 }];
+  if (query.includes("GROUP BY device_class")) data = [{ device_class: "desktop", event_name: "page_view", event_count: 1, unique_sessions: 1 }];
+  return new Response(JSON.stringify({ data }), { status: 200 });
+};
+
+const configuredSummary = await getSummary({
+  request: new Request("https://flora-aroma.com.ua/api/analytics/summary?preset=7d"),
+  env: {
+    CF_ACCOUNT_ID: "account-id",
+    CF_ANALYTICS_API_TOKEN: "test-read-token",
+    CF_ANALYTICS_DATASET: "flora_aroma_analytics_preview"
+  }
+});
+assert.equal(configuredSummary.status, 200);
+const configuredJson = await configuredSummary.json();
+assert.equal(configuredJson.configured, true);
+assert.equal(configuredJson.meta.query_count, sqlCalls);
+assert.equal(configuredJson.commercial.status, "ORDER_SOURCE_NOT_CONNECTED");
+globalThis.fetch = originalFetch;
 
 const mapped = analyticsDataPoint(sanitizeAnalyticsPayload(validPayload).event);
 assert.equal(mapped.indexes.length, ANALYTICS_COLUMN_MAP.indexes.length);

@@ -6,6 +6,7 @@ import {
   jsonResponse,
   parseAnalyticsPeriod,
   parseSqlJson,
+  previousAnalyticsPeriod,
   validateDatasetName
 } from "../../_analytics.js";
 
@@ -56,13 +57,27 @@ export async function onRequestGet({ request, env }) {
   }
 
   try {
+    const previousRange = previousAnalyticsPeriod(range);
     const queries = buildSummaryQueries(dataset, range);
+    const previousQueries = buildSummaryQueries(dataset, previousRange, { includeDetails: false });
     const rowsByQuery = {};
     for (const [name, query] of Object.entries(queries)) {
       rowsByQuery[name] = await runSql(env, query);
     }
 
-    return jsonResponse({ ok: true, ...assembleAnalyticsSummary(range, rowsByQuery) });
+    const previousRowsByQuery = {};
+    for (const [name, query] of Object.entries(previousQueries)) {
+      previousRowsByQuery[name] = await runSql(env, query);
+    }
+
+    return jsonResponse({
+      ok: true,
+      ...assembleAnalyticsSummary(range, rowsByQuery, {
+        previousRange,
+        previousRowsByQuery,
+        queryCount: Object.keys(queries).length + Object.keys(previousQueries).length
+      })
+    });
   } catch {
     return jsonResponse({
       ok: false,
