@@ -314,6 +314,14 @@ function sqlString(value) {
   return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
 
+function sqlDateTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("datetime_invalid");
+  }
+  return date.toISOString().slice(0, 19).replace("T", " ");
+}
+
 export function validateDatasetName(dataset) {
   return /^[A-Za-z_][A-Za-z0-9_]*$/.test(dataset || "");
 }
@@ -323,12 +331,12 @@ export function buildSummaryQueries(dataset, range) {
     throw new Error("dataset_invalid");
   }
 
-  const from = sqlString(range.from);
-  const to = sqlString(range.to);
+  const from = sqlString(sqlDateTime(range.from));
+  const to = sqlString(sqlDateTime(range.to));
   const where = `timestamp >= toDateTime('${from}') AND timestamp <= toDateTime('${to}')`;
 
   return {
-    sessions: `SELECT uniq(index1) AS sessions FROM ${dataset} WHERE ${where} FORMAT JSON`,
+    sessions: `SELECT count(DISTINCT index1) AS sessions FROM ${dataset} WHERE ${where} FORMAT JSON`,
     eventCounts: `SELECT blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} GROUP BY event_name FORMAT JSON`,
     dailySeries: `SELECT toDate(timestamp) AS day, blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} AND blob1 IN ('page_view','view_plant','add_to_cart','copy_order_request') GROUP BY day, event_name ORDER BY day ASC FORMAT JSON`,
     topProducts: `SELECT blob4 AS plant_id, blob5 AS plant_name, blob1 AS event_name, SUM(_sample_interval) AS count FROM ${dataset} WHERE ${where} AND blob4 != '' AND blob1 IN ('view_plant','add_to_cart','copy_order_request') GROUP BY plant_id, plant_name, event_name ORDER BY count DESC LIMIT 200 FORMAT JSON`,

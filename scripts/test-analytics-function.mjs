@@ -7,6 +7,7 @@ import {
   ANALYTICS_COLUMN_MAP,
   analyticsDataPoint,
   buildSummaryQueries,
+  parseAnalyticsPeriod,
   sanitizeAnalyticsPayload
 } from "../functions/_analytics.js";
 
@@ -148,6 +149,39 @@ assert.throws(
   () => buildSummaryQueries("flora;drop", { from: new Date().toISOString(), to: new Date().toISOString() }),
   /dataset_invalid/
 );
+
+const summaryQueries = buildSummaryQueries("flora_aroma_analytics_preview", {
+  from: "2026-07-08T19:45:32.833Z",
+  to: "2026-07-15T19:45:32.833Z"
+});
+assert.equal(summaryQueries.sessions.includes("uniq("), false);
+assert.equal(summaryQueries.sessions.includes("count(DISTINCT index1)"), true);
+assert.match(summaryQueries.sessions, /toDateTime\('2026-07-08 19:45:32'\)/);
+assert.match(summaryQueries.sessions, /toDateTime\('2026-07-15 19:45:32'\)/);
+for (const query of Object.values(summaryQueries)) {
+  assert.equal(query.includes("T19:45:32"), false);
+  assert.equal(query.includes(".833Z"), false);
+  assert.equal(query.includes("Z'"), false);
+}
+
+const presetPeriod = parseAnalyticsPeriod(
+  "https://flora-aroma.com.ua/api/analytics/summary?preset=7d",
+  new Date("2026-07-15T19:45:32.833Z")
+);
+assert.equal(presetPeriod.ok, true);
+assert.equal(presetPeriod.preset, "7d");
+const presetQueries = buildSummaryQueries("flora_aroma_analytics_preview", presetPeriod);
+assert.match(presetQueries.sessions, /toDateTime\('2026-07-08 19:45:32'\)/);
+assert.match(presetQueries.sessions, /toDateTime\('2026-07-15 19:45:32'\)/);
+
+const customPeriod = parseAnalyticsPeriod(
+  "https://flora-aroma.com.ua/api/analytics/summary?from=2026-07-01&to=2026-07-14"
+);
+assert.equal(customPeriod.ok, true);
+assert.equal(customPeriod.preset, "custom");
+const customQueries = buildSummaryQueries("flora_aroma_analytics_preview", customPeriod);
+assert.match(customQueries.sessions, /toDateTime\('2026-07-01 00:00:00'\)/);
+assert.match(customQueries.sessions, /toDateTime\('2026-07-14 23:59:59'\)/);
 
 const mapped = analyticsDataPoint(sanitizeAnalyticsPayload(validPayload).event);
 assert.equal(mapped.indexes.length, ANALYTICS_COLUMN_MAP.indexes.length);
