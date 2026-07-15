@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { onRequestPost as postEvent } from "../functions/api/analytics/event.js";
+import { onRequestGet as getD5Diagnostics } from "../functions/api/analytics/d5-diagnostics.js";
 import { onRequestGet as getSummary } from "../functions/api/analytics/summary.js";
 import {
   ANALYTICS_COLUMN_MAP,
@@ -219,5 +220,63 @@ if (distText) {
   assert.equal(distText.includes("CF_ANALYTICS_API_TOKEN"), false);
   assert.equal(distText.includes("replace_with_account_analytics_read_token"), false);
 }
+
+const blockedDiagnostic = await getD5Diagnostics({
+  request: new Request("https://flora-aroma.com.ua/api/analytics/d5-diagnostics"),
+  env: {}
+});
+assert.equal(blockedDiagnostic.status, 404);
+
+const diagnosticCalls = [];
+async function diagnosticFetch(_url, options) {
+  diagnosticCalls.push(options.body);
+  assert.equal(String(options.headers.Authorization).includes("SECRET_TOKEN_VALUE"), true);
+  const response = (body, status = 200) =>
+    new Response(typeof body === "string" ? body : JSON.stringify(body), { status });
+  if (options.body.includes("Hello Workers Analytics Engine")) {
+    return response({ data: [{ message: "Hello Workers Analytics Engine" }] });
+  }
+  if (options.body === "SHOW TABLES") {
+    return response("name\nflora_aroma_analytics_preview\n");
+  }
+  if (options.body.includes("SELECT * FROM flora_aroma_analytics_preview LIMIT 10")) {
+    return response({ data: [{ timestamp: "2026-07-14 12:00:00", index1: "other-session", blob1: "page_view" }] });
+  }
+  if (options.body.includes("d5-verification-test-20260714-v2")) {
+    return response({ data: [{ matching_rows: 1 }] });
+  }
+  if (options.body.includes("count(DISTINCT index1)")) {
+    return response({ data: [{ sessions: 1 }] });
+  }
+  if (options.body.includes("GROUP BY event_name FORMAT JSON")) {
+    return response({ data: [{ event_name: "page_view", count: 1 }] });
+  }
+  return response({ errors: [{ code: 9200, message: "Safe test SQL error for diagnostic route" }] }, 400);
+}
+
+const diagnostic = await getD5Diagnostics({
+  request: new Request("https://flora-aroma.com.ua/api/analytics/d5-diagnostics?confirm=D5_READ_ONLY_DIAGNOSTICS"),
+  env: {
+    CF_ACCOUNT_ID: "ACCOUNT_ID",
+    CF_ANALYTICS_API_TOKEN: "SECRET_TOKEN_VALUE",
+    CF_ANALYTICS_DATASET: "flora_aroma_analytics_preview"
+  },
+  fetchFn: diagnosticFetch
+});
+assert.equal(diagnostic.status, 200);
+const diagnosticBody = await diagnostic.json();
+assert.equal(JSON.stringify(diagnosticBody).includes("SECRET_TOKEN_VALUE"), false);
+assert.equal(JSON.stringify(diagnosticBody).includes("Authorization"), false);
+assert.equal(diagnosticBody.auth_probe.success, true);
+assert.equal(diagnosticBody.show_tables.dataset_present, true);
+assert.equal(diagnosticBody.minimal_select.success, true);
+assert.equal(diagnosticBody.test_marker_column, "index1");
+assert.equal(diagnosticBody.test_event_read_back, true);
+assert.equal(diagnosticBody.matching_rows, 1);
+assert.equal(diagnosticBody.first_failing_query, "dailySeries");
+assert.equal(diagnosticBody.first_failing_error_code, 9200);
+assert.equal(diagnosticBody.root_cause_category, "F. Specific summary query error");
+assert.equal(diagnosticBody.new_analytics_event_sent, "no");
+assert.ok(diagnosticCalls.length >= 6);
 
 console.log("Analytics function tests passed.");
