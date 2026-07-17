@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { formatFlowering, formatHeight, getCategories, getProducts } from "../../lib/products";
+import { formatFlowering, formatHeight, formatProductOptionSummary, formatProductStartingPrice, getCategories, getProducts } from "../../lib/products";
 
 export function getStaticPaths() {
   return getCategories().map((category) => ({
@@ -36,17 +36,17 @@ const description = `${category.name}: ${products.length} позицій Flora &
             <span>висота: {formatHeight(product)}</span>
             <span>цвітіння: {formatFlowering(product)}</span>
             <span>призначення: {product.use_case_labels.slice(0, 2).join(", ")}</span>
-            <span>формат: {product.container}</span>
-            <span>ціна: {product.price_uah} UAH/{product.unit}</span>
+            <span>типорозміри: {formatProductOptionSummary(product, 3)}</span>
+            <span>ціна: {formatProductStartingPrice(product)}</span>
           </div>
           <dl>
             <div>
-              <dt>Формат</dt>
-              <dd>{product.container}</dd>
+              <dt>Типорозміри</dt>
+              <dd>{formatProductOptionSummary(product)}</dd>
             </div>
             <div>
               <dt>Ціна</dt>
-              <dd>{product.price_uah} UAH/{product.unit}</dd>
+              <dd>{formatProductStartingPrice(product)}</dd>
             </div>
           </dl>
         </a>

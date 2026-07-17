@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getProducts } from "../lib/products";
+import { formatOptionPrice, getOptionDisplayName, getProducts } from "../lib/products";
 
 const products = getProducts();
 const priceRows = products.flatMap((product) =>
@@ -18,7 +18,7 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
 
 <BaseLayout
   title="Прайс Flora & Aroma"
-  description="Актуальний публічний прайс Flora & Aroma: українська назва, латинська назва, формат і ціна рослин."
+  description="Актуальний публічний прайс Flora & Aroma: українська назва, латинська назва, типорозмір і ціна рослин."
 >
   <section class="page-title">
     <p class="eyebrow">Прайс</p>
@@ -40,7 +40,7 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
           <th>ID</th>
           <th>Українська назва</th>
           <th>Латинська назва</th>
-          <th>Горщик / касета</th>
+          <th>Типорозмір</th>
           <th>Ціна</th>
           <th>Кошик</th>
         </tr>
@@ -51,8 +51,8 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
             <td>{product.plant_id}</td>
             <td><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></td>
             <td><em>{product.latin_name}</em></td>
-            <td>{option.container}</td>
-            <td>{option.price_uah} UAH/{option.unit}</td>
+            <td>{getOptionDisplayName(option)}</td>
+            <td>{formatOptionPrice(option)}</td>
             <td>
               <button
                 class="table-cart-button"
@@ -61,7 +61,7 @@ const generatedAt = new Intl.DateTimeFormat("uk-UA", {
                 data-plant-id={product.plant_id}
                 data-name={product.name_uk}
                 data-latin={product.latin_name}
-                data-container={option.container}
+                data-container={getOptionDisplayName(option)}
                 data-price={option.price_uah}
                 data-unit={option.unit}
                 data-option-id={option.variant_id}

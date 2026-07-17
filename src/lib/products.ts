@@ -58,6 +58,20 @@ export type Product = {
   category_slug: string;
 };
 
+const FORMAT_SORT_ORDER: Record<string, number> = {
+  "V-120": 10,
+  "V-265": 15,
+  P9: 20,
+  P10: 30,
+  P11: 40,
+  P12: 50,
+  P13: 60,
+  P15: 70,
+  P18: 80,
+  P19: 90,
+  P23: 100
+};
+
 const projectRoot = process.cwd();
 const productsCsvPath =
   [join(projectRoot, "data", "products.csv"), join(projectRoot, "flora-aroma-site", "data", "products.csv")].find(
@@ -320,6 +334,60 @@ function replaceTechnicalWinterHardiness(text: string, publicText: string): stri
   return text.replace(/Зимостійкість:\s*[^.]+\.?/giu, publicText);
 }
 
+function normalizeFormatCode(value: string): string {
+  const normalized = value.trim().toUpperCase().replace(/\s+/g, "");
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (/^V-?\d{3}$/.test(normalized)) {
+    return `V-${normalized.replace(/^V-?/, "")}`;
+  }
+
+  if (/^P-?\d{1,2}$/.test(normalized)) {
+    return `P${normalized.replace(/^P-?/, "")}`;
+  }
+
+  return value.trim();
+}
+
+function formatCodeFromContainer(container: string): string {
+  const normalized = container.trim();
+  const hikoMatch = normalized.match(/V[-\s]?(\d{3})/i);
+  if (hikoMatch) {
+    return `V-${hikoMatch[1]}`;
+  }
+
+  const potMatch = normalized.match(/\bP[-\s]?(\d{1,2})\b/i);
+  if (potMatch) {
+    return `P${potMatch[1]}`;
+  }
+
+  return normalized;
+}
+
+function optionDisplayNameValue(formatCode: string, container: string): string {
+  return normalizeFormatCode(formatCode) || formatCodeFromContainer(container);
+}
+
+function compareProductOptions(left: ProductOption, right: ProductOption): number {
+  const leftName = optionDisplayNameValue(left.format_code, left.container).toUpperCase();
+  const rightName = optionDisplayNameValue(right.format_code, right.container).toUpperCase();
+  const leftOrder = FORMAT_SORT_ORDER[leftName] ?? 999;
+  const rightOrder = FORMAT_SORT_ORDER[rightName] ?? 999;
+
+  if (leftOrder !== rightOrder) {
+    return leftOrder - rightOrder;
+  }
+
+  if (left.price_uah !== right.price_uah) {
+    return left.price_uah - right.price_uah;
+  }
+
+  return leftName.localeCompare(rightName, "uk");
+}
+
 function optionIdFrom(container: string, index: number): string {
   const slug = slugify(container);
   return slug || `option-${index + 1}`;
@@ -364,6 +432,40 @@ function productOptionsFrom(row: Record<string, string>): ProductOption[] {
   });
 }
 
+export function getOptionDisplayName(option: Pick<ProductOption, "format_code" | "container">): string {
+  return optionDisplayNameValue(option.format_code, option.container);
+}
+
+export function formatOptionPrice(option: Pick<ProductOption, "price_uah" | "unit">): string {
+  return `${option.price_uah} грн/${option.unit}`;
+}
+
+export function formatOptionSummary(option: ProductOption): string {
+  return `${getOptionDisplayName(option)} — ${formatOptionPrice(option)}`;
+}
+
+export function formatProductStartingPrice(product: Pick<Product, "options" | "has_multiple_options">): string {
+  const primaryOption = product.options[0];
+
+  if (!primaryOption) {
+    return "";
+  }
+
+  const priceLabel = formatOptionPrice(primaryOption);
+  return product.has_multiple_options ? `від ${priceLabel}` : priceLabel;
+}
+
+export function formatProductOptionSummary(product: Pick<Product, "options">, limit?: number): string {
+  const visibleOptions = typeof limit === "number" && limit > 0 ? product.options.slice(0, limit) : product.options;
+  const summary = visibleOptions.map((option) => formatOptionSummary(option)).join("; ");
+
+  if (product.options.length > visibleOptions.length) {
+    return `${summary}; ...`;
+  }
+
+  return summary;
+}
+
 export function slugify(value: string): string {
   const transliterated = value
     .toLowerCase()
@@ -389,9 +491,8 @@ export function getProducts(): Product[] {
         .split(/[;|]/)
         .map((path) => path.trim())
         .filter(Boolean);
-      const options = productOptionsFrom(row);
-      const optionsByPrice = [...options].sort((a, b) => a.price_uah - b.price_uah);
-      const primaryOption = optionsByPrice[0] ?? options[0];
+      const options = productOptionsFrom(row).sort(compareProductOptions);
+      const primaryOption = options[0];
       const kyivWinterHardiness = getKyivWinterHardiness(row.winter_hardiness);
 
       return {

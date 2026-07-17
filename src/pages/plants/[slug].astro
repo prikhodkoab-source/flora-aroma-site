@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
 import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
-import { getProducts } from "../../lib/products";
+import { formatOptionPrice, formatProductOptionSummary, getOptionDisplayName, getProducts } from "../../lib/products";
 
 export function getStaticPaths() {
   return getProducts().map((product) => ({
@@ -13,7 +13,16 @@ export function getStaticPaths() {
 
 const { product } = Astro.props;
 const imagePaths = product.image_paths.length > 0 ? product.image_paths : ["/images/tilda-clone/tilda-logo.png"];
-const selectedOption = product.options[0];
+const selectedOption = product.options[0] ?? {
+  variant_id: "default",
+  container_type_id: "",
+  format_code: "",
+  container: product.container,
+  price_uah: product.price_uah,
+  unit: product.unit,
+  label: ""
+};
+const selectedOptionDisplayName = getOptionDisplayName(selectedOption);
 ---
 
 <BaseLayout
@@ -54,11 +63,12 @@ const selectedOption = product.options[0];
       <section class="tilda-product-info">
         <h1>{product.name_uk}</h1>
         <p class="tilda-product-latin"><em>{product.latin_name}</em></p>
-        <div class="tilda-product-price" data-selected-price>{selectedOption.price_uah} грн.</div>
+        <div class="tilda-product-price" data-selected-price>{formatOptionPrice(selectedOption)}</div>
         <p class="tilda-product-summary">{product.summary}</p>
+        <p class="tilda-product-summary">Типорозміри: {formatProductOptionSummary(product)}</p>
 
         <div class="tilda-product-options">
-          <div class="tilda-input-title">Формат</div>
+          <div class="tilda-input-title">Типорозмір</div>
           {product.options.map((option, index) => (
             <label>
               <input
@@ -67,12 +77,13 @@ const selectedOption = product.options[0];
                 checked={index === 0}
                 data-product-option
                 data-option-id={option.variant_id}
-                data-container={option.container}
+                data-container={getOptionDisplayName(option)}
                 data-price={option.price_uah}
+                data-price-label={formatOptionPrice(option)}
                 data-currency="UAH"
                 data-unit={option.unit}
               />
-              <span>{option.container}</span>
+              <span>{getOptionDisplayName(option)} — {formatOptionPrice(option)}</span>
             </label>
           ))}
         </div>
@@ -89,7 +100,7 @@ const selectedOption = product.options[0];
           data-plant-id={product.plant_id}
           data-name={product.name_uk}
           data-latin={product.latin_name}
-          data-container={selectedOption.container}
+          data-container={selectedOptionDisplayName}
           data-price={selectedOption.price_uah}
           data-currency="UAH"
           data-unit={selectedOption.unit}
@@ -141,7 +152,7 @@ const selectedOption = product.options[0];
         addButton.dataset.price = input.dataset.price || "";
         addButton.dataset.unit = input.dataset.unit || "шт.";
         addButton.dataset.optionId = input.dataset.optionId || "";
-        if (price) price.textContent = `${input.dataset.price || ""} грн.`;
+        if (price) price.textContent = input.dataset.priceLabel || "";
       });
     });
   });

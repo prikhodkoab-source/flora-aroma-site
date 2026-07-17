@@ -3,7 +3,7 @@ import TildaCloneFooter from "../components/TildaCloneFooter.astro";
 import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
 import { aromaticBorderContent } from "../data/aromaticBorderContent";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getProducts } from "../lib/products";
+import { formatProductOptionSummary, getProducts } from "../lib/products";
 
 type ContentBlock =
   | { type: "h1"; text: string }
@@ -95,11 +95,6 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
         <div class="collection-plant-list">
           {
             collectionProducts.map((product) => {
-              const option = product.options?.[0] || {
-                container: product.container,
-                price_uah: product.price_uah,
-                unit: product.unit
-              };
               const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
               return (
                 <a class="collection-plant-card" href={`/plants/${product.slug}/`}>
@@ -107,9 +102,7 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
                   <span>
                     <strong>{product.name_uk}</strong>
                     <em>{product.latin_name}</em>
-                    <small>
-                      {option.container} · {option.price_uah} грн
-                    </small>
+                    <small>{formatProductOptionSummary(product, 2)}</small>
                   </span>
                 </a>
               );

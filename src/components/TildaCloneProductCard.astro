@@ -1,9 +1,12 @@
 ---
+import { formatProductOptionSummary, formatProductStartingPrice, getOptionDisplayName } from "../lib/products";
+
 const { product } = Astro.props;
 const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
 const hoverImage = product.image_paths?.[1] || image;
 const option = product.options?.[0] || {
   variant_id: "default",
+  format_code: "",
   container: product.container,
   price_uah: product.price_uah,
   unit: product.unit
@@ -19,9 +22,8 @@ const option = product.options?.[0] || {
     <span class="tilda-product-card__text">
       <span class="tilda-product-card__title">{product.name_uk} ({product.latin_name})</span>
       <span class="tilda-product-card__descr">{product.summary}</span>
-      <span class="tilda-product-card__price">
-        <span>{option.price_uah}</span><span>грн.</span>
-      </span>
+      <span class="tilda-product-card__price">{formatProductStartingPrice(product)}</span>
+      <span class="tilda-product-card__descr">Типорозміри: {formatProductOptionSummary(product, 3)}</span>
     </span>
   </a>
   <button
@@ -31,7 +33,7 @@ const option = product.options?.[0] || {
     data-plant-id={product.plant_id}
     data-name={product.name_uk}
     data-latin={product.latin_name}
-    data-container={option.container}
+    data-container={getOptionDisplayName(option)}
     data-price={option.price_uah}
     data-currency="UAH"
     data-unit={option.unit}
