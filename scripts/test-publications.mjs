@@ -87,6 +87,10 @@ assert.match(detailSource, /getApprovedPublications/);
 assert.match(detailSource, /relatedPlantIds/);
 assert.match(detailSource, /Рослини з цієї публікації/);
 
+const notFoundSource = read("src/pages/404.astro");
+assert.match(notFoundSource, /Сторінку не знайдено/);
+assert.match(notFoundSource, /href="\/publications\/"/);
+
 const sitemapSource = read("src/pages/sitemap-index.xml.ts");
 assert.match(sitemapSource, /"\/publications\/"/);
 assert.match(sitemapSource, /getApprovedPublications/);

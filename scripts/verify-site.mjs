@@ -59,7 +59,7 @@ if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
 }
 
-for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html", "cart/index.html", "publications/index.html", "admin/statistics/index.html"]) {
+for (const requiredPage of ["index.html", "404.html", "shop/index.html", "catalog/index.html", "cart/index.html", "publications/index.html", "admin/statistics/index.html"]) {
   if (!existsSync(join(root, "dist", requiredPage))) {
     fail(`Missing required Tilda clone page: ${requiredPage}`);
   }
@@ -220,6 +220,11 @@ for (const requiredMarker of [
 const sitemap = readFileSync(join(root, "dist", "sitemap-index.xml"), "utf8");
 if (!sitemap.includes("https://flora-aroma.com.ua/publications/")) {
   fail("Expected /publications/ in sitemap.");
+}
+
+const notFoundPage = readFileSync(join(root, "dist", "404.html"), "utf8");
+if (!notFoundPage.includes("Сторінку не знайдено")) {
+  fail("Expected custom not-found page content in dist/404.html.");
 }
 for (const forbiddenSitemapPath of ["/admin/", "/api/"]) {
   if (sitemap.includes(forbiddenSitemapPath)) {
