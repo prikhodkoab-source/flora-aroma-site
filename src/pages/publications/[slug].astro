@@ -1,0 +1,78 @@
+---
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
+import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
+import { getProducts } from "../../lib/products";
+import { getApprovedPublications, type PublicPublication } from "../../lib/publications";
+
+export async function getStaticPaths() {
+  const publications = await getApprovedPublications();
+
+  return publications.map((publication) => ({
+    params: { slug: publication.data.slug },
+    props: { publication }
+  }));
+}
+
+type Props = {
+  publication: PublicPublication;
+};
+
+const { publication } = Astro.props;
+const { data } = publication;
+const { Content } = await render(publication);
+const productById = new Map(getProducts().map((product) => [product.plant_id, product]));
+const relatedProducts = data.relatedPlantIds.map((plantId) => productById.get(plantId)).filter(Boolean);
+const publishedDate = new Intl.DateTimeFormat("uk-UA", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}).format(data.publishedAt);
+---
+
+<BaseLayout
+  title={data.seoTitle}
+  description={data.seoDescription}
+  image={data.coverImage ?? null}
+  ogType="article"
+  articlePublishedTime={data.publishedAt.toISOString()}
+  articleModifiedTime={data.updatedAt?.toISOString()}
+>
+  <TildaCloneShopHeader />
+
+  <article class="publication-detail tilda-container">
+    <a class="publication-back" href="/publications/">Поради та ідеї</a>
+    <header class="publication-detail__header">
+      <div class="publication-detail__meta">
+        <span>{data.category}</span>
+        <time datetime={data.publishedAt.toISOString()}>{publishedDate}</time>
+      </div>
+      <h1>{data.title}</h1>
+      <p>{data.excerpt}</p>
+    </header>
+
+    {data.coverImage && (
+      <img class="publication-detail__cover" src={data.coverImage} alt={data.coverImageAlt ?? ""} />
+    )}
+
+    <div class="publication-detail__body">
+      <Content />
+    </div>
+
+    {relatedProducts.length > 0 && (
+      <section class="publication-related" aria-labelledby="publication-related-title">
+        <h2 id="publication-related-title">Рослини з цієї публікації</h2>
+        <ul>
+          {relatedProducts.map((product) => (
+            <li><a href={`/plants/${product.slug}/`}>{product.name_uk}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <a class="publication-catalog-cta" href="/shop/">Перейти до асортименту</a>
+  </article>
+
+  <TildaCloneFooter showContacts={true} />
+</BaseLayout>

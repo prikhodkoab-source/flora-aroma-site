@@ -1,0 +1,34 @@
+---
+import type { PublicPublication } from "../lib/publications";
+
+type Props = {
+  publication: PublicPublication;
+};
+
+const { publication } = Astro.props;
+const { data } = publication;
+const href = `/publications/${data.slug}/`;
+const publishedDate = new Intl.DateTimeFormat("uk-UA", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}).format(data.publishedAt);
+const approvedCover = data.mediaRightsStatus === "approved" ? data.coverImage : undefined;
+---
+
+<article class="publication-card">
+  {approvedCover && (
+    <a class="publication-card__image-link" href={href} aria-label={`Читати: ${data.title}`}>
+      <img src={approvedCover} alt={data.coverImageAlt ?? ""} loading="lazy" />
+    </a>
+  )}
+  <div class="publication-card__body">
+    <div class="publication-card__meta">
+      <span>{data.category}</span>
+      <time datetime={data.publishedAt.toISOString()}>{publishedDate}</time>
+    </div>
+    <h2><a href={href}>{data.title}</a></h2>
+    <p>{data.excerpt}</p>
+    <a class="publication-card__read" href={href}>Читати</a>
+  </div>
+</article>

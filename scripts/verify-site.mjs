@@ -59,7 +59,7 @@ if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
 }
 
-for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html", "cart/index.html", "admin/statistics/index.html"]) {
+for (const requiredPage of ["index.html", "shop/index.html", "catalog/index.html", "cart/index.html", "publications/index.html", "admin/statistics/index.html"]) {
   if (!existsSync(join(root, "dist", requiredPage))) {
     fail(`Missing required Tilda clone page: ${requiredPage}`);
   }
@@ -72,7 +72,10 @@ for (const requiredAsset of [
   "functions/_analytics.js",
   "functions/api/analytics/event.js",
   "functions/api/analytics/summary.js",
-  "src/lib/analytics.ts"
+  "src/lib/analytics.ts",
+  "src/content.config.ts",
+  "src/lib/publication-policy.mjs",
+  "src/lib/publications.ts"
 ]) {
   if (!existsSync(join(root, requiredAsset))) {
     fail(`Missing required Tilda clone asset: ${requiredAsset}`);
@@ -171,6 +174,8 @@ for (const requiredPhrase of [
   "Рослини, вирощені за сучасними технологіями",
   "Отримати консультацію",
   "Перейти до асортименту",
+  "Поради та ідеї",
+  "Матеріали готуються",
   "Як ми вирощуємо",
   "Що ми вирощуємо",
   "Як замовити",
@@ -201,6 +206,7 @@ for (const requiredMarker of [
   "tilda-order-success",
   "data-product-option",
   "data-selected-price",
+  "publications-empty",
   'rel="canonical"',
   'property="og:title"',
   'property="og:description"',
@@ -208,6 +214,16 @@ for (const requiredMarker of [
 ]) {
   if (!publicHtml.includes(requiredMarker)) {
     fail(`Expected Tilda clone marker: ${requiredMarker}`);
+  }
+}
+
+const sitemap = readFileSync(join(root, "dist", "sitemap-index.xml"), "utf8");
+if (!sitemap.includes("https://flora-aroma.com.ua/publications/")) {
+  fail("Expected /publications/ in sitemap.");
+}
+for (const forbiddenSitemapPath of ["/admin/", "/api/"]) {
+  if (sitemap.includes(forbiddenSitemapPath)) {
+    fail(`Forbidden sitemap path found: ${forbiddenSitemapPath}`);
   }
 }
 

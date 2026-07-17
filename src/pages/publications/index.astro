@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PublicationCard from "../../components/PublicationCard.astro";
+import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
+import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
+import { getApprovedPublications } from "../../lib/publications";
+
+const publications = await getApprovedPublications();
+const pageTitle = "Поради та ідеї — Флора і Арома";
+const pageDescription = "Практичні матеріали про вирощування рослин, природні сади, ароматичні культури та використання рослин у ландшафті.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <TildaCloneShopHeader />
+
+  <header class="publications-heading tilda-container">
+    <h1>Поради та ідеї</h1>
+    <p>{pageDescription}</p>
+  </header>
+
+  <section class="publications-section tilda-container" aria-label="Публікації">
+    {publications.length > 0 ? (
+      <div class="publications-grid">
+        {publications.map((publication) => <PublicationCard publication={publication} />)}
+      </div>
+    ) : (
+      <div class="publications-empty">
+        <h2>Матеріали готуються</h2>
+        <p>Ми готуємо практичні матеріали про вирощування рослин, природні сади та використання ароматичних культур.</p>
+        <a href="/shop/">Перейти до асортименту</a>
+      </div>
+    )}
+  </section>
+
+  <TildaCloneFooter showContacts={true} />
+</BaseLayout>
