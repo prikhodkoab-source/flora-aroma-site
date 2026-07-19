@@ -72,6 +72,34 @@ const FORMAT_SORT_ORDER: Record<string, number> = {
   P23: 100
 };
 
+const FORMAT_VOLUME_LITERS: Record<string, number> = {
+  "V-120": 0.12,
+  "V-265": 0.265,
+  P9: 0.4,
+  P10: 0.5,
+  P11: 0.6,
+  P12: 0.7,
+  P13: 1.0,
+  P15: 1.5,
+  P18: 2.4,
+  P19: 3.0,
+  P23: 5.0
+};
+
+const CONTAINER_TYPE_VOLUME_LITERS: Record<string, number> = {
+  "CASSETTE-HIKO-V120SS": 0.12,
+  "CASSETTE-HIKO-V265": 0.265,
+  "POT-P9": 0.4,
+  "POT-P10": 0.5,
+  "POT-P11": 0.6,
+  "POT-P12": 0.7,
+  "POT-P13": 1.0,
+  "POT-P15": 1.5,
+  "POT-P18": 2.4,
+  "POT-P19": 3.0,
+  "POT-P23": 5.0
+};
+
 const projectRoot = process.cwd();
 const productsCsvPath =
   [join(projectRoot, "data", "products.csv"), join(projectRoot, "flora-aroma-site", "data", "products.csv")].find(
@@ -334,6 +362,65 @@ function replaceTechnicalWinterHardiness(text: string, publicText: string): stri
   return text.replace(/Зимостійкість:\s*[^.]+\.?/giu, publicText);
 }
 
+function buildPublicOptionSentence(options: ProductOption[]): string {
+  if (options.length === 0) {
+    return "";
+  }
+
+  const summary = options.map((option) => formatOptionSummary(option)).join("; ");
+  const suffix = summary.endsWith(".") ? "" : ".";
+  return options.length > 1 ? `Доступні об'єми: ${summary}${suffix}` : `Об'єм: ${summary}${suffix}`;
+}
+
+function buildPublicSeoDescription(nameUk: string, latinName: string, summary: string, options: ProductOption[]): string {
+  const parts: string[] = [];
+  const title = [nameUk.trim(), latinName.trim() ? `(${latinName.trim()})` : ""].filter(Boolean).join(" ");
+
+  if (title) {
+    parts.push(title.endsWith(".") ? title : `${title}.`);
+  }
+
+  const normalizedSummary = summary.trim();
+  if (normalizedSummary) {
+    parts.push(normalizedSummary.endsWith(".") ? normalizedSummary : `${normalizedSummary}.`);
+  }
+
+  const optionSentence = buildPublicOptionSentence(options);
+  if (optionSentence) {
+    parts.push(optionSentence);
+  }
+
+  parts.push("Наявність уточнюємо при замовленні.");
+  return parts.join(" ").replace(/\s+/g, " ").trim();
+}
+
+function sanitizeSeoDescription(
+  text: string,
+  nameUk: string,
+  latinName: string,
+  summary: string,
+  options: ProductOption[],
+  kyivWinterHardiness: string
+): string {
+  const fallback = buildPublicSeoDescription(nameUk, latinName, summary, options);
+
+  if (!text) {
+    return fallback;
+  }
+
+  const optionSentence = buildPublicOptionSentence(options);
+  const normalized = replaceTechnicalWinterHardiness(text, kyivWinterHardiness)
+    .replace(/(?:Типорозміри|Типорозмір|Варіанти|Варіант):\s*[^.]+\.?/giu, optionSentence)
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (/(?:CASSETTE-HIKO|POT-P\d|Горщик P\d|(?:^|\s)V-?\d{3}\b|(?:^|\s)P\d{1,2}\b)/iu.test(normalized)) {
+    return fallback;
+  }
+
+  return normalized;
+}
+
 function normalizeFormatCode(value: string): string {
   const normalized = value.trim().toUpperCase().replace(/\s+/g, "");
 
@@ -369,6 +456,35 @@ function formatCodeFromContainer(container: string): string {
 
 function optionDisplayNameValue(formatCode: string, container: string): string {
   return normalizeFormatCode(formatCode) || formatCodeFromContainer(container);
+}
+
+function formatLitersLabel(volumeLiters: number): string {
+  const normalized = volumeLiters.toFixed(3).replace(/\.?0+$/, "");
+  return `${normalized} л`;
+}
+
+function optionVolumeLitersValue(option: Pick<ProductOption, "container_type_id" | "format_code" | "container">): number | null {
+  const containerTypeId = option.container_type_id.trim().toUpperCase();
+  if (containerTypeId && containerTypeId in CONTAINER_TYPE_VOLUME_LITERS) {
+    return CONTAINER_TYPE_VOLUME_LITERS[containerTypeId];
+  }
+
+  const formatCode = normalizeFormatCode(option.format_code).toUpperCase();
+  if (formatCode && formatCode in FORMAT_VOLUME_LITERS) {
+    return FORMAT_VOLUME_LITERS[formatCode];
+  }
+
+  const containerCode = formatCodeFromContainer(option.container).toUpperCase();
+  if (containerCode && containerCode in FORMAT_VOLUME_LITERS) {
+    return FORMAT_VOLUME_LITERS[containerCode];
+  }
+
+  const cassetteMatch = (formatCode || containerCode).match(/^V-(\d{3})$/);
+  if (cassetteMatch) {
+    return Number(cassetteMatch[1]) / 1000;
+  }
+
+  return null;
 }
 
 function compareProductOptions(left: ProductOption, right: ProductOption): number {
@@ -432,7 +548,12 @@ function productOptionsFrom(row: Record<string, string>): ProductOption[] {
   });
 }
 
-export function getOptionDisplayName(option: Pick<ProductOption, "format_code" | "container">): string {
+export function getOptionDisplayName(option: Pick<ProductOption, "container_type_id" | "format_code" | "container">): string {
+  const volumeLiters = optionVolumeLitersValue(option);
+  if (volumeLiters !== null) {
+    return formatLitersLabel(volumeLiters);
+  }
+
   return optionDisplayNameValue(option.format_code, option.container);
 }
 
@@ -491,7 +612,12 @@ export function getProducts(): Product[] {
         .split(/[;|]/)
         .map((path) => path.trim())
         .filter(Boolean);
-      const options = productOptionsFrom(row).sort(compareProductOptions);
+      const options = productOptionsFrom(row)
+        .sort(compareProductOptions)
+        .map((option) => ({
+          ...option,
+          label: formatOptionSummary(option)
+        }));
       const primaryOption = options[0];
       const kyivWinterHardiness = getKyivWinterHardiness(row.winter_hardiness);
 
@@ -500,7 +626,7 @@ export function getProducts(): Product[] {
         name_uk: row.name_uk,
         latin_name: row.latin_name,
         category: row.category,
-        container: primaryOption.container,
+        container: primaryOption ? getOptionDisplayName(primaryOption) : row.container,
         price_uah: primaryOption.price_uah,
         unit: primaryOption.unit,
         availability_status: row.availability_status,
@@ -532,7 +658,14 @@ export function getProducts(): Product[] {
         use_case_labels: labelsFrom(row.use_cases, useCaseLabels),
         selection_tag_list: splitList(row.selection_tags),
         seo_title: row.seo_title,
-        seo_description: replaceTechnicalWinterHardiness(row.seo_description, kyivWinterHardiness.full),
+        seo_description: sanitizeSeoDescription(
+          row.seo_description,
+          row.name_uk,
+          row.latin_name,
+          replaceTechnicalWinterHardiness(row.summary, kyivWinterHardiness.full),
+          options,
+          kyivWinterHardiness.full
+        ),
         image_path: row.image_path,
         image_paths: imagePaths,
         primary_image_path: imagePaths[0] ?? "",

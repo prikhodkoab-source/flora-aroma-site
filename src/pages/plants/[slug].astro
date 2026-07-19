@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
 import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
-import { formatOptionPrice, formatProductOptionSummary, getOptionDisplayName, getProducts } from "../../lib/products";
+import { formatOptionPrice, getOptionDisplayName, getProducts } from "../../lib/products";
 
 export function getStaticPaths() {
   return getProducts().map((product) => ({
@@ -65,10 +65,8 @@ const selectedOptionDisplayName = getOptionDisplayName(selectedOption);
         <p class="tilda-product-latin"><em>{product.latin_name}</em></p>
         <div class="tilda-product-price" data-selected-price>{formatOptionPrice(selectedOption)}</div>
         <p class="tilda-product-summary">{product.summary}</p>
-        <p class="tilda-product-summary">Типорозміри: {formatProductOptionSummary(product)}</p>
-
         <div class="tilda-product-options">
-          <div class="tilda-input-title">Типорозмір</div>
+          <div class="tilda-input-title">Об'єм</div>
           {product.options.map((option, index) => (
             <label>
               <input

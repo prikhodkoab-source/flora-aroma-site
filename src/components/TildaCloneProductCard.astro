@@ -1,5 +1,5 @@
 ---
-import { formatProductOptionSummary, formatProductStartingPrice, getOptionDisplayName } from "../lib/products";
+import { formatProductStartingPrice, getOptionDisplayName } from "../lib/products";
 
 const { product } = Astro.props;
 const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
@@ -23,7 +23,6 @@ const option = product.options?.[0] || {
       <span class="tilda-product-card__title">{product.name_uk} ({product.latin_name})</span>
       <span class="tilda-product-card__descr">{product.summary}</span>
       <span class="tilda-product-card__price">{formatProductStartingPrice(product)}</span>
-      <span class="tilda-product-card__descr">Типорозміри: {formatProductOptionSummary(product, 3)}</span>
     </span>
   </a>
   <button

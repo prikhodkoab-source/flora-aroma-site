@@ -3,7 +3,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
   formatFlowering,
   formatHeight,
-  formatProductOptionSummary,
   formatProductStartingPrice,
   getProducts,
   getPublicAvailabilityLabel,
@@ -45,14 +44,9 @@ const description = `${selection.title}: ${products.length} позицій Flora
             <span>висота: {formatHeight(product)}</span>
             <span>цвітіння: {formatFlowering(product)}</span>
             <span>призначення: {product.use_case_labels.slice(0, 2).join(", ")}</span>
-            <span>типорозміри: {formatProductOptionSummary(product, 3)}</span>
             <span>ціна: {formatProductStartingPrice(product)}</span>
           </div>
           <dl>
-            <div>
-              <dt>Типорозміри</dt>
-              <dd>{formatProductOptionSummary(product)}</dd>
-            </div>
             <div>
               <dt>Ціна</dt>
               <dd>{formatProductStartingPrice(product)}</dd>

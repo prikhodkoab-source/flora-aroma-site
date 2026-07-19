@@ -3,7 +3,7 @@ import TildaCloneFooter from "../components/TildaCloneFooter.astro";
 import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
 import { aromaticBorderContent } from "../data/aromaticBorderContent";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatProductOptionSummary, getProducts } from "../lib/products";
+import { formatProductStartingPrice, getProducts } from "../lib/products";
 
 type ContentBlock =
   | { type: "h1"; text: string }
@@ -89,7 +89,7 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
       <aside class="collection-plants" aria-label="Рослини в добірці">
         <h2>Рослини в добірці</h2>
         <p>
-          Показуємо актуальні публічні картки рослин. Наявність і формат уточнюємо
+          Показуємо актуальні публічні картки рослин. Наявність і об'єм уточнюємо
           під час замовлення.
         </p>
         <div class="collection-plant-list">
@@ -102,7 +102,7 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
                   <span>
                     <strong>{product.name_uk}</strong>
                     <em>{product.latin_name}</em>
-                    <small>{formatProductOptionSummary(product, 2)}</small>
+                    <small>{formatProductStartingPrice(product)}</small>
                   </span>
                 </a>
               );

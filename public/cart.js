@@ -161,7 +161,7 @@
         return `- ${item.name}, ${item.container}: ${qty} ${item.unit} x ${item.price} UAH = ${Math.round(qty * Number(item.price || 0))} UAH`;
       }),
       `Попередня сума: ${Math.round(cartTotals(items).sum)} UAH.`,
-      "Наявність, формат і можливість резерву підтвердить оператор."
+      "Наявність, об'єм і можливість резерву підтвердить оператор."
     ];
     if (customer.name) lines.push(`Ім'я: ${customer.name}`);
     if (customer.email) lines.push(`Email: ${customer.email}`);

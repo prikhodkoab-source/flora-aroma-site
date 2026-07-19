@@ -38,6 +38,40 @@ function makeRequestId() {
   return `SITE-${timestamp}-${suffix}`;
 }
 
+const CONTAINER_VOLUMES_L = {
+  "CASSETTE-HIKO-V120SS": 0.12,
+  "CASSETTE-HIKO-V265": 0.265,
+  "POT-P9": 0.4,
+  "POT-P10": 0.5,
+  "POT-P11": 0.6,
+  "POT-P12": 0.7,
+  "POT-P13": 1.0,
+  "POT-P15": 1.5,
+  "POT-P18": 2.4,
+  "POT-P19": 3.0,
+  "POT-P23": 5.0
+};
+
+function formatVolumeLabel(volume) {
+  return `${Number(volume).toFixed(3).replace(/\.?0+$/, "")} л`;
+}
+
+function publicContainerLabel(variant) {
+  const containerTypeId = cleanText(variant?.container_type_id, 80).toUpperCase();
+  const directVolume = CONTAINER_VOLUMES_L[containerTypeId];
+  if (directVolume) {
+    return formatVolumeLabel(directVolume);
+  }
+
+  const formatCode = cleanText(variant?.format_code, 40).toUpperCase();
+  const cassetteMatch = formatCode.match(/^V-?(\d{3})$/);
+  if (cassetteMatch) {
+    return formatVolumeLabel(Number(cassetteMatch[1]) / 1000);
+  }
+
+  return cleanText(variant?.container, 100);
+}
+
 function validatePayload(payload) {
   if (!payload || typeof payload !== "object") return { error: "Некоректні дані заявки." };
   if (cleanText(payload.website, 100)) return { error: "Заявку відхилено." };
@@ -67,10 +101,17 @@ function validatePayload(payload) {
     const price = normalizePrice(raw?.price);
     const catalogProduct = productCatalog[plantId];
     const catalogVariant = catalogProduct?.variants.find(
-      (variant) =>
-        variant.container === container
-        && Number(variant.price) === price
-        && (!variantId || !variant.variant_id || variant.variant_id === variantId)
+      (variant) => {
+        if (Number(variant.price) !== price) {
+          return false;
+        }
+
+        if (variantId) {
+          return !variant.variant_id || variant.variant_id === variantId;
+        }
+
+        return variant.container === container;
+      }
     );
 
     if (
@@ -88,7 +129,7 @@ function validatePayload(payload) {
       plantId,
       variantId: catalogVariant.variant_id || variantId,
       name: catalogProduct.name,
-      container: catalogVariant.container,
+      container: container || publicContainerLabel(catalogVariant),
       unit: catalogVariant.unit,
       qty,
       price: Number(catalogVariant.price)
