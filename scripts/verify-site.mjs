@@ -3,6 +3,8 @@ import { join } from "node:path";
 
 const cwd = typeof process !== "undefined" ? process.cwd() : globalThis.nodeRepl?.cwd;
 const root = existsSync(join(cwd, "data", "products.csv")) ? cwd : join(cwd, "flora-aroma-site");
+const siteBase = "https://flora-aroma-site.pages.dev";
+const approvedArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
 let failed = false;
 
 function fail(message) {
@@ -59,7 +61,16 @@ if (!existsSync(join(root, "dist", "index.html"))) {
   fail("dist/index.html is missing. Run npm run build first.");
 }
 
-for (const requiredPage of ["index.html", "404.html", "shop/index.html", "catalog/index.html", "cart/index.html", "publications/index.html", "admin/statistics/index.html"]) {
+for (const requiredPage of [
+  "index.html",
+  "404.html",
+  "shop/index.html",
+  "catalog/index.html",
+  "cart/index.html",
+  "publications/index.html",
+  `${approvedArticleSlug}/index.html`,
+  "admin/statistics/index.html"
+]) {
   if (!existsSync(join(root, "dist", requiredPage))) {
     fail(`Missing required Tilda clone page: ${requiredPage}`);
   }
@@ -175,7 +186,8 @@ for (const requiredPhrase of [
   "Отримати консультацію",
   "Перейти до асортименту",
   "Поради та ідеї",
-  "Матеріали готуються",
+  "Ароматний бордюр із пряних і запашних рослин",
+  "Рослини в добірці",
   "Як ми вирощуємо",
   "Що ми вирощуємо",
   "Як замовити",
@@ -195,6 +207,10 @@ for (const requiredMarker of [
   "tilda-cover",
   "tilda-shop-header",
   "tilda-product-card",
+  "homepage-publications",
+  "publication-card",
+  "publication-detail",
+  "collection-plants",
   "tilda-cart-page",
   "tilda-cart-icon",
   "data-cart-add",
@@ -206,7 +222,6 @@ for (const requiredMarker of [
   "tilda-order-success",
   "data-product-option",
   "data-selected-price",
-  "publications-empty",
   'rel="canonical"',
   'property="og:title"',
   'property="og:description"',
@@ -218,8 +233,30 @@ for (const requiredMarker of [
 }
 
 const sitemap = readFileSync(join(root, "dist", "sitemap-index.xml"), "utf8");
-if (!sitemap.includes("https://flora-aroma.com.ua/publications/")) {
+const publicationIndexUrl = `${siteBase}/publications/`;
+const approvedArticleUrl = `${siteBase}/${approvedArticleSlug}/`;
+if (!sitemap.includes(publicationIndexUrl)) {
   fail("Expected /publications/ in sitemap.");
+}
+if ((sitemap.match(new RegExp(publicationIndexUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length !== 1) {
+  fail("Expected /publications/ exactly once in sitemap.");
+}
+if ((sitemap.match(new RegExp(approvedArticleUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length !== 1) {
+  fail("Expected approved article exactly once in sitemap.");
+}
+if (sitemap.includes(`https://flora-aroma.com.ua/${approvedArticleSlug}/`)) {
+  fail("Forbidden known-404 main-domain article URL found in sitemap.");
+}
+if (sitemap.includes(`${siteBase}/publications/${approvedArticleSlug}/`)) {
+  fail("Forbidden duplicate /publications/<slug>/ article URL found in sitemap.");
+}
+
+const articlePage = readFileSync(join(root, "dist", approvedArticleSlug, "index.html"), "utf8");
+if (!articlePage.includes(`<link rel="canonical" href="${approvedArticleUrl}">`)) {
+  fail("Expected approved article canonical to point to active Pages storefront.");
+}
+if (articlePage.includes(`https://flora-aroma.com.ua/${approvedArticleSlug}/`)) {
+  fail("Forbidden known-404 main-domain article canonical found.");
 }
 
 const notFoundPage = readFileSync(join(root, "dist", "404.html"), "utf8");
@@ -257,7 +294,7 @@ for (const requiredCartScriptMarker of [
   "cartItemKey",
   "flora-analytics-event",
   "copy_order_request",
-  "Наявність, формат і можливість резерву підтвердить оператор"
+  "Наявність, об'єм і можливість резерву підтвердить оператор"
 ]) {
   if (!cartScript.includes(requiredCartScriptMarker)) {
     fail(`Expected cart script marker: ${requiredCartScriptMarker}`);

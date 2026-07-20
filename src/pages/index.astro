@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PublicationCard from "../components/PublicationCard.astro";
 import TildaCloneFooter from "../components/TildaCloneFooter.astro";
+import { getApprovedPublications } from "../lib/publications";
+
+const [featuredPublication] = (await getApprovedPublications()).slice(0, 1);
 ---
 
 <BaseLayout title="Флора і Арома — саджанці рослин у контейнерах">
@@ -83,6 +87,18 @@ import TildaCloneFooter from "../components/TildaCloneFooter.astro";
       </ul>
     </div>
   </section>
+
+  {featuredPublication && (
+    <section class="homepage-publications">
+      <div class="tilda-container tilda-container--narrow">
+        <div class="homepage-publications__heading">
+          <h2>Поради та ідеї</h2>
+          <a href="/publications/">Усі публікації</a>
+        </div>
+        <PublicationCard publication={featuredPublication} />
+      </div>
+    </section>
+  )}
 
   <section class="tilda-list-section">
     <div class="tilda-container tilda-container--narrow">

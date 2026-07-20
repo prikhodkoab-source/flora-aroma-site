@@ -13,7 +13,10 @@ const publications = defineCollection({
   schema: z
     .object({
       publicationId: z.string().trim().min(1),
+      approvedRevision: z.string().trim().min(1).optional(),
+      approvedPreviewHash: z.string().trim().min(1).optional(),
       slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+      language: z.string().trim().min(2).optional(),
       title: z.string().trim().min(1),
       excerpt: z.string().trim().min(1),
       category: z.string().trim().min(1),

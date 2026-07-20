@@ -1,115 +1,87 @@
 ---
+import { render } from "astro:content";
 import TildaCloneFooter from "../components/TildaCloneFooter.astro";
 import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
-import { aromaticBorderContent } from "../data/aromaticBorderContent";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { formatProductStartingPrice, getProducts } from "../lib/products";
+import { getApprovedPublications, type PublicPublication } from "../lib/publications";
 
-type ContentBlock =
-  | { type: "h1"; text: string }
-  | { type: "h2"; text: string }
-  | { type: "paragraph"; text: string }
-  | { type: "list"; items: string[] };
+export async function getStaticPaths() {
+  const publications = await getApprovedPublications();
 
-function markdownBlocks(markdown: string): ContentBlock[] {
-  return markdown
-    .trim()
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block): ContentBlock => {
-      if (block.startsWith("# ")) {
-        return { type: "h1", text: block.slice(2).trim() };
-      }
-      if (block.startsWith("## ")) {
-        return { type: "h2", text: block.slice(3).trim() };
-      }
-      if (block.startsWith("- ")) {
-        return {
-          type: "list",
-          items: block
-            .split("\n")
-            .map((line) => line.replace(/^- /, "").trim())
-            .filter(Boolean)
-        };
-      }
-      return { type: "paragraph", text: block };
-    });
+  return publications.map((publication) => ({
+    params: { slug: publication.data.slug },
+    props: { publication }
+  }));
 }
 
-const products = getProducts();
-const productById = new Map(products.map((product) => [product.plant_id, product]));
-const collectionProducts = aromaticBorderContent.plantIds
-  .map((plantId) => productById.get(plantId))
-  .filter(Boolean);
-const blocks = markdownBlocks(aromaticBorderContent.bodyMarkdown);
-const bodyBlocks = blocks.filter((block) => block.type !== "h1");
+type Props = {
+  publication: PublicPublication;
+};
+
+const { publication } = Astro.props;
+const { data } = publication;
+const { Content } = await render(publication);
+const productById = new Map(getProducts().map((product) => [product.plant_id, product]));
+const collectionProducts = data.relatedPlantIds.map((plantId) => productById.get(plantId)).filter(Boolean);
+const publishedDate = new Intl.DateTimeFormat("uk-UA", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}).format(data.publishedAt);
 ---
 
 <BaseLayout
-  title={aromaticBorderContent.metaTitle}
-  description={aromaticBorderContent.metaDescription}
-  image={collectionProducts[0]?.primary_image_path || "/images/tilda-clone/hero-greenhouse.jpg"}
+  title={data.seoTitle}
+  description={data.seoDescription}
+  image={data.coverImage ?? null}
+  ogType="article"
+  articlePublishedTime={data.publishedAt.toISOString()}
+  articleModifiedTime={data.updatedAt?.toISOString()}
 >
   <TildaCloneShopHeader />
 
   <section class="collection-hero">
     <div class="collection-shell">
-      <p class="collection-eyebrow">Тематична добірка Flora & Aroma</p>
-      <h1>{aromaticBorderContent.title}</h1>
-      <p class="collection-lead">
-        Готова ідея ароматного бордюру з поточного асортименту: постійна основа,
-        декоративні акценти, окрема свіжа зона і сезонні пряні доповнення.
-      </p>
+      <a class="publication-back" href="/publications/">Поради та ідеї</a>
+      <p class="collection-eyebrow">{data.category} · {publishedDate}</p>
+      <h1>{data.title}</h1>
+      <p class="collection-lead">{data.excerpt}</p>
     </div>
   </section>
 
   <section class="collection-content">
     <div class="collection-shell collection-grid">
-      <article class="collection-article">
-        {
-          bodyBlocks.map((block) => {
-            if (block.type === "h2") {
-              return <h2>{block.text}</h2>;
-            }
-            if (block.type === "list") {
-              return (
-                <ul>
-                  {block.items.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              );
-            }
-            return <p>{block.text}</p>;
-          })
-        }
+      <article class="collection-article publication-detail">
+        <Content />
       </article>
 
-      <aside class="collection-plants" aria-label="Рослини в добірці">
-        <h2>Рослини в добірці</h2>
-        <p>
-          Показуємо актуальні публічні картки рослин. Наявність і об'єм уточнюємо
-          під час замовлення.
-        </p>
-        <div class="collection-plant-list">
-          {
-            collectionProducts.map((product) => {
-              const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
-              return (
-                <a class="collection-plant-card" href={`/plants/${product.slug}/`}>
-                  <img src={image} alt={`${product.name_uk} (${product.latin_name})`} loading="lazy" />
-                  <span>
-                    <strong>{product.name_uk}</strong>
-                    <em>{product.latin_name}</em>
-                    <small>{formatProductStartingPrice(product)}</small>
-                  </span>
-                </a>
-              );
-            })
-          }
-        </div>
-      </aside>
+      {collectionProducts.length > 0 && (
+        <aside class="collection-plants" aria-label="Рослини в добірці">
+          <h2>Рослини в добірці</h2>
+          <p>
+            Показуємо актуальні публічні картки рослин. Наявність і об'єм уточнюємо
+            під час замовлення.
+          </p>
+          <div class="collection-plant-list">
+            {
+              collectionProducts.map((product) => {
+                const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
+                return (
+                  <a class="collection-plant-card" href={`/plants/${product.slug}/`}>
+                    <img src={image} alt={`${product.name_uk} (${product.latin_name})`} loading="lazy" />
+                    <span>
+                      <strong>{product.name_uk}</strong>
+                      <em>{product.latin_name}</em>
+                      <small>{formatProductStartingPrice(product)}</small>
+                    </span>
+                  </a>
+                );
+              })
+            }
+          </div>
+        </aside>
+      )}
     </div>
   </section>
 
@@ -134,8 +106,12 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
   }
 
   .collection-hero {
-    padding: 96px 0 72px;
+    padding: 74px 0 72px;
     background: #eef4ea;
+  }
+
+  .collection-hero .publication-back {
+    margin-bottom: 32px;
   }
 
   .collection-eyebrow {
@@ -179,29 +155,29 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
     min-width: 0;
   }
 
-  .collection-article h2 {
+  .collection-article :global(h2) {
     margin: 48px 0 16px;
     color: #1d2819;
     font-size: 32px;
     line-height: 1.2;
   }
 
-  .collection-article h2:first-child {
+  .collection-article :global(h2:first-child) {
     margin-top: 0;
   }
 
-  .collection-article p,
-  .collection-article li {
+  .collection-article :global(p),
+  .collection-article :global(li) {
     color: #2f352c;
     font-size: 19px;
     line-height: 1.68;
   }
 
-  .collection-article p {
+  .collection-article :global(p) {
     margin: 0 0 22px;
   }
 
-  .collection-article ul {
+  .collection-article :global(ul) {
     display: grid;
     gap: 14px;
     margin: 0 0 26px;
@@ -312,7 +288,7 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
 
   @media (max-width: 900px) {
     .collection-hero {
-      padding: 68px 0 52px;
+      padding: 58px 0 52px;
     }
 
     .collection-hero h1 {
@@ -348,12 +324,12 @@ const bodyBlocks = blocks.filter((block) => block.type !== "h1");
       padding: 48px 0;
     }
 
-    .collection-article h2 {
+    .collection-article :global(h2) {
       font-size: 26px;
     }
 
-    .collection-article p,
-    .collection-article li {
+    .collection-article :global(p),
+    .collection-article :global(li) {
       font-size: 17px;
     }
 

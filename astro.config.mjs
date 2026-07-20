@@ -5,7 +5,7 @@ const astroPrerenderEntry = fileURLToPath(new URL("./node_modules/astro/dist/ent
 
 export default defineConfig({
   output: "static",
-  site: "https://flora-aroma.com.ua",
+  site: "https://flora-aroma-site.pages.dev",
   vite: {
     resolve: {
       alias: {

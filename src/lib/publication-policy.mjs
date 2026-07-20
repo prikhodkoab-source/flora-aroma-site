@@ -81,6 +81,9 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     }
     if (!hasText(data.seoTitle)) errors.push(`${label}: approved publication requires seoTitle`);
     if (!hasText(data.seoDescription)) errors.push(`${label}: approved publication requires seoDescription`);
+    if (!hasText(data.approvedRevision)) errors.push(`${label}: approved publication requires approvedRevision`);
+    if (!hasText(data.approvedPreviewHash)) errors.push(`${label}: approved publication requires approvedPreviewHash`);
+    if (!hasText(data.language)) errors.push(`${label}: approved publication requires language`);
     if (!hasText(entry.body)) errors.push(`${label}: approved publication requires body`);
 
     for (const plantId of data.relatedPlantIds ?? []) {

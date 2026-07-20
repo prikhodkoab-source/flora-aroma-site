@@ -169,10 +169,11 @@ const validPayload = {
   items: [
     {
       plantId: "PLANT-0041",
+      variantId: "VAR-PLANT-0041-V120",
       name: "Шавлія дібровна",
-      container: "Касета Hiko V-120ss",
+      container: "0.12 л",
       qty: 2,
-      price: 40,
+      price: 30,
       unit: "шт."
     }
   ]

@@ -1,28 +1,35 @@
-export const aromaticBorderContent = {
-  contentId: "WC-CR-20260712-AROMATIC-BORDER",
-  approvedRevision: "1ee002dd9a0005fe",
-  approvedPreviewHash: "e6f5ca0584cdbcc1",
-  slug: "aromatnyi-bordiur-priani-zapashni-roslyny",
-  title: "Ароматний бордюр із пряних і запашних рослин",
-  metaTitle: "Ароматний бордюр із пряних рослин | Flora & Aroma",
-  metaDescription:
-    "Добір рослин для ароматного бордюру Flora & Aroma: сухий бордюр, пряний сад біля кухні та змішані комбінації з актуального асортименту.",
-  plantIds: [
-    "PLANT-0084",
-    "PLANT-0051",
-    "PLANT-0055",
-    "PLANT-0037",
-    "PLANT-0044",
-    "PLANT-0081",
-    "PLANT-0077",
-    "PLANT-0066",
-    "PLANT-0074",
-    "PLANT-0082",
-    "PLANT-0098",
-    "PLANT-0089",
-    "PLANT-0033"
-  ],
-  bodyMarkdown: `# Ароматний бордюр із пряних і запашних рослин
+---
+publicationId: WC-CR-20260712-AROMATIC-BORDER
+approvedRevision: 1ee002dd9a0005fe
+approvedPreviewHash: e6f5ca0584cdbcc1
+slug: aromatnyi-bordiur-priani-zapashni-roslyny
+language: uk
+title: "Ароматний бордюр із пряних і запашних рослин"
+excerpt: "Готова ідея ароматного бордюру з поточного асортименту: постійна основа, декоративні акценти, окрема свіжа зона і сезонні пряні доповнення."
+category: "Тематична добірка Flora & Aroma"
+coverImage: "/images/tilda-clone/hero-greenhouse.jpg"
+coverImageAlt: "Рослини Flora & Aroma у теплиці"
+relatedPlantIds:
+  - PLANT-0084
+  - PLANT-0051
+  - PLANT-0055
+  - PLANT-0037
+  - PLANT-0044
+  - PLANT-0081
+  - PLANT-0077
+  - PLANT-0066
+  - PLANT-0074
+  - PLANT-0082
+  - PLANT-0098
+  - PLANT-0089
+  - PLANT-0033
+seoTitle: "Ароматний бордюр із пряних рослин | Flora & Aroma"
+seoDescription: "Добір рослин для ароматного бордюру Flora & Aroma: сухий бордюр, пряний сад біля кухні та змішані комбінації з актуального асортименту."
+publishedAt: 2026-07-20T00:00:00.000Z
+updatedAt: 2026-07-20T00:00:00.000Z
+publicationStatus: approved
+mediaRightsStatus: approved
+---
 
 Ароматний бордюр — це посадка, яку хочеться відчувати зблизька: біля доріжки, тераси, кухонної зони або сонячного краю квітника. У такому бордюрі важливі не лише квіти, а й запах листя, фактура, м’який край посадки і можливість зібрати рослини під конкретний стиль саду.
 
@@ -89,5 +96,4 @@ export const aromaticBorderContent = {
 
 ## Як замовити
 
-Хочете створити ароматний бордюр? Напишіть нам, який варіант вам ближчий — декоративний, пряний чи змішаний. Ми допоможемо підібрати рослини з актуального асортименту під умови вашої ділянки і підкажемо, які культури краще винести в окрему зону або використати як сезонний акцент.`
-} as const;
+Хочете створити ароматний бордюр? Напишіть нам, який варіант вам ближчий — декоративний, пряний чи змішаний. Ми допоможемо підібрати рослини з актуального асортименту під умови вашої ділянки і підкажемо, які культури краще винести в окрему зону або використати як сезонний акцент.
