@@ -204,23 +204,43 @@ assert.match(pendingContent, /mediaRightsStatus:\s*pending_operator_review/);
 
 assert.equal(existsSync(join(root, "src/pages/publications/[slug].astro")), true);
 assert.equal(existsSync(join(root, "src/pages/[slug].astro")), false);
+assert.equal(existsSync(join(root, "src/components/TildaCloneShopHeader.astro")), false);
 
 const layoutSource = read("src/layouts/BaseLayout.astro");
 assert.match(layoutSource, /import SiteHeader from "\.\.\/components\/SiteHeader\.astro";/);
+assert.match(layoutSource, /import type \{ SiteNavKey \} from "\.\.\/config\/siteNavigation";/);
 assert.match(layoutSource, /<SiteHeader /);
 assert.doesNotMatch(layoutSource, /TildaCloneShopHeader/);
 
+const navConfigSource = read("src/config/siteNavigation.ts");
+assert.match(navConfigSource, /label:\s*"Про нас"/);
+assert.match(navConfigSource, /href:\s*"\/"/);
+assert.match(navConfigSource, /label:\s*"Асортимент"/);
+assert.match(navConfigSource, /label:\s*"Поради та ідеї"/);
+assert.match(navConfigSource, /label:\s*"Контакти"/);
+const homeIndex = navConfigSource.indexOf('label: "Про нас"');
+const catalogIndex = navConfigSource.indexOf('label: "Асортимент"');
+const publicationsNavIndex = navConfigSource.indexOf('label: "Поради та ідеї"');
+const contactsIndex = navConfigSource.indexOf('label: "Контакти"');
+assert.ok(homeIndex < catalogIndex && catalogIndex < publicationsNavIndex && publicationsNavIndex < contactsIndex, "Navigation order must match the approved sequence.");
+
 const headerSource = read("src/components/SiteHeader.astro");
-assert.match(headerSource, /Асортимент/);
-assert.match(headerSource, /Поради та ідеї/);
-assert.match(headerSource, /Контакти/);
+assert.match(headerSource, /siteNavigationItems/);
 assert.match(headerSource, /data-site-menu-toggle/);
+assert.match(headerSource, /data-site-menu-backdrop/);
+assert.match(headerSource, /data-site-mobile-menu/);
 assert.match(headerSource, /aria-expanded/);
 assert.match(headerSource, /site-menu-open/);
 assert.match(headerSource, /Escape/);
 assert.match(headerSource, /data-cart-open/);
+const menuToggleIndex = headerSource.indexOf("site-menu-toggle");
+const logoIndex = headerSource.indexOf("site-header__logo");
+const cartIndex = headerSource.indexOf("site-cart-button");
+assert.ok(menuToggleIndex >= 0 && logoIndex >= 0 && cartIndex >= 0, "Header controls must exist.");
+assert.ok(menuToggleIndex < logoIndex && logoIndex < cartIndex, "Mobile header order must stay hamburger -> logo -> cart.");
 
 const heroSource = read("src/pages/index.astro");
+assert.match(heroSource, /navKey="home"/);
 const shopLinkIndex = heroSource.indexOf('href="/shop/"');
 const publicationsLinkIndex = heroSource.indexOf('href="/publications/"');
 const telegramLinkIndex = heroSource.indexOf("siteContacts.consultationTelegramUrl");
@@ -238,6 +258,9 @@ assert.match(contactsSource, /siteContacts\.consultationTelegramUrl/);
 assert.match(contactsSource, /siteContacts\.phoneHref/);
 assert.match(contactsSource, /flora-aroma\.com\.ua/);
 assert.match(contactsSource, /nursery-irrigation\.jpg/);
+
+const footerSource = read("src/components/TildaCloneFooter.astro");
+assert.match(footerSource, /siteNavigationItems/);
 
 const cardSource = read("src/components/PublicationCard.astro");
 assert.match(cardSource, /\/publications\/\$\{data\.slug\}\//);
@@ -263,5 +286,5 @@ assert.match(contractSource, /at least 5 unique approved images/i);
 assert.match(contractSource, /unknown.+forbidden/i);
 
 console.log(
-  "Publications tests passed: unified header is wired through BaseLayout, publications use /publications/<slug>/, pending content stays private, and approved-only media thresholds fail closed."
+  "Publications tests passed: shared navigation is wired through BaseLayout, mobile header order stays hamburger/logo/cart, pending content stays private, and approved-only media thresholds fail closed."
 );

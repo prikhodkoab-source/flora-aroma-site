@@ -1,15 +1,10 @@
 ---
-type NavKey = "catalog" | "publications" | "contacts";
+import { siteNavigationItems, type SiteNavKey } from "../config/siteNavigation";
+
 type Variant = "solid" | "overlay";
 
-type NavItem = {
-  key: NavKey;
-  href: string;
-  label: string;
-};
-
 type Props = {
-  navKey?: NavKey | null;
+  navKey?: SiteNavKey | null;
   variant?: Variant;
   showCart?: boolean;
 };
@@ -19,22 +14,29 @@ const {
   variant = "solid",
   showCart = true
 } = Astro.props;
-
-const navItems: NavItem[] = [
-  { key: "catalog", href: "/shop/", label: "Асортимент" },
-  { key: "publications", href: "/publications/", label: "Поради та ідеї" },
-  { key: "contacts", href: "/contacts/", label: "Контакти" }
-];
 ---
 
-<header class:list={["site-header", `site-header--${variant}`]}>
+<header class:list={["site-header", `site-header--${variant}`]} data-site-header>
   <div class="site-header__inner">
-    <a class="site-header__logo" href="/" aria-label="Flora & Aroma">
-      <img src="/images/tilda-clone/tilda-logo.png" alt="Flora & Aroma" />
+    <button
+      class="site-menu-toggle"
+      type="button"
+      data-site-menu-toggle
+      aria-expanded="false"
+      aria-controls="site-mobile-menu"
+      aria-label="Відкрити меню"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <a class="site-header__logo" href="/" aria-label="Флора і Арома">
+      <img src="/images/tilda-clone/tilda-logo.png" alt="Флора і Арома" />
     </a>
 
     <nav class="site-header__nav" aria-label="Головна навігація">
-      {navItems.map((item) => (
+      {siteNavigationItems.map((item) => (
         <a href={item.href} aria-current={navKey === item.key ? "page" : undefined}>
           {item.label}
         </a>
@@ -54,25 +56,14 @@ const navItems: NavItem[] = [
           <span class="site-cart-button__count" data-cart-count hidden>0</span>
         </button>
       )}
-
-      <button
-        class="site-menu-toggle"
-        type="button"
-        data-site-menu-toggle
-        aria-expanded="false"
-        aria-controls="site-mobile-menu"
-        aria-label="Відкрити меню"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
     </div>
   </div>
 
-  <div class="site-mobile-menu" id="site-mobile-menu" data-site-mobile-menu hidden>
+  <button class="site-menu-backdrop" type="button" data-site-menu-backdrop hidden tabindex="-1" aria-hidden="true"></button>
+
+  <div class="site-mobile-menu" id="site-mobile-menu" data-site-mobile-menu hidden aria-hidden="true">
     <nav class="site-mobile-menu__nav" aria-label="Мобільна навігація">
-      {navItems.map((item) => (
+      {siteNavigationItems.map((item) => (
         <a href={item.href} aria-current={navKey === item.key ? "page" : undefined}>
           {item.label}
         </a>
@@ -82,20 +73,34 @@ const navItems: NavItem[] = [
 </header>
 
 <script>
-  const header = document.querySelector(".site-header");
-  const toggle = header?.querySelector?.("[data-site-menu-toggle]");
-  const menu = header?.querySelector?.("[data-site-mobile-menu]");
+  const header = document.querySelector("[data-site-header]");
 
-  if (toggle instanceof HTMLButtonElement && menu instanceof HTMLElement) {
+  if (header instanceof HTMLElement && header.dataset.menuBound !== "true") {
+    header.dataset.menuBound = "true";
+
+    const toggle = header.querySelector("[data-site-menu-toggle]");
+    const menu = header.querySelector("[data-site-mobile-menu]");
+    const backdrop = header.querySelector("[data-site-menu-backdrop]");
+
+    if (!(toggle instanceof HTMLButtonElement) || !(menu instanceof HTMLElement) || !(backdrop instanceof HTMLButtonElement)) {
+      throw new Error("Site header menu controls are not available.");
+    }
+
     const closeMenu = () => {
       toggle.setAttribute("aria-expanded", "false");
       menu.hidden = true;
+      menu.setAttribute("aria-hidden", "true");
+      backdrop.hidden = true;
+      backdrop.setAttribute("aria-hidden", "true");
       document.body.classList.remove("site-menu-open");
     };
 
     const openMenu = () => {
       toggle.setAttribute("aria-expanded", "true");
       menu.hidden = false;
+      menu.setAttribute("aria-hidden", "false");
+      backdrop.hidden = false;
+      backdrop.setAttribute("aria-hidden", "false");
       document.body.classList.add("site-menu-open");
     };
 
@@ -110,6 +115,8 @@ const navItems: NavItem[] = [
     menu.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", closeMenu);
     });
+
+    backdrop.addEventListener("click", closeMenu);
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !menu.hidden) closeMenu();

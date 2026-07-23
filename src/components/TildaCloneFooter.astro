@@ -1,14 +1,15 @@
 ---
 import { siteContacts, socialLinks } from "../config/siteContacts";
+import { siteNavigationItems } from "../config/siteNavigation";
 
 const showContacts = Astro.props.showContacts ?? false;
 ---
 
 <footer class={`tilda-contact-footer${showContacts ? "" : " tilda-contact-footer--compact"}`}>
   <nav class="tilda-footer-nav" aria-label="Навігація в підвалі">
-    <a href="/shop/">Асортимент</a>
-    <a href="/publications/">Поради та ідеї</a>
-    <a href="/contacts/">Контакти</a>
+    {siteNavigationItems.map((item) => (
+      <a href={item.href}>{item.label}</a>
+    ))}
   </nav>
   {showContacts && (
     <>

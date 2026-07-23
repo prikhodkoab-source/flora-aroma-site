@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import SiteHeader from "../components/SiteHeader.astro";
 import TildaCloneCart from "../components/TildaCloneCart.astro";
+import type { SiteNavKey } from "../config/siteNavigation";
 
 type Props = {
   title: string;
@@ -9,7 +10,7 @@ type Props = {
   image?: string | null;
   showCart?: boolean;
   showHeader?: boolean;
-  navKey?: "catalog" | "publications" | "contacts" | null;
+  navKey?: SiteNavKey | null;
   headerVariant?: "solid" | "overlay";
   ogType?: "website" | "article";
   articlePublishedTime?: string;
