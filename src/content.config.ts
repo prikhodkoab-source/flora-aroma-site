@@ -3,6 +3,19 @@ import { glob } from "astro/loaders";
 
 const publicationStatuses = ["draft", "pending_operator_review", "approved", "suspended", "archived"] as const;
 const mediaRightsStatuses = ["pending_operator_review", "approved", "restricted", "rejected", "expired"] as const;
+const mediaSourceTypes = ["own", "supplier", "generated", "unknown"] as const;
+const mediaPlacements = ["cover", "body"] as const;
+
+const articleMediaItem = z.object({
+  mediaAssetId: z.string().trim().min(1),
+  src: z.string().trim().min(1),
+  alt: z.string().trim().min(1),
+  caption: z.string().trim().min(1),
+  sourceType: z.enum(mediaSourceTypes),
+  placement: z.enum(mediaPlacements),
+  sortOrder: z.number().int().nonnegative(),
+  rightsStatus: z.enum(mediaRightsStatuses)
+});
 
 const publications = defineCollection({
   loader: glob({
@@ -22,6 +35,8 @@ const publications = defineCollection({
       category: z.string().trim().min(1),
       coverImage: z.string().trim().min(1).optional(),
       coverImageAlt: z.string().trim().min(1).optional(),
+      coverMediaAssetId: z.string().trim().min(1).optional(),
+      articleMedia: z.array(articleMediaItem).default([]),
       relatedPlantIds: z.array(z.string().trim().regex(/^PLANT-\d{4}$/)).default([]),
       seoTitle: z.string().trim().min(1).optional(),
       seoDescription: z.string().trim().min(1).optional(),

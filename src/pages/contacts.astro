@@ -1,56 +1,55 @@
 ---
+import TildaCloneFooter from "../components/TildaCloneFooter.astro";
+import { siteContacts } from "../config/siteContacts";
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
   title="Контакти | Flora & Aroma"
-  description="Контакти Flora & Aroma для замовлення рослин у контейнерах різного об'єму."
+  description="Контакти Flora & Aroma для уточнення наявності рослин, формату контейнера та умов отримання."
+  image="/images/site/nursery-irrigation.jpg"
+  navKey="contacts"
 >
-  <section class="page-title">
-    <p class="eyebrow">Контакти</p>
-    <h1>Flora & Aroma</h1>
-    <p>Для замовлення напишіть список рослин і бажану кількість. Оператор уточнить наявність і об'єм контейнера.</p>
-  </section>
-
-  <section class="section compact-section">
-    <div class="contact-grid">
-      <section>
-        <h2>Телефон</h2>
-        <p><a href="tel:+380500272882">+380500272882</a></p>
-      </section>
-      <section>
-        <h2>Сайт</h2>
-        <p><a href="https://flora-aroma.com.ua">flora-aroma.com.ua</a></p>
-      </section>
-      <section>
-        <h2>Що написати</h2>
-        <p>Назви рослин, кількість, місто, спосіб отримання і короткий коментар до замовлення.</p>
-      </section>
-    </div>
-  </section>
-
-  <section class="section compact-section">
-    <div class="media-band">
-      <img src="/images/site/nursery-irrigation.jpg" alt="Площадка дорощування Flora & Aroma з поливом" loading="lazy" />
-      <div>
-        <p class="eyebrow">Вирощування</p>
-        <h2>Рослини проходять дорощування перед продажем</h2>
-        <p>
-          Перед відповіддю клієнту оператор уточнює фактичну готовність, об'єм контейнера і можливість резерву.
-          Це допомагає не обіцяти рослини, які ще потребують перевірки.
-        </p>
+  <section class="site-page">
+    <div class="site-page__intro site-page__intro--contact">
+      <p class="site-page__eyebrow">Flora & Aroma</p>
+      <h1>Контакти</h1>
+      <p>Напишіть нам, щоб уточнити наявність рослин, формат контейнера та умови отримання.</p>
+      <div class="site-page__actions">
+        <a class="site-page__button" href={siteContacts.consultationTelegramUrl} target="_blank" rel="noopener noreferrer">
+          Написати в Telegram
+        </a>
       </div>
     </div>
+
+    <div class="site-contact-grid">
+      <article class="site-contact-card">
+        <h2>Телефон</h2>
+        <p><a href={siteContacts.phoneHref}>{siteContacts.phoneDisplay}</a></p>
+      </article>
+
+      <article class="site-contact-card">
+        <h2>Сайт</h2>
+        <p><a href="https://flora-aroma.com.ua" target="_blank" rel="noopener noreferrer">flora-aroma.com.ua</a></p>
+      </article>
+
+      <article class="site-contact-card site-contact-card--wide">
+        <h2>Що написати</h2>
+        <p>Назви рослин, кількість, місто, бажаний спосіб отримання та короткий коментар до замовлення.</p>
+      </article>
+    </div>
+
+    <figure class="site-page__media">
+      <img
+        src="/images/site/nursery-irrigation.jpg"
+        alt="Питомник Flora & Aroma з дорощуванням рослин і поливом"
+        loading="lazy"
+      />
+      <figcaption>
+        Реальна фотографія дорощування рослин у Flora & Aroma. Точну наявність і формат контейнера підтверджує оператор.
+      </figcaption>
+    </figure>
   </section>
 
-  <section class="section compact-section">
-    <div class="notice">
-      <h2>Шаблон повідомлення</h2>
-      <p>
-        Добрий день. Хочу замовити: назва рослини, кількість. Місто: ... Спосіб отримання: самовивіз або доставка.
-        Підкажіть, будь ласка, актуальну наявність і суму.
-      </p>
-      <a class="button" href="tel:+380500272882">Зателефонувати</a>
-    </div>
-  </section>
+  <TildaCloneFooter showContacts={true} />
 </BaseLayout>

@@ -4,7 +4,7 @@ import { join } from "node:path";
 const cwd = typeof process !== "undefined" ? process.cwd() : globalThis.nodeRepl?.cwd;
 const root = existsSync(join(cwd, "data", "products.csv")) ? cwd : join(cwd, "flora-aroma-site");
 const siteBase = "https://flora-aroma-site.pages.dev";
-const approvedArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
+const pendingArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
 let failed = false;
 
 function fail(message) {
@@ -67,30 +67,40 @@ for (const requiredPage of [
   "shop/index.html",
   "catalog/index.html",
   "cart/index.html",
+  "contacts/index.html",
   "publications/index.html",
-  `${approvedArticleSlug}/index.html`,
   "admin/statistics/index.html"
 ]) {
   if (!existsSync(join(root, "dist", requiredPage))) {
-    fail(`Missing required Tilda clone page: ${requiredPage}`);
+    fail(`Missing required site page: ${requiredPage}`);
   }
+}
+
+if (existsSync(join(root, "dist", "publications", pendingArticleSlug, "index.html"))) {
+  fail("Pending publication must not generate a public article route.");
 }
 
 for (const requiredAsset of [
   "public/images/tilda-clone/hero-greenhouse.jpg",
   "public/images/tilda-clone/tilda-logo.png",
+  "public/images/site/nursery-irrigation.jpg",
   "public/cart.js",
   "functions/_analytics.js",
   "functions/api/analytics/event.js",
   "functions/api/analytics/summary.js",
-  "src/lib/analytics.ts",
+  "src/components/SiteHeader.astro",
   "src/content.config.ts",
   "src/lib/publication-policy.mjs",
-  "src/lib/publications.ts"
+  "src/lib/publications.ts",
+  "src/pages/publications/[slug].astro"
 ]) {
   if (!existsSync(join(root, requiredAsset))) {
-    fail(`Missing required Tilda clone asset: ${requiredAsset}`);
+    fail(`Missing required site asset: ${requiredAsset}`);
   }
+}
+
+if (existsSync(join(root, "src/pages/[slug].astro"))) {
+  fail("Legacy root publication route still exists.");
 }
 
 const productsCsv = readFileSync(join(root, "data", "products.csv"), "utf8");
@@ -182,37 +192,30 @@ const publicHtml = readHtmlFiles(join(root, "dist")).join("\n");
 
 for (const requiredPhrase of [
   "Дім правильних рослин",
-  "Рослини, вирощені за сучасними технологіями",
-  "Отримати консультацію",
   "Перейти до асортименту",
   "Поради та ідеї",
-  "Ароматний бордюр із пряних і запашних рослин",
-  "Рослини в добірці",
-  "Як ми вирощуємо",
-  "Що ми вирощуємо",
-  "Як замовити",
+  "Контакти",
+  "Матеріали готуються",
+  "Написати в Telegram",
+  "Що написати",
   "Ваше замовлення",
   "Оформити замовлення",
-  "Оплата",
-  "Інформація про доставку",
   "Статистика сайту",
   "Confirmed order analytics not connected."
 ]) {
   if (!publicHtml.includes(requiredPhrase)) {
-    fail(`Expected Tilda clone phrase: ${requiredPhrase}`);
+    fail(`Expected public phrase: ${requiredPhrase}`);
   }
 }
 
 for (const requiredMarker of [
-  "tilda-cover",
-  "tilda-shop-header",
-  "tilda-product-card",
-  "homepage-publications",
-  "publication-card",
-  "publication-detail",
-  "collection-plants",
+  "site-header",
+  "site-cart-button",
+  "data-site-menu-toggle",
+  "data-site-mobile-menu",
+  "publications-empty",
+  "publication-catalog-cta",
   "tilda-cart-page",
-  "tilda-cart-icon",
   "data-cart-add",
   "data-cart-page",
   "data-cart-submit",
@@ -224,44 +227,47 @@ for (const requiredMarker of [
   "data-selected-price",
   'rel="canonical"',
   'property="og:title"',
-  'property="og:description"',
-  'property="og:image"'
+  'property="og:description"'
 ]) {
   if (!publicHtml.includes(requiredMarker)) {
-    fail(`Expected Tilda clone marker: ${requiredMarker}`);
+    fail(`Expected site marker: ${requiredMarker}`);
+  }
+}
+
+for (const forbiddenMarker of ["tilda-cart-icon", "tilda-shop-header", "Flora plant_id:"]) {
+  if (publicHtml.includes(forbiddenMarker)) {
+    fail(`Forbidden legacy marker found: ${forbiddenMarker}`);
+  }
+}
+
+const publicationsPage = readFileSync(join(root, "dist", "publications", "index.html"), "utf8");
+if (publicationsPage.includes("hero-greenhouse.jpg")) {
+  fail("Publications index must not use the greenhouse placeholder image.");
+}
+if (publicationsPage.includes("publication-card__image-link")) {
+  fail("Empty publications page must not render article cards.");
+}
+if (publicationsPage.includes(pendingArticleSlug)) {
+  fail("Pending publication slug leaked into publications index.");
+}
+
+const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");
+for (const requiredContactMarker of ["tel:+380500272882", "https://flora-aroma.com.ua", "nursery-irrigation.jpg"]) {
+  if (!contactsPage.includes(requiredContactMarker)) {
+    fail(`Contacts page is missing: ${requiredContactMarker}`);
   }
 }
 
 const sitemap = readFileSync(join(root, "dist", "sitemap-index.xml"), "utf8");
 const publicationIndexUrl = `${siteBase}/publications/`;
-const approvedArticleUrl = `${siteBase}/${approvedArticleSlug}/`;
 if (!sitemap.includes(publicationIndexUrl)) {
   fail("Expected /publications/ in sitemap.");
 }
-if ((sitemap.match(new RegExp(publicationIndexUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length !== 1) {
-  fail("Expected /publications/ exactly once in sitemap.");
+if (sitemap.includes(`${siteBase}/publications/${pendingArticleSlug}/`) || sitemap.includes(`${siteBase}/${pendingArticleSlug}/`)) {
+  fail("Pending publication must not appear in sitemap.");
 }
-if ((sitemap.match(new RegExp(approvedArticleUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length !== 1) {
-  fail("Expected approved article exactly once in sitemap.");
-}
-if (sitemap.includes(`https://flora-aroma.com.ua/${approvedArticleSlug}/`)) {
-  fail("Forbidden known-404 main-domain article URL found in sitemap.");
-}
-if (sitemap.includes(`${siteBase}/publications/${approvedArticleSlug}/`)) {
-  fail("Forbidden duplicate /publications/<slug>/ article URL found in sitemap.");
-}
-
-const articlePage = readFileSync(join(root, "dist", approvedArticleSlug, "index.html"), "utf8");
-if (!articlePage.includes(`<link rel="canonical" href="${approvedArticleUrl}">`)) {
-  fail("Expected approved article canonical to point to active Pages storefront.");
-}
-if (articlePage.includes(`https://flora-aroma.com.ua/${approvedArticleSlug}/`)) {
-  fail("Forbidden known-404 main-domain article canonical found.");
-}
-
-const notFoundPage = readFileSync(join(root, "dist", "404.html"), "utf8");
-if (!notFoundPage.includes("Сторінку не знайдено")) {
-  fail("Expected custom not-found page content in dist/404.html.");
+if (sitemap.includes("https://flora-aroma.com.ua")) {
+  fail("Main-domain URLs must not appear in sitemap.");
 }
 for (const forbiddenSitemapPath of ["/admin/", "/api/"]) {
   if (sitemap.includes(forbiddenSitemapPath)) {
@@ -275,8 +281,7 @@ for (const forbidden of [
   "Кількість у Tilda",
   "Джерела картки",
   "Джерела зображень",
-  "Розширений опис",
-  "Flora plant_id:"
+  "Розширений опис"
 ]) {
   if (publicHtml.includes(forbidden)) {
     fail(`Forbidden public phrase found: ${forbidden}`);
@@ -314,5 +319,7 @@ for (const forbiddenPublicSecret of ["CF_ANALYTICS_API_TOKEN", "replace_with_acc
 }
 
 if (!failed) {
-  console.log("Site verification passed: Tilda clone shell, shop grid, product pages, safe draft cart, analytics MVP files, 44 products, local images, PLANT-0090/PLANT-0098 identity split, and SEO markers are present.");
+  console.log(
+    "Site verification passed: unified header is present, contacts page is rebuilt, publications stay fail-closed without placeholder covers, 44 products remain intact, and public cart/analytics markers are still wired."
+  );
 }

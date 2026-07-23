@@ -22,7 +22,7 @@ const products = getProducts().filter((product) => productMatchesSelection(produ
 const description = `${selection.title}: ${products.length} позицій Flora & Aroma. Ціни з публічного прайсу, наявність підтверджує оператор.`;
 ---
 
-<BaseLayout title={`${selection.title} | Flora & Aroma`} description={description}>
+<BaseLayout title={`${selection.title} | Flora & Aroma`} description={description} navKey="catalog">
   <section class="page-title">
     <p class="eyebrow">Добірка</p>
     <h1>{selection.title}</h1>

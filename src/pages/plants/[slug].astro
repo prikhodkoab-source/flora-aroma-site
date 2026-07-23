@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
-import TildaCloneShopHeader from "../../components/TildaCloneShopHeader.astro";
 import { formatOptionPrice, getOptionDisplayName, getProducts } from "../../lib/products";
 
 export function getStaticPaths() {
@@ -29,9 +28,8 @@ const selectedOptionDisplayName = getOptionDisplayName(selectedOption);
   title={product.seo_title || `${product.name_uk} | Flora & Aroma`}
   description={product.seo_description || product.summary}
   image={imagePaths[0]}
+  navKey="catalog"
 >
-  <TildaCloneShopHeader />
-
   <article
     class="tilda-product-page"
     data-product-page

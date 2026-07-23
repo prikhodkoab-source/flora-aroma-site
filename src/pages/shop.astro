@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../components/TildaCloneFooter.astro";
 import TildaCloneProductCard from "../components/TildaCloneProductCard.astro";
-import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
 import { getProducts } from "../lib/products";
 
 const products = getProducts();
@@ -12,9 +11,8 @@ const products = getProducts();
   title="Flora i Aroma - katalog sadzhantsiv"
   description="Katalog sadzhantsiv. Nayavnist i hotovnist utochnyuyemo pered vidpravkoyu."
   image="/images/tilda-clone/tilda-logo.png"
+  navKey="catalog"
 >
-  <TildaCloneShopHeader />
-
   <section class="tilda-shop-preface">
     <div class="tilda-container tilda-container--narrow tilda-align-center">
       <p><strong>Дім правильних рослин</strong><br />Рослини, вирощені за сучасними технологіями</p>

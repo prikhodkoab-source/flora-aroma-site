@@ -1,5 +1,5 @@
 ---
-import type { PublicPublication } from "../lib/publications";
+import { getCoverMedia, type PublicPublication } from "../lib/publications";
 
 type Props = {
   publication: PublicPublication;
@@ -7,19 +7,19 @@ type Props = {
 
 const { publication } = Astro.props;
 const { data } = publication;
-const href = `/${data.slug}/`;
+const href = `/publications/${data.slug}/`;
 const publishedDate = new Intl.DateTimeFormat("uk-UA", {
   day: "numeric",
   month: "long",
   year: "numeric"
 }).format(data.publishedAt);
-const approvedCover = data.mediaRightsStatus === "approved" ? data.coverImage : undefined;
+const coverMedia = getCoverMedia(publication);
 ---
 
 <article class="publication-card">
-  {approvedCover && (
+  {coverMedia && (
     <a class="publication-card__image-link" href={href} aria-label={`Читати: ${data.title}`}>
-      <img src={approvedCover} alt={data.coverImageAlt ?? ""} loading="lazy" />
+      <img src={coverMedia.src} alt={coverMedia.alt} loading="lazy" />
     </a>
   )}
   <div class="publication-card__body">

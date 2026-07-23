@@ -1,10 +1,9 @@
 ---
 import { render } from "astro:content";
-import TildaCloneFooter from "../components/TildaCloneFooter.astro";
-import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatProductStartingPrice, getProducts } from "../lib/products";
-import { getApprovedPublications, type PublicPublication } from "../lib/publications";
+import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatProductStartingPrice, getProducts } from "../../lib/products";
+import { getApprovedPublications, getBodyMedia, getCoverMedia, type PublicPublication } from "../../lib/publications";
 
 export async function getStaticPaths() {
   const publications = await getApprovedPublications();
@@ -22,6 +21,8 @@ type Props = {
 const { publication } = Astro.props;
 const { data } = publication;
 const { Content } = await render(publication);
+const coverMedia = getCoverMedia(publication);
+const bodyMedia = getBodyMedia(publication);
 const productById = new Map(getProducts().map((product) => [product.plant_id, product]));
 const collectionProducts = data.relatedPlantIds.map((plantId) => productById.get(plantId)).filter(Boolean);
 const publishedDate = new Intl.DateTimeFormat("uk-UA", {
@@ -35,12 +36,11 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
   title={data.seoTitle}
   description={data.seoDescription}
   image={data.coverImage ?? null}
+  navKey="publications"
   ogType="article"
   articlePublishedTime={data.publishedAt.toISOString()}
   articleModifiedTime={data.updatedAt?.toISOString()}
 >
-  <TildaCloneShopHeader />
-
   <section class="collection-hero">
     <div class="collection-shell">
       <a class="publication-back" href="/publications/">Поради та ідеї</a>
@@ -53,16 +53,29 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
   <section class="collection-content">
     <div class="collection-shell collection-grid">
       <article class="collection-article publication-detail">
+        {coverMedia && (
+          <figure class="publication-detail__media publication-detail__media--cover">
+            <img class="publication-detail__cover" src={coverMedia.src} alt={coverMedia.alt} loading="eager" />
+            <figcaption>{coverMedia.caption}</figcaption>
+          </figure>
+        )}
         <Content />
+        {bodyMedia.length > 0 && (
+          <div class="publication-detail__gallery">
+            {bodyMedia.map((item) => (
+              <figure class="publication-detail__media">
+                <img src={item.src} alt={item.alt} loading="lazy" />
+                <figcaption>{item.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
       </article>
 
       {collectionProducts.length > 0 && (
-        <aside class="collection-plants" aria-label="Рослини в добірці">
-          <h2>Рослини в добірці</h2>
-          <p>
-            Показуємо актуальні публічні картки рослин. Наявність і об'єм уточнюємо
-            під час замовлення.
-          </p>
+        <aside class="collection-plants" aria-label="Рослини з цієї публікації">
+          <h2>Рослини з цієї публікації</h2>
+          <p>Показуємо тільки публічні картки рослин. Наявність і формат контейнера підтверджує оператор.</p>
           <div class="collection-plant-list">
             {
               collectionProducts.map((product) => {
@@ -87,12 +100,9 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
 
   <section class="collection-cta">
     <div class="collection-shell">
-      <h2>Хочете створити ароматний бордюр?</h2>
-      <p>
-        Напишіть нам, який варіант вам ближчий — декоративний, пряний чи змішаний.
-        Ми допоможемо підібрати рослини під умови вашої ділянки.
-      </p>
-      <a href="/contacts/">Зв’язатися з Flora & Aroma</a>
+      <h2>Потрібна консультація щодо рослин?</h2>
+      <p>Перейдіть до асортименту або напишіть нам, щоб уточнити наявність, формат контейнера та доречні варіанти для вашої ділянки.</p>
+      <a href="/shop/">Перейти до асортименту</a>
     </div>
   </section>
 
@@ -119,7 +129,6 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
     color: #4d6b45;
     font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0;
     text-transform: uppercase;
   }
 

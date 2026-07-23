@@ -1,22 +1,19 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../components/TildaCloneFooter.astro";
-import TildaCloneShopHeader from "../components/TildaCloneShopHeader.astro";
 ---
 
 <BaseLayout
   title="Сторінку не знайдено — Флора і Арома"
   description="Запитаної сторінки немає. Перейдіть до асортименту або розділу з порадами та ідеями."
 >
-  <TildaCloneShopHeader />
-
-  <main class="publications-section tilda-container">
+  <section class="publications-section tilda-container">
     <div class="publications-empty">
       <h1>Сторінку не знайдено</h1>
       <p>Можливо, посилання застаріло або сторінку було переміщено.</p>
       <a href="/publications/">Поради та ідеї</a>
     </div>
-  </main>
+  </section>
 
   <TildaCloneFooter showContacts={true} />
 </BaseLayout>

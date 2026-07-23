@@ -17,7 +17,7 @@ export async function GET({ site }: { site?: URL }) {
     ...getCategories().map((category) => `/categories/${category.slug}/`),
     ...getSelections().map((selection) => `/selections/${selection.slug}/`),
     ...getProducts().map((product) => `/plants/${product.slug}/`),
-    ...publications.map((publication) => `/${publication.data.slug}/`)
+    ...publications.map((publication) => `/publications/${publication.data.slug}/`)
   ];
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls

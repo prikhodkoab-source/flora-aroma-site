@@ -14,7 +14,7 @@ const products = getProducts().filter((product) => product.category_slug === cat
 const description = `${category.name}: ${products.length} позицій Flora & Aroma. Ціни синхронізовані з затвердженим прайсом, наявність підтверджує оператор.`;
 ---
 
-<BaseLayout title={`${category.name} | Flora & Aroma`} description={description}>
+<BaseLayout title={`${category.name} | Flora & Aroma`} description={description} navKey="catalog">
   <section class="page-title">
     <p class="eyebrow">Категорія</p>
     <h1>{category.name}</h1>

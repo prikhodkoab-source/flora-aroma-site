@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The repository site is a read-only consumer of approved publication exports. It does not approve articles, media rights or publication actions.
+The repository site is a read-only consumer of approved publication exports. It does not approve articles, media rights, or publication actions.
 
 Target flow:
 
@@ -35,24 +35,43 @@ slug: stable-public-slug
 title: Public title
 excerpt: Public introduction
 category: Public category
-coverImage: /images/publications/approved-image.jpg # optional
-coverImageAlt: Approved accessible description # required with coverImage
+coverImage: /images/publications/approved-image.jpg
+coverImageAlt: Approved accessible description
+coverMediaAssetId: MEDIA-ASSET-0001
+articleMedia:
+  - mediaAssetId: MEDIA-ASSET-0001
+    src: /images/publications/approved-image.jpg
+    alt: Approved accessible description
+    caption: Public caption
+    sourceType: own
+    placement: cover
+    sortOrder: 0
+    rightsStatus: approved
+  - mediaAssetId: MEDIA-ASSET-0002
+    src: /images/publications/approved-detail.jpg
+    alt: Supporting photo
+    caption: Public caption
+    sourceType: own
+    placement: body
+    sortOrder: 10
+    rightsStatus: approved
 relatedPlantIds: []
 seoTitle: Search title
 seoDescription: Search description
 publishedAt: 2026-07-17T00:00:00Z
-updatedAt: 2026-07-17T00:00:00Z # optional
+updatedAt: 2026-07-17T00:00:00Z
 publicationStatus: approved
 mediaRightsStatus: approved
 ```
 
-No example file is stored in the collection because a valid-looking example could be mistaken for approved public content.
+No example file is stored as an approved public entry unless it has passed operator review and media approval. A valid-looking draft must not be mistaken for approved public content.
 
 ## Stable identity
 
 - `publicationId` is permanent and must not be reassigned.
-- `slug` is unique and stable because it defines `/publications/<slug>/`.
+- `slug` is unique and stable because it defines the article URL.
 - A slug change requires an approved redirect plan.
+- `coverMediaAssetId` must reference one item in `articleMedia`.
 - `relatedPlantIds` may be empty. Every populated ID must exist in the current public product catalog.
 
 ## Allowed statuses
@@ -60,6 +79,9 @@ No example file is stored in the collection because a valid-looking example coul
 ```text
 publicationStatus=draft|pending_operator_review|approved|suspended|archived
 mediaRightsStatus=pending_operator_review|approved|restricted|rejected|expired
+articleMedia[].rightsStatus=pending_operator_review|approved|restricted|rejected|expired
+articleMedia[].sourceType=own|supplier|generated|unknown
+articleMedia[].placement=cover|body
 ```
 
 The public build selects only:
@@ -70,7 +92,7 @@ AND
 mediaRightsStatus=approved
 ```
 
-Missing fields never mean approved. Draft, pending, suspended, archived, restricted, rejected and expired records do not generate public routes or sitemap entries.
+Missing fields never mean approved. Draft, pending, suspended, archived, restricted, rejected, and expired records do not generate public routes or sitemap entries.
 
 ## Fail-closed validation
 
@@ -79,30 +101,43 @@ For every collection entry the build validates:
 - non-empty stable `publicationId`;
 - unique `publicationId` and `slug`;
 - supported statuses;
-- title, excerpt and category;
+- title, excerpt, and category;
 - `coverImageAlt` whenever `coverImage` is present;
-- valid `relatedPlantIds` array.
+- valid `relatedPlantIds` array;
+- `articleMedia` unique by `mediaAssetId`;
+- every media object has `src`, `alt`, `caption`, `sourceType`, `placement`, `sortOrder`, and `rightsStatus`.
 
 For a public `approved + approved` entry it additionally requires:
 
 - non-empty Markdown body;
 - `publishedAt`;
 - `seoTitle` and `seoDescription`;
-- every related plant to exist in the public site catalog.
+- `approvedRevision`, `approvedPreviewHash`, and `language`;
+- `coverMediaAssetId`;
+- `coverImage` and `coverImageAlt`;
+- cover image path and alt must match the approved cover media item;
+- all media items must have `rightsStatus=approved`;
+- no media item may use `sourceType=unknown`;
+- a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 `own`, and at least 2 body images;
+- a long article (over 1200 words) must have at least 5 unique approved images, at least 3 `own`, and at least 4 body images;
+- duplicate `mediaAssetId` values do not increase image counts;
+- every related plant must exist in the public site catalog.
 
-Validation errors stop the build. Internal notes, operator comments, source dumps, credentials, customer data, exact stock quantities and internal costs are outside the public contract and must not be exported.
+Validation errors stop the build. Internal notes, operator comments, source dumps, credentials, customer data, exact stock quantities, and internal costs are outside the public contract and must not be exported.
 
-## Media rights
+## Media rules
 
-`mediaRightsStatus=approved` must come from future canonical media-rights evidence. A local file, external URL, generated image or existing use on another channel is not proof by itself. The site never promotes a missing or unknown media status to approved.
-
-Cover images are rendered only for public entries that passed the approved media gate. Attribution and license presentation, when required, must be included by the future exporter from canonical evidence.
+- A greenhouse placeholder cannot be reused as the cover for an unrelated article about a plant, pollinators, or a naturalistic planting theme.
+- `generated` media may exist as an approved illustration, but it does not count toward the minimum `own` photo requirement.
+- `supplier` media may be approved, but it does not count toward the minimum `own` photo requirement.
+- `unknown` media is forbidden for public articles.
+- Every public image must resolve through an approved media registry item and keep a stable `mediaAssetId`.
 
 ## Operator boundary
 
 Publication files must never be manually changed to `approved` as a shortcut. The future WebPublisher exporter may generate approved site entries only from the canonical operator-approved revision and approved media evidence.
 
-Pending `WebsiteContent`, social drafts and `WebsitePublishQueue` rows are not imported automatically. The website remains a consumer, not the approval system.
+Pending `WebsiteContent`, social drafts, and `WebsitePublishQueue` rows are not imported automatically. The website remains a consumer, not the approval system.
 
 ## Deployment boundary
 

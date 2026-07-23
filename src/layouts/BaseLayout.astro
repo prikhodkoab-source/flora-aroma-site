@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
 import TildaCloneCart from "../components/TildaCloneCart.astro";
 
 type Props = {
@@ -7,6 +8,9 @@ type Props = {
   description?: string;
   image?: string | null;
   showCart?: boolean;
+  showHeader?: boolean;
+  navKey?: "catalog" | "publications" | "contacts" | null;
+  headerVariant?: "solid" | "overlay";
   ogType?: "website" | "article";
   articlePublishedTime?: string;
   articleModifiedTime?: string;
@@ -17,6 +21,9 @@ const {
   description = "Контейнерні саджанці декоративних, ароматичних і лікарських рослин. Власне вирощування, консультація перед замовленням, погодження наявності.",
   image = "/images/tilda-clone/hero-greenhouse.jpg",
   showCart = true,
+  showHeader = true,
+  navKey = null,
+  headerVariant = "solid",
   ogType = "website",
   articlePublishedTime,
   articleModifiedTime
@@ -46,7 +53,8 @@ const socialImageUrl = image ? new URL(image, Astro.site) : null;
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
-  <body class="tilda-clone-body">
+  <body class:list={["tilda-clone-body", headerVariant === "overlay" && "tilda-clone-body--overlay-header"]}>
+    {showHeader && <SiteHeader navKey={navKey} variant={headerVariant} showCart={showCart} />}
     <main>
       <slot />
     </main>

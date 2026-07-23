@@ -1,0 +1,118 @@
+---
+type NavKey = "catalog" | "publications" | "contacts";
+type Variant = "solid" | "overlay";
+
+type NavItem = {
+  key: NavKey;
+  href: string;
+  label: string;
+};
+
+type Props = {
+  navKey?: NavKey | null;
+  variant?: Variant;
+  showCart?: boolean;
+};
+
+const {
+  navKey = null,
+  variant = "solid",
+  showCart = true
+} = Astro.props;
+
+const navItems: NavItem[] = [
+  { key: "catalog", href: "/shop/", label: "Асортимент" },
+  { key: "publications", href: "/publications/", label: "Поради та ідеї" },
+  { key: "contacts", href: "/contacts/", label: "Контакти" }
+];
+---
+
+<header class:list={["site-header", `site-header--${variant}`]}>
+  <div class="site-header__inner">
+    <a class="site-header__logo" href="/" aria-label="Flora & Aroma">
+      <img src="/images/tilda-clone/tilda-logo.png" alt="Flora & Aroma" />
+    </a>
+
+    <nav class="site-header__nav" aria-label="Головна навігація">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={navKey === item.key ? "page" : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="site-header__actions">
+      {showCart && (
+        <button class="site-cart-button" type="button" data-cart-open aria-label="Відкрити кошик">
+          <span class="site-cart-button__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path d="M16 7h4v13H4V7h4" fill="none" stroke="currentColor" stroke-width="1.8"></path>
+              <path d="M8 9V5a4 4 0 1 1 8 0v4" fill="none" stroke="currentColor" stroke-width="1.8"></path>
+            </svg>
+          </span>
+          <span class="site-cart-button__label">Кошик</span>
+          <span class="site-cart-button__count" data-cart-count hidden>0</span>
+        </button>
+      )}
+
+      <button
+        class="site-menu-toggle"
+        type="button"
+        data-site-menu-toggle
+        aria-expanded="false"
+        aria-controls="site-mobile-menu"
+        aria-label="Відкрити меню"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="site-mobile-menu" id="site-mobile-menu" data-site-mobile-menu hidden>
+    <nav class="site-mobile-menu__nav" aria-label="Мобільна навігація">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={navKey === item.key ? "page" : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector(".site-header");
+  const toggle = header?.querySelector?.("[data-site-menu-toggle]");
+  const menu = header?.querySelector?.("[data-site-mobile-menu]");
+
+  if (toggle instanceof HTMLButtonElement && menu instanceof HTMLElement) {
+    const closeMenu = () => {
+      toggle.setAttribute("aria-expanded", "false");
+      menu.hidden = true;
+      document.body.classList.remove("site-menu-open");
+    };
+
+    const openMenu = () => {
+      toggle.setAttribute("aria-expanded", "true");
+      menu.hidden = false;
+      document.body.classList.add("site-menu-open");
+    };
+
+    toggle.addEventListener("click", () => {
+      if (menu.hidden) {
+        openMenu();
+        return;
+      }
+      closeMenu();
+    });
+
+    menu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !menu.hidden) closeMenu();
+    });
+  }
+</script>
