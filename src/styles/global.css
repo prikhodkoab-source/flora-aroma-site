@@ -90,6 +90,7 @@ body.site-menu-open {
 
 .site-header--overlay .site-header__inner {
   grid-template-columns: minmax(0, 1fr) auto;
+  width: min(910px, calc(100% - 40px));
 }
 
 .site-header--overlay .site-header__logo {
