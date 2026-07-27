@@ -286,6 +286,13 @@ body.site-menu-open {
   text-align: center;
 }
 
+.tilda-hero-content__logo {
+  display: block;
+  width: clamp(150px, 14vw, 210px);
+  height: auto;
+  margin: 0 auto 28px;
+}
+
 .tilda-hero-content__uptitle {
   margin-bottom: 34px;
   font-size: 24px;
@@ -2090,6 +2097,10 @@ body.site-menu-open {
 
   .tilda-hero-content__uptitle {
     font-size: 18px;
+  }
+
+  .tilda-hero-content__logo {
+    display: none;
   }
 
   .tilda-hero-buttons {
