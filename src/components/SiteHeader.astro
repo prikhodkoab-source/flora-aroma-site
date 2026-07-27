@@ -32,7 +32,18 @@ const {
     </button>
 
     <a class="site-header__logo" href="/" aria-label="Флора і Арома">
-      <img src="/images/tilda-clone/tilda-logo.png" alt="Флора і Арома" />
+      <img
+        class="site-header__logo-image site-header__logo-image--light"
+        src="/images/tilda-clone/tilda-logo.png"
+        alt=""
+        aria-hidden="true"
+      />
+      <img
+        class="site-header__logo-image site-header__logo-image--dark"
+        src="/images/tilda-clone/logo-white.png"
+        alt=""
+        aria-hidden="true"
+      />
     </a>
 
     <nav class="site-header__nav" aria-label="Головна навігація">
@@ -86,6 +97,25 @@ const {
       throw new Error("Site header menu controls are not available.");
     }
 
+    const applyLogoTheme = () => {
+      const isOverlay = header.classList.contains("site-header--overlay");
+      const backgroundColor = window.getComputedStyle(header).backgroundColor;
+      const match = backgroundColor.match(/\d+(?:\.\d+)?/g);
+
+      let isDark = isOverlay;
+
+      if (!isDark && match && match.length >= 3) {
+        const [red, green, blue, alpha = "1"] = match.map(Number);
+        const brightness = (red * 299 + green * 587 + blue * 114) / 1000;
+
+        if (alpha < 0.75 || brightness < 160) {
+          isDark = true;
+        }
+      }
+
+      header.dataset.logoTheme = isDark ? "dark" : "light";
+    };
+
     const closeMenu = () => {
       toggle.setAttribute("aria-expanded", "false");
       menu.hidden = true;
@@ -121,5 +151,8 @@ const {
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && !menu.hidden) closeMenu();
     });
+
+    applyLogoTheme();
+    window.addEventListener("resize", applyLogoTheme);
   }
 </script>

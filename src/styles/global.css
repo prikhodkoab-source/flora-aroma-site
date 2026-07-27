@@ -125,10 +125,22 @@ body.site-menu-open {
   text-decoration: none;
 }
 
-.site-header__logo img {
+.site-header__logo-image {
   display: block;
   width: 80px;
   height: auto;
+}
+
+.site-header__logo-image--dark {
+  display: none;
+}
+
+.site-header[data-logo-theme="dark"] .site-header__logo-image--light {
+  display: none;
+}
+
+.site-header[data-logo-theme="dark"] .site-header__logo-image--dark {
+  display: block;
 }
 
 .site-header__nav {
@@ -2106,7 +2118,7 @@ body.site-menu-open {
     transform: translate(-50%, -50%);
   }
 
-  .site-header__logo img {
+  .site-header__logo-image {
     width: 92px;
   }
 
