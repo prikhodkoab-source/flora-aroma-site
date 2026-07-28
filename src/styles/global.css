@@ -874,11 +874,19 @@ body.site-menu-open {
   margin: 0 auto;
 }
 
+.catalog-products-grid.tilda-products-grid {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  justify-content: stretch;
+}
+
 .tilda-product-card {
   position: relative;
   display: flex;
   flex-direction: column;
   text-align: left;
+  min-width: 0;
 }
 
 .tilda-product-card__link {
@@ -2832,6 +2840,8 @@ body.site-menu-open {
   .catalog-sort,
   .catalog-sort select {
     width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .catalog-filter-toggle {
@@ -2840,8 +2850,16 @@ body.site-menu-open {
 
   .catalog-sort {
     position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 54px;
     gap: 0;
+    padding: 0;
     margin-left: 0;
+    border: 1px solid #d7ddd2;
+    border-radius: 999px;
+    background: #ffffff;
+    overflow: hidden;
   }
 
   .catalog-sort__mobile-label {
@@ -2850,6 +2868,9 @@ body.site-menu-open {
     z-index: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding-right: 8px;
+    text-align: center;
     color: #111111;
     font-size: 14px;
     font-weight: 700;
@@ -2872,10 +2893,16 @@ body.site-menu-open {
   }
 
   .catalog-sort select {
-    position: relative;
+    position: absolute;
+    inset: 0;
     z-index: 2;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
     appearance: none;
     opacity: 0;
+    cursor: pointer;
   }
 
   .catalog-sort:focus-within {
@@ -2986,6 +3013,8 @@ body.site-menu-open {
   }
 
   .catalog-products-grid {
+    width: 100%;
+    max-width: 100%;
     grid-template-columns: minmax(0, 1fr);
     gap: 34px;
   }
