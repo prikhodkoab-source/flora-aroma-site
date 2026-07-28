@@ -291,7 +291,7 @@ export type SelectionDefinition = (typeof selectionDefinitions)[number];
 
 function splitList(value: string): string[] {
   return value
-    .split(/[;|]/)
+    .split(/[;,|]/)
     .map((item) => item.trim())
     .filter(Boolean);
 }

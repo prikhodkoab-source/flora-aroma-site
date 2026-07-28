@@ -1,9 +1,13 @@
 ---
+import { buildProductFilterIndex } from "../lib/catalogFilters";
 import { formatProductStartingPrice, getOptionDisplayName } from "../lib/products";
 
 const { product } = Astro.props;
 const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
 const hoverImage = product.image_paths?.[1] || image;
+const filterIndex = buildProductFilterIndex(product);
+const visiblePurposes = filterIndex.purposeLabels;
+const formatSummary = filterIndex.formatLabels.join(" / ");
 const option = product.options?.[0] || {
   variant_id: "default",
   format_code: "",
@@ -13,33 +17,72 @@ const option = product.options?.[0] || {
 };
 ---
 
-<article class="tilda-product-card js-product">
+<article class="tilda-product-card js-product" data-catalog-card data-plant-id={product.plant_id}>
   <a class="tilda-product-card__link" href={`/plants/${product.slug}/`}>
     <span class="tilda-product-card__image-wrap">
       <span class="tilda-product-card__image tilda-product-card__image--first" style={`background-image:url('${image}')`}></span>
       <span class="tilda-product-card__image tilda-product-card__image--second" style={`background-image:url('${hoverImage}')`}></span>
     </span>
     <span class="tilda-product-card__text">
-      <span class="tilda-product-card__title">{product.name_uk} ({product.latin_name})</span>
+      <span class="tilda-product-card__category">{product.category}</span>
+      <span class="tilda-product-card__title">{product.name_uk}</span>
+      <span class="tilda-product-card__latin"><em>{product.latin_name}</em></span>
+      <span class="tilda-product-card__traits" aria-label="Характеристики рослини">
+        {filterIndex.sunLabel && (
+          <span class="tilda-product-card__trait">
+            <span aria-hidden="true">☀</span>
+            <span>{filterIndex.sunLabel}</span>
+          </span>
+        )}
+        {filterIndex.moistureLabel && (
+          <span class="tilda-product-card__trait">
+            <span aria-hidden="true">💧</span>
+            <span>{filterIndex.moistureLabel}</span>
+          </span>
+        )}
+        {filterIndex.heightLabel && (
+          <span class="tilda-product-card__trait">
+            <span aria-hidden="true">↕</span>
+            <span>{filterIndex.heightLabel}</span>
+          </span>
+        )}
+        {filterIndex.floweringLabel && (
+          <span class="tilda-product-card__trait">
+            <span aria-hidden="true">🌸</span>
+            <span>{filterIndex.floweringLabel}</span>
+          </span>
+        )}
+        {visiblePurposes.length > 0 && (
+          <span class="tilda-product-card__trait">
+            <span aria-hidden="true">🐝</span>
+            <span>{visiblePurposes.join(" / ")}</span>
+          </span>
+        )}
+      </span>
       <span class="tilda-product-card__descr">{product.summary}</span>
+      {formatSummary && <span class="tilda-product-card__formats">Формати: {formatSummary}</span>}
       <span class="tilda-product-card__price">{formatProductStartingPrice(product)}</span>
+      <span class="tilda-product-card__availability">Наявність підтверджуємо перед замовленням</span>
     </span>
   </a>
-  <button
-    class="tilda-product-card__button"
-    type="button"
-    data-cart-add
-    data-plant-id={product.plant_id}
-    data-name={product.name_uk}
-    data-latin={product.latin_name}
-    data-container={getOptionDisplayName(option)}
-    data-price={option.price_uah}
-    data-currency="UAH"
-    data-unit={option.unit}
-    data-option-id={option.variant_id}
-    data-url={`/plants/${product.slug}/`}
-    data-image={image}
-  >
-    Додати до кошика
-  </button>
+  <div class="tilda-product-card__actions">
+    <a class="tilda-product-card__detail" href={`/plants/${product.slug}/`}>Детальніше</a>
+    <button
+      class="tilda-product-card__button"
+      type="button"
+      data-cart-add
+      data-plant-id={product.plant_id}
+      data-name={product.name_uk}
+      data-latin={product.latin_name}
+      data-container={getOptionDisplayName(option)}
+      data-price={option.price_uah}
+      data-currency="UAH"
+      data-unit={option.unit}
+      data-option-id={option.variant_id}
+      data-url={`/plants/${product.slug}/`}
+      data-image={image}
+    >
+      До кошика
+    </button>
+  </div>
 </article>

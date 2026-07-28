@@ -1,0 +1,566 @@
+---
+import TildaCloneProductCard from "./TildaCloneProductCard.astro";
+import {
+  buildCatalogFilterSections,
+  buildCatalogQuickPicks,
+  buildProductFilterIndex,
+  getCatalogSortOptions
+} from "../lib/catalogFilters";
+
+const { products } = Astro.props;
+
+const productEntries = products.map((product, index) => ({
+  product,
+  meta: buildProductFilterIndex(product, index)
+}));
+
+const filterSections = buildCatalogFilterSections(products);
+const quickPicks = buildCatalogQuickPicks(products);
+const sortOptions = getCatalogSortOptions();
+const configJson = JSON.stringify(
+  {
+    sections: filterSections,
+    quickPicks,
+    sortOptions,
+    products: productEntries.map((entry) => entry.meta)
+  },
+  null,
+  2
+).replace(/</g, "\\u003c");
+---
+
+<section class="catalog-explorer" data-catalog-root>
+  <div class="tilda-container catalog-explorer__container">
+    <div class="catalog-explorer__toolbar">
+      <div class="catalog-explorer__heading">
+        <h2>Каталог рослин</h2>
+        <p>Підберіть рослини за умовами ділянки. Наявність підтверджуємо перед замовленням.</p>
+      </div>
+
+      <label class="catalog-search">
+        <span class="catalog-search__label">Пошук рослини</span>
+        <input type="search" placeholder="Пошук рослини" data-catalog-search />
+      </label>
+
+      {quickPicks.length > 0 && (
+        <div class="catalog-quick-picks" aria-label="Швидкі добірки">
+          {quickPicks.map((pick) => (
+            <button
+              type="button"
+              class="catalog-quick-pick"
+              data-catalog-quick-pick
+              data-quick-pick-id={pick.id}
+              data-quick-pick-filters={JSON.stringify(pick.filters)}
+            >
+              {pick.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div class="catalog-toolbar__controls">
+        <button type="button" class="catalog-filter-toggle" data-catalog-open-filters aria-expanded="false">
+          <span data-catalog-filter-toggle-label>Фільтри</span>
+        </button>
+
+        <label class="catalog-sort">
+          <span>Сортування</span>
+          <select data-catalog-sort>
+            {sortOptions.map((option) => (
+              <option value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="catalog-layout">
+      <div class="catalog-layout__backdrop" data-catalog-backdrop hidden></div>
+
+      <aside class="catalog-sidebar" data-catalog-sidebar aria-labelledby="catalog-filters-title">
+        <div class="catalog-sidebar__header">
+          <h3 id="catalog-filters-title">Фільтри</h3>
+          <button type="button" class="catalog-sidebar__close" data-catalog-close-filters aria-label="Закрити фільтри">
+            ×
+          </button>
+        </div>
+
+        <div class="catalog-sidebar__body">
+          {filterSections.map((section) => (
+            <section class="catalog-filter-group" data-filter-group={section.id}>
+              <h4>{section.label}</h4>
+              <div class="catalog-filter-group__options">
+                {section.options.map((option) => {
+                  const inputId = `${section.id}-${option.value}`;
+                  return (
+                    <label class="catalog-filter-chip" for={inputId}>
+                      <input
+                        id={inputId}
+                        type="checkbox"
+                        name={section.queryKey}
+                        value={option.value}
+                        data-catalog-filter
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+
+        <div class="catalog-sidebar__footer">
+          <button type="button" class="catalog-sidebar__reset" data-catalog-reset>Скинути</button>
+          <button type="button" class="catalog-sidebar__apply" data-catalog-apply>
+            <span data-catalog-apply-label>Показати {products.length} рослин</span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="catalog-results">
+        <div class="catalog-results__summary">
+          <div>
+            <p class="catalog-results__count" data-catalog-results-count>Знайдено {products.length} рослин</p>
+          </div>
+          <button type="button" class="catalog-results__reset" data-catalog-reset-all hidden>Скинути все</button>
+        </div>
+
+        <div class="catalog-active-chips" data-catalog-active-chips hidden>
+          <div class="catalog-active-chips__list" data-catalog-active-chip-list></div>
+        </div>
+
+        <div class="tilda-products-grid catalog-products-grid" data-catalog-grid>
+          {productEntries.map((entry) => <TildaCloneProductCard product={entry.product} />)}
+        </div>
+
+        <div class="catalog-empty-state" data-catalog-empty hidden>
+          <h3>Нічого не знайдено</h3>
+          <p>Спробуйте інші умови підбору або скиньте фільтри, щоб побачити всі доступні рослини.</p>
+          <button type="button" class="catalog-empty-state__reset" data-catalog-reset-all>Скинути все</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-catalog-config set:html={configJson}></script>
+</section>
+
+<script>
+  const pluralizePlants = (count) => {
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+    if (mod10 === 1 && mod100 !== 11) return "рослину";
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "рослини";
+    return "рослин";
+  };
+
+  const createEmptyState = () => ({
+    search: "",
+    sort: "default",
+    sun: [],
+    moisture: [],
+    purpose: [],
+    height: [],
+    flowering: [],
+    category: [],
+    format: [],
+    price: []
+  });
+
+  const normalizeText = (value) =>
+    value
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[’'`"]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const parseStateFromUrl = (searchParams, sections) => {
+    const state = createEmptyState();
+    const sectionMap = new Map(sections.map((section) => [section.queryKey, new Set(section.options.map((option) => option.value))]));
+    state.search = searchParams.get("q")?.trim() ?? "";
+    const sort = searchParams.get("sort");
+    state.sort = ["default", "name", "price-asc", "price-desc"].includes(sort) ? sort : "default";
+
+    for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
+      const allowed = sectionMap.get(key);
+      state[key] = searchParams
+        .getAll(key)
+        .flatMap((value) => value.split(","))
+        .map((value) => value.trim())
+        .filter((value) => value && allowed?.has(value));
+    }
+
+    return state;
+  };
+
+  const serializeStateToUrl = (state) => {
+    const params = new URLSearchParams();
+    if (state.search.trim()) params.set("q", state.search.trim());
+    if (state.sort !== "default") params.set("sort", state.sort);
+
+    for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
+      if (state[key].length > 0) {
+        params.set(key, state[key].join(","));
+      }
+    }
+
+    return params;
+  };
+
+  const matchesHeightBand = (product, value) => {
+    if (!Number.isFinite(product.heightMin) || !Number.isFinite(product.heightMax)) return false;
+    if (value === "0-30") return product.heightMax <= 30;
+    if (value === "30-60") return product.heightMin <= 60 && product.heightMax >= 30;
+    if (value === "60-100") return product.heightMin <= 100 && product.heightMax >= 60;
+    if (value === "100-plus") return product.heightMax > 100;
+    return false;
+  };
+
+  const matchesPriceBand = (product, value) => {
+    if (value === "0-50") return product.price <= 50;
+    if (value === "50-100") return product.price > 50 && product.price <= 100;
+    if (value === "100-plus") return product.price > 100;
+    return false;
+  };
+
+  const productMatchesState = (product, state) => {
+    const search = normalizeText(state.search);
+    if (search && !product.searchText.includes(search)) return false;
+    if (state.sun.length > 0 && !state.sun.some((value) => product.sun.includes(value))) return false;
+    if (state.moisture.length > 0 && !state.moisture.some((value) => product.moisture.includes(value))) return false;
+    if (state.purpose.length > 0 && !state.purpose.some((value) => product.purpose.includes(value))) return false;
+    if (state.height.length > 0 && !state.height.some((value) => matchesHeightBand(product, value))) return false;
+    if (state.flowering.length > 0 && !state.flowering.some((value) => product.flowering.includes(value))) return false;
+    if (state.category.length > 0 && !state.category.includes(product.categoryValue)) return false;
+    if (state.format.length > 0 && !state.format.some((value) => product.formats.includes(value))) return false;
+    if (state.price.length > 0 && !state.price.some((value) => matchesPriceBand(product, value))) return false;
+    return true;
+  };
+
+  const sortProducts = (products, sort) => {
+    const items = [...products];
+    if (sort === "price-asc") {
+      return items.sort((left, right) => left.price - right.price || left.nameUk.localeCompare(right.nameUk, "uk"));
+    }
+
+    if (sort === "price-desc") {
+      return items.sort((left, right) => right.price - left.price || left.nameUk.localeCompare(right.nameUk, "uk"));
+    }
+
+    if (sort === "name") {
+      return items.sort((left, right) => left.nameUk.localeCompare(right.nameUk, "uk"));
+    }
+
+    return items.sort((left, right) => left.sortIndex - right.sortIndex);
+  };
+
+  const activeFilterCount = (state) => {
+    let count = 0;
+    for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
+      count += state[key].length;
+    }
+    return count;
+  };
+
+  const isQuickPickActive = (state, pick) =>
+    Object.entries(pick.filters).every(([group, values]) => values.every((value) => state[group].includes(value)));
+
+  const buildActiveChips = (state, sections) => {
+    const chips = [];
+    const labelMap = new Map();
+
+    sections.forEach((section) => {
+      section.options.forEach((option) => {
+        labelMap.set(`${section.queryKey}:${option.value}`, option.label);
+      });
+    });
+
+    for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
+      state[key].forEach((value) => {
+        const label = labelMap.get(`${key}:${value}`);
+        if (label) chips.push({ group: key, value, label });
+      });
+    }
+
+    return chips;
+  };
+
+  document.querySelectorAll("[data-catalog-root]").forEach((root) => {
+    const configNode = root.querySelector("[data-catalog-config]");
+    if (!(configNode instanceof HTMLScriptElement)) return;
+
+    const config = JSON.parse(configNode.textContent || "{}");
+    const sections = config.sections || [];
+    const products = config.products || [];
+    const quickPicks = config.quickPicks || [];
+    const grid = root.querySelector("[data-catalog-grid]");
+    const cards = new Map(Array.from(root.querySelectorAll("[data-catalog-card]")).map((card) => [card.dataset.plantId, card]));
+    const searchInput = root.querySelector("[data-catalog-search]");
+    const sortSelect = root.querySelector("[data-catalog-sort]");
+    const countNode = root.querySelector("[data-catalog-results-count]");
+    const chipsNode = root.querySelector("[data-catalog-active-chips]");
+    const chipListNode = root.querySelector("[data-catalog-active-chip-list]");
+    const emptyNode = root.querySelector("[data-catalog-empty]");
+    const resetButtons = root.querySelectorAll("[data-catalog-reset-all], [data-catalog-reset]");
+    const filterButton = root.querySelector("[data-catalog-open-filters]");
+    const filterButtonLabel = root.querySelector("[data-catalog-filter-toggle-label]");
+    const sidebar = root.querySelector("[data-catalog-sidebar]");
+    const closeButton = root.querySelector("[data-catalog-close-filters]");
+    const backdrop = root.querySelector("[data-catalog-backdrop]");
+    const applyButton = root.querySelector("[data-catalog-apply]");
+    const applyLabel = root.querySelector("[data-catalog-apply-label]");
+    const filterInputs = Array.from(root.querySelectorAll("[data-catalog-filter]"));
+    const mobileMedia = window.matchMedia("(max-width: 960px)");
+    let state = parseStateFromUrl(new URLSearchParams(window.location.search), sections);
+    let isDrawerOpen = false;
+
+    const syncDrawerAccessibility = () => {
+      if (!(sidebar instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
+
+      if (!mobileMedia.matches) {
+        isDrawerOpen = false;
+        sidebar.classList.remove("is-open");
+        sidebar.removeAttribute("inert");
+        backdrop.hidden = true;
+        document.body.classList.remove("catalog-filters-open");
+        if (filterButton instanceof HTMLButtonElement) filterButton.setAttribute("aria-expanded", "false");
+        return;
+      }
+
+      if (isDrawerOpen) {
+        sidebar.classList.add("is-open");
+        sidebar.removeAttribute("inert");
+        backdrop.hidden = false;
+        document.body.classList.add("catalog-filters-open");
+      } else {
+        sidebar.classList.remove("is-open");
+        sidebar.setAttribute("inert", "");
+        backdrop.hidden = true;
+        document.body.classList.remove("catalog-filters-open");
+      }
+
+      if (filterButton instanceof HTMLButtonElement) {
+        filterButton.setAttribute("aria-expanded", isDrawerOpen ? "true" : "false");
+      }
+    };
+
+    const openDrawer = () => {
+      if (!mobileMedia.matches) return;
+      isDrawerOpen = true;
+      syncDrawerAccessibility();
+    };
+
+    const closeDrawer = () => {
+      isDrawerOpen = false;
+      syncDrawerAccessibility();
+    };
+
+    const syncInputsFromState = () => {
+      if (searchInput instanceof HTMLInputElement) {
+        searchInput.value = state.search;
+      }
+
+      if (sortSelect instanceof HTMLSelectElement) {
+        sortSelect.value = state.sort;
+      }
+
+      filterInputs.forEach((input) => {
+        if (!(input instanceof HTMLInputElement)) return;
+        input.checked = state[input.name]?.includes(input.value) || false;
+      });
+    };
+
+    const updateUrl = () => {
+      const params = serializeStateToUrl(state);
+      const query = params.toString();
+      const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+      history.replaceState(null, "", nextUrl);
+    };
+
+    const render = () => {
+      const visibleProducts = sortProducts(
+        products.filter((product) => productMatchesState(product, state)),
+        state.sort
+      );
+      const visibleIds = new Set(visibleProducts.map((item) => item.plantId));
+
+      if (grid instanceof HTMLElement) {
+        visibleProducts.forEach((product) => {
+          const card = cards.get(product.plantId);
+          if (!(card instanceof HTMLElement)) return;
+          card.hidden = false;
+          grid.appendChild(card);
+        });
+
+        cards.forEach((card, plantId) => {
+          if (!(card instanceof HTMLElement)) return;
+          if (!visibleIds.has(plantId)) {
+            card.hidden = true;
+          }
+        });
+      }
+
+      if (countNode instanceof HTMLElement) {
+        countNode.textContent = `Знайдено ${visibleProducts.length} ${pluralizePlants(visibleProducts.length)}`;
+      }
+
+      if (applyLabel instanceof HTMLElement) {
+        applyLabel.textContent = `Показати ${visibleProducts.length} ${pluralizePlants(visibleProducts.length)}`;
+      }
+
+      const totalActive = activeFilterCount(state);
+      const hasResettableState = totalActive > 0 || Boolean(state.search.trim());
+      if (filterButtonLabel instanceof HTMLElement) {
+        filterButtonLabel.textContent = totalActive > 0 ? `Фільтри ${totalActive}` : "Фільтри";
+      }
+
+      if (emptyNode instanceof HTMLElement) {
+        emptyNode.hidden = visibleProducts.length > 0;
+      }
+
+      const chips = buildActiveChips(state, sections);
+      if (chipsNode instanceof HTMLElement) {
+        chipsNode.hidden = chips.length === 0;
+      }
+
+      if (chipListNode instanceof HTMLElement) {
+        chipListNode.innerHTML = "";
+        chips.forEach((chip) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "catalog-active-chip";
+          button.dataset.group = chip.group;
+          button.dataset.value = chip.value;
+          button.innerHTML = `<span>${chip.label}</span><span aria-hidden="true">×</span>`;
+          chipListNode.appendChild(button);
+        });
+      }
+
+      root.querySelectorAll("[data-catalog-reset-all]").forEach((button) => {
+        if (button instanceof HTMLElement) {
+          button.hidden = !hasResettableState;
+        }
+      });
+
+      root.querySelectorAll("[data-catalog-quick-pick]").forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        const pick = quickPicks.find((item) => item.id === button.dataset.quickPickId);
+        if (!pick) return;
+        button.classList.toggle("is-active", isQuickPickActive(state, pick));
+      });
+    };
+
+    const applyState = (nextState, options = {}) => {
+      state = {
+        ...createEmptyState(),
+        ...nextState,
+        search: nextState.search ?? "",
+        sort: nextState.sort ?? "default"
+      };
+      syncInputsFromState();
+      render();
+      if (!options.skipUrl) updateUrl();
+    };
+
+    syncInputsFromState();
+    render();
+    syncDrawerAccessibility();
+
+    if (filterButton instanceof HTMLButtonElement) {
+      filterButton.addEventListener("click", () => {
+        if (isDrawerOpen) closeDrawer();
+        else openDrawer();
+      });
+    }
+
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.addEventListener("click", closeDrawer);
+    }
+
+    if (backdrop instanceof HTMLElement) {
+      backdrop.addEventListener("click", closeDrawer);
+    }
+
+    if (applyButton instanceof HTMLButtonElement) {
+      applyButton.addEventListener("click", closeDrawer);
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && isDrawerOpen) closeDrawer();
+    });
+
+    mobileMedia.addEventListener("change", syncDrawerAccessibility);
+
+    if (searchInput instanceof HTMLInputElement) {
+      searchInput.addEventListener("input", () => {
+        applyState({ ...state, search: searchInput.value });
+      });
+    }
+
+    if (sortSelect instanceof HTMLSelectElement) {
+      sortSelect.addEventListener("change", () => {
+        applyState({ ...state, sort: sortSelect.value });
+      });
+    }
+
+    filterInputs.forEach((input) => {
+      if (!(input instanceof HTMLInputElement)) return;
+      input.addEventListener("change", () => {
+        const group = input.name;
+        const selected = filterInputs
+          .filter((item) => item instanceof HTMLInputElement && item.name === group && item.checked)
+          .map((item) => item.value);
+        applyState({ ...state, [group]: selected });
+      });
+    });
+
+    resetButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        applyState(createEmptyState());
+      });
+    });
+
+    if (chipListNode instanceof HTMLElement) {
+      chipListNode.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const chip = target.closest("[data-group][data-value]");
+        if (!(chip instanceof HTMLButtonElement)) return;
+
+        const { group, value } = chip.dataset;
+        applyState({
+          ...state,
+          [group]: state[group].filter((item) => item !== value)
+        });
+      });
+    }
+
+    root.querySelectorAll("[data-catalog-quick-pick]").forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.addEventListener("click", () => {
+        const pick = quickPicks.find((item) => item.id === button.dataset.quickPickId);
+        if (!pick) return;
+
+        const nextState = { ...state };
+        if (isQuickPickActive(state, pick)) {
+          Object.entries(pick.filters).forEach(([group, values]) => {
+            nextState[group] = nextState[group].filter((value) => !values.includes(value));
+          });
+        } else {
+          Object.entries(pick.filters).forEach(([group, values]) => {
+            nextState[group] = Array.from(new Set([...nextState[group], ...values]));
+          });
+        }
+
+        applyState(nextState);
+      });
+    });
+
+    window.addEventListener("popstate", () => {
+      applyState(parseStateFromUrl(new URLSearchParams(window.location.search), sections), { skipUrl: true });
+    });
+  });
+</script>

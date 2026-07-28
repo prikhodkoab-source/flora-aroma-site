@@ -13,6 +13,7 @@
     "build": "node scripts/build-site-order-catalog.mjs && astro build",
     "preview": "astro preview",
     "verify": "node scripts/verify-site.mjs",
+    "test:catalog-filters": "node scripts/test-catalog-filters.mjs",
     "test:publications": "node scripts/test-publications.mjs",
     "test:site-order": "node scripts/test-site-order-function.mjs",
     "test:analytics": "node scripts/test-analytics-function.mjs",

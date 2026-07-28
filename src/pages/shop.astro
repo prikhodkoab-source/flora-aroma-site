@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import TildaCloneFooter from "../components/TildaCloneFooter.astro";
-import TildaCloneProductCard from "../components/TildaCloneProductCard.astro";
+import TildaCatalogExplorer from "../components/TildaCatalogExplorer.astro";
 import { getProducts } from "../lib/products";
 
 const products = getProducts();
@@ -20,9 +20,7 @@ const products = getProducts();
   </section>
 
   <section class="tilda-catalog-section">
-    <div class="tilda-products-grid">
-      {products.map((product) => <TildaCloneProductCard product={product} />)}
-    </div>
+    <TildaCatalogExplorer products={products} />
   </section>
 
   <section class="tilda-info-block">
