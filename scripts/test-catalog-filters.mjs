@@ -44,6 +44,7 @@ const config = JSON.parse(configMatch[1]);
 const sections = config.sections ?? [];
 const quickPicks = config.quickPicks ?? [];
 const products = config.products ?? [];
+const sortOptions = config.sortOptions ?? [];
 
 const sectionById = new Map(sections.map((section) => [section.id, section]));
 const quickPickById = new Map(quickPicks.map((pick) => [pick.id, pick]));
@@ -172,5 +173,16 @@ assert.ok(
 );
 
 assert.equal(quickPickById.get("pollinators")?.label, "Для запилювачів", "Pollinator quick pick label must match the filter label.");
+
+assert.deepEqual(
+  sortOptions.map((option) => option.value),
+  ["popular", "name", "price-asc", "price-desc"],
+  "Catalog sort options must expose popularity, name, and price sorts only."
+);
+assert.ok(
+  !sortOptions.some((option) => option.value === "default" || option.label === "За замовчуванням"),
+  "Catalog sort options must not expose the legacy default sort label."
+);
+assert.match(shopHtml, /catalog-sort__mobile-label/, "Catalog mobile sort label marker is missing.");
 
 console.log("Catalog filter integration checks passed.");

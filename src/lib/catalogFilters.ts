@@ -1,6 +1,6 @@
 import { getOptionDisplayName, slugify, type Product } from "./products";
 
-export type CatalogSortValue = "default" | "name" | "price-asc" | "price-desc";
+export type CatalogSortValue = "popular" | "name" | "price-asc" | "price-desc";
 
 export type CatalogFilterGroupId =
   | "sun"
@@ -123,7 +123,7 @@ const priceDefinitions = [
 ] as const;
 
 const sortOptions = [
-  { value: "default", label: "За замовчуванням" },
+  { value: "popular", label: "За популярністю" },
   { value: "name", label: "За назвою" },
   { value: "price-asc", label: "Спочатку дешевші" },
   { value: "price-desc", label: "Спочатку дорожчі" }
@@ -318,7 +318,7 @@ function buildOptionCounts<T extends readonly { value: string; label: string }[]
 export function createEmptyCatalogState(): CatalogFilterState {
   return {
     search: "",
-    sort: "default",
+    sort: "popular",
     sun: [],
     moisture: [],
     purpose: [],
@@ -509,8 +509,9 @@ export function parseCatalogStateFromSearch(
   const nextState = createEmptyCatalogState();
 
   nextState.search = searchParams.get("q")?.trim() ?? "";
-  const sort = searchParams.get("sort") as CatalogSortValue | null;
-  nextState.sort = sortOptions.some((option) => option.value === sort) ? (sort as CatalogSortValue) : "default";
+  const rawSort = searchParams.get("sort");
+  const sort = rawSort === "default" ? "popular" : rawSort;
+  nextState.sort = sortOptions.some((option) => option.value === sort) ? (sort as CatalogSortValue) : "popular";
 
   for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"] as const) {
     const raw = searchParams.getAll(key).flatMap((value) => value.split(","));
@@ -530,7 +531,7 @@ export function serializeCatalogStateToSearch(state: CatalogFilterState): URLSea
     params.set("q", state.search.trim());
   }
 
-  if (state.sort !== "default") {
+  if (state.sort !== "popular") {
     params.set("sort", state.sort);
   }
 

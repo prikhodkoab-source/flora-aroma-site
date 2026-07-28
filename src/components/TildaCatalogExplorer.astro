@@ -64,8 +64,9 @@ const configJson = JSON.stringify(
         </button>
 
         <label class="catalog-sort">
-          <span>Сортування</span>
-          <select data-catalog-sort>
+          <span class="catalog-sort__title">Сортування</span>
+          <span class="catalog-sort__mobile-label" aria-hidden="true">Сортування</span>
+          <select data-catalog-sort aria-label="Сортування">
             {sortOptions.map((option) => (
               <option value={option.value}>{option.label}</option>
             ))}
@@ -157,7 +158,7 @@ const configJson = JSON.stringify(
 
   const createEmptyState = () => ({
     search: "",
-    sort: "default",
+    sort: "popular",
     sun: [],
     moisture: [],
     purpose: [],
@@ -181,8 +182,9 @@ const configJson = JSON.stringify(
     const state = createEmptyState();
     const sectionMap = new Map(sections.map((section) => [section.queryKey, new Set(section.options.map((option) => option.value))]));
     state.search = searchParams.get("q")?.trim() ?? "";
-    const sort = searchParams.get("sort");
-    state.sort = ["default", "name", "price-asc", "price-desc"].includes(sort) ? sort : "default";
+    const rawSort = searchParams.get("sort");
+    const sort = rawSort === "default" ? "popular" : rawSort;
+    state.sort = ["popular", "name", "price-asc", "price-desc"].includes(sort) ? sort : "popular";
 
     for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
       const allowed = sectionMap.get(key);
@@ -199,7 +201,7 @@ const configJson = JSON.stringify(
   const serializeStateToUrl = (state) => {
     const params = new URLSearchParams();
     if (state.search.trim()) params.set("q", state.search.trim());
-    if (state.sort !== "default") params.set("sort", state.sort);
+    if (state.sort !== "popular") params.set("sort", state.sort);
 
     for (const key of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
       if (state[key].length > 0) {
@@ -454,12 +456,12 @@ const configJson = JSON.stringify(
     };
 
     const applyState = (nextState, options = {}) => {
-      state = {
-        ...createEmptyState(),
-        ...nextState,
-        search: nextState.search ?? "",
-        sort: nextState.sort ?? "default"
-      };
+        state = {
+          ...createEmptyState(),
+          ...nextState,
+          search: nextState.search ?? "",
+          sort: nextState.sort ?? "popular"
+        };
       syncInputsFromState();
       render();
       if (!options.skipUrl) updateUrl();
