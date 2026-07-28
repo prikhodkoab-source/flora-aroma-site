@@ -1,4 +1,4 @@
-import { slugify, type Product } from "./products";
+import { getOptionDisplayName, slugify, type Product } from "./products";
 
 export type CatalogSortValue = "default" | "name" | "price-asc" | "price-desc";
 
@@ -223,9 +223,7 @@ function formatCodeFromContainer(container: string): string {
 }
 
 function getFormatLabel(formatCode: string): string {
-  if (formatCode === "V-120") return "V-120 / 0,12 л";
-  if (formatCode === "V-265") return "V-265 / 0,265 л";
-  return formatCode;
+  return getOptionDisplayName({ container_type_id: "", format_code: formatCode, container: formatCode });
 }
 
 function getFormatCodes(product: Product): string[] {
@@ -487,7 +485,7 @@ export function buildCatalogQuickPicks(products: Product[]): CatalogQuickPick[] 
     { id: "sunny", label: "Для сонця", filters: { sun: ["full-sun"] } },
     { id: "part-shade", label: "Для півтіні", filters: { sun: ["part-sun"] } },
     { id: "dry-sites", label: "Для сухих місць", filters: { moisture: ["dry"] } },
-    { id: "pollinators", label: "Для бджіл і метеликів", filters: { purpose: ["pollinator"] } },
+    { id: "pollinators", label: "Для запилювачів", filters: { purpose: ["pollinator"] } },
     { id: "aromatic-garden", label: "Ароматичний сад", filters: { purpose: ["aromatic"] } },
     ...(grassCategory ? [{ id: "ornamental-grasses", label: "Декоративні злаки", filters: { category: [grassCategory] } }] : []),
     { id: "long-blooming", label: "Довгоквітучі", filters: { purpose: ["long-blooming"] } },

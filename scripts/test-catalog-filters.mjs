@@ -102,8 +102,8 @@ assert.ok(hasOption("height", "30-60"), "Height filter is missing 30-60.");
 assert.ok(hasOption("price", "0-50"), "Price filter is missing 0-50.");
 assert.ok(hasOption("price", "50-100"), "Price filter is missing 50-100.");
 
-assert.ok(hasLabel("format", "V-120 / 0,12 л"), "Format filter is missing V-120 / 0,12 л.");
-assert.ok(hasLabel("format", "P9"), "Format filter is missing P9.");
+assert.ok(hasLabel("format", "0,12 л"), "Format filter is missing 0,12 л.");
+assert.ok(hasLabel("format", "0,4 л"), "Format filter is missing 0,4 л.");
 
 assert.ok(
   !hasLabel("category", "Злаки") && !hasLabel("category", "Кущі"),
@@ -140,6 +140,14 @@ assert.ok(
   "Pollinator filters should match products that expose the pollinator purpose."
 );
 
+const festuca = products.find((product) => product.plantId === "PLANT-0048");
+assert.ok(festuca, "Expected PLANT-0048 in the public catalog config.");
+assert.ok(!festuca.purpose.includes("pollinator"), "PLANT-0048 must not be marked as pollinator-friendly.");
+assert.ok(
+  !productMatchesFilters(festuca, { purpose: ["pollinator"] }),
+  "PLANT-0048 must not match the pollinator quick filter."
+);
+
 const firstPartShadeProduct = products.find((product) => product.sun.includes("part-sun"));
 assert.ok(firstPartShadeProduct, "Expected at least one part-shade product in the public catalog.");
 assert.ok(
@@ -158,6 +166,11 @@ assert.match(builtJs, /new URLSearchParams\(window\.location\.search\)/, "Catalo
 assert.match(shopHtml, /data-catalog-search/, "Catalog search input marker is missing from built HTML.");
 assert.match(shopHtml, /data-catalog-open-filters/, "Catalog mobile filter toggle marker is missing from built HTML.");
 assert.match(shopHtml, /data-catalog-active-chip-list/, "Active filter chip marker is missing from built HTML.");
-assert.match(shopHtml, /Наявність підтверджуємо перед замовленням/, "Public availability notice is missing.");
+assert.ok(
+  !shopHtml.includes("Наявність підтверджуємо перед замовленням"),
+  "Catalog page must not repeat the operator-confirmed availability notice in the heading or product cards."
+);
+
+assert.equal(quickPickById.get("pollinators")?.label, "Для запилювачів", "Pollinator quick pick label must match the filter label.");
 
 console.log("Catalog filter integration checks passed.");

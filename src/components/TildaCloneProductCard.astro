@@ -1,15 +1,16 @@
 ---
 import { buildProductFilterIndex } from "../lib/catalogFilters";
-import { formatProductStartingPrice, getOptionDisplayName } from "../lib/products";
+import { formatProductStartingPrice, getOptionDisplayName, getProductFormatDisplayNames } from "../lib/products";
 
 const { product } = Astro.props;
 const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
 const hoverImage = product.image_paths?.[1] || image;
 const filterIndex = buildProductFilterIndex(product);
 const visiblePurposes = filterIndex.purposeLabels;
-const formatSummary = filterIndex.formatLabels.join(" / ");
+const formatSummary = getProductFormatDisplayNames(product).join(" / ");
 const option = product.options?.[0] || {
   variant_id: "default",
+  container_type_id: "",
   format_code: "",
   container: product.container,
   price_uah: product.price_uah,
@@ -62,7 +63,6 @@ const option = product.options?.[0] || {
       <span class="tilda-product-card__descr">{product.summary}</span>
       {formatSummary && <span class="tilda-product-card__formats">Формати: {formatSummary}</span>}
       <span class="tilda-product-card__price">{formatProductStartingPrice(product)}</span>
-      <span class="tilda-product-card__availability">Наявність підтверджуємо перед замовленням</span>
     </span>
   </a>
   <div class="tilda-product-card__actions">

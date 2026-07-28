@@ -460,7 +460,7 @@ function optionDisplayNameValue(formatCode: string, container: string): string {
 
 function formatLitersLabel(volumeLiters: number): string {
   const normalized = volumeLiters.toFixed(3).replace(/\.?0+$/, "");
-  return `${normalized} л`;
+  return `${normalized.replace(".", ",")} л`;
 }
 
 function optionVolumeLitersValue(option: Pick<ProductOption, "container_type_id" | "format_code" | "container">): number | null {
@@ -555,6 +555,15 @@ export function getOptionDisplayName(option: Pick<ProductOption, "container_type
   }
 
   return optionDisplayNameValue(option.format_code, option.container);
+}
+
+export function getProductFormatDisplayNames(product: Pick<Product, "options" | "container">): string[] {
+  const sourceOptions =
+    product.options.length > 0
+      ? product.options
+      : [{ container_type_id: "", format_code: "", container: product.container }];
+
+  return [...new Set(sourceOptions.map((option) => getOptionDisplayName(option)).filter(Boolean))];
 }
 
 export function formatOptionPrice(option: Pick<ProductOption, "price_uah" | "unit">): string {

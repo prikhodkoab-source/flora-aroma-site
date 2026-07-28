@@ -952,15 +952,12 @@ body.site-menu-open {
 }
 
 .tilda-product-card__descr {
-  display: -webkit-box;
-  min-height: 72px;
+  display: block;
+  min-height: 0;
   margin-top: 0;
-  overflow: hidden;
   color: var(--muted-text-color);
   font-size: 14px;
   line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
 }
 
 .tilda-product-card__formats {
@@ -3118,7 +3115,7 @@ body.site-menu-open {
   }
 
   .tilda-product-card__descr {
-    min-height: 86px;
+    min-height: 0;
     font-size: 12px;
   }
 
