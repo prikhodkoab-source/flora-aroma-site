@@ -257,7 +257,8 @@ assert.match(contactsSource, /navKey="contacts"/);
 assert.match(contactsSource, /siteContacts\.consultationTelegramUrl/);
 assert.match(contactsSource, /siteContacts\.phoneHref/);
 assert.match(contactsSource, /flora-aroma\.com\.ua/);
-assert.match(contactsSource, /nursery-irrigation\.jpg/);
+assert.doesNotMatch(contactsSource, /Що написати/);
+assert.doesNotMatch(contactsSource, /nursery-irrigation\.jpg/);
 
 const footerSource = read("src/components/TildaCloneFooter.astro");
 assert.match(footerSource, /siteNavigationItems/);

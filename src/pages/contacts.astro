@@ -7,12 +7,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <BaseLayout
   title="Контакти | Flora & Aroma"
   description="Контакти Flora & Aroma для уточнення наявності рослин, формату контейнера та умов отримання."
-  image="/images/site/nursery-irrigation.jpg"
+  image={null}
   navKey="contacts"
 >
   <section class="site-page">
-    <div class="site-page__intro site-page__intro--contact">
-      <p class="site-page__eyebrow">Flora & Aroma</p>
+    <div class="site-page__intro site-page__intro--centered">
       <h1>Контакти</h1>
       <p>Напишіть нам, щоб уточнити наявність рослин, формат контейнера та умови отримання.</p>
       <div class="site-page__actions">
@@ -32,23 +31,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <h2>Сайт</h2>
         <p><a href="https://flora-aroma.com.ua" target="_blank" rel="noopener noreferrer">flora-aroma.com.ua</a></p>
       </article>
-
-      <article class="site-contact-card site-contact-card--wide">
-        <h2>Що написати</h2>
-        <p>Назви рослин, кількість, місто, бажаний спосіб отримання та короткий коментар до замовлення.</p>
-      </article>
     </div>
-
-    <figure class="site-page__media">
-      <img
-        src="/images/site/nursery-irrigation.jpg"
-        alt="Питомник Flora & Aroma з дорощуванням рослин і поливом"
-        loading="lazy"
-      />
-      <figcaption>
-        Реальна фотографія дорощування рослин у Flora & Aroma. Точну наявність і формат контейнера підтверджує оператор.
-      </figcaption>
-    </figure>
   </section>
 
   <TildaCloneFooter showContacts={true} />

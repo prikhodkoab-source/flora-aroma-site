@@ -63,20 +63,23 @@ const configJson = JSON.stringify(
           <span data-catalog-filter-toggle-label>Фільтри</span>
         </button>
 
-        <label class="catalog-sort">
+        <div class="catalog-sort">
           <span class="catalog-sort__title">Сортування</span>
-          <span class="catalog-sort__mobile-label" aria-hidden="true">Сортування</span>
-          <select data-catalog-sort aria-label="Сортування">
+          <select class="catalog-sort__select" data-catalog-sort aria-label="Сортування">
             {sortOptions.map((option) => (
               <option value={option.value}>{option.label}</option>
             ))}
           </select>
-        </label>
+          <button type="button" class="catalog-sort__trigger" data-catalog-open-sort aria-expanded="false">
+            <span class="catalog-sort__mobile-label" aria-hidden="true">Сортування</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="catalog-layout">
       <div class="catalog-layout__backdrop" data-catalog-backdrop hidden></div>
+      <div class="catalog-sort-backdrop" data-catalog-sort-backdrop hidden></div>
 
       <aside class="catalog-sidebar" data-catalog-sidebar aria-labelledby="catalog-filters-title">
         <div class="catalog-sidebar__header">
@@ -118,6 +121,29 @@ const configJson = JSON.stringify(
           </button>
         </div>
       </aside>
+
+      <div class="catalog-sort-sheet" data-catalog-sort-sheet hidden aria-hidden="true" aria-labelledby="catalog-sort-title">
+        <div class="catalog-sort-sheet__header">
+          <h3 id="catalog-sort-title">Сортування</h3>
+          <button type="button" class="catalog-sort-sheet__close" data-catalog-close-sort aria-label="Закрити сортування">
+            ×
+          </button>
+        </div>
+
+        <div class="catalog-sort-sheet__options">
+          {sortOptions.map((option) => (
+            <button
+              type="button"
+              class="catalog-sort-sheet__option"
+              data-catalog-sort-option
+              data-sort-value={option.value}
+              aria-pressed={option.value === "popular" ? "true" : "false"}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div class="catalog-results">
         <div class="catalog-results__summary">
@@ -312,12 +338,22 @@ const configJson = JSON.stringify(
     const sidebar = root.querySelector("[data-catalog-sidebar]");
     const closeButton = root.querySelector("[data-catalog-close-filters]");
     const backdrop = root.querySelector("[data-catalog-backdrop]");
+    const sortTrigger = root.querySelector("[data-catalog-open-sort]");
+    const sortBackdrop = root.querySelector("[data-catalog-sort-backdrop]");
+    const sortSheet = root.querySelector("[data-catalog-sort-sheet]");
+    const sortCloseButton = root.querySelector("[data-catalog-close-sort]");
+    const sortOptionButtons = Array.from(root.querySelectorAll("[data-catalog-sort-option]"));
     const applyButton = root.querySelector("[data-catalog-apply]");
     const applyLabel = root.querySelector("[data-catalog-apply-label]");
     const filterInputs = Array.from(root.querySelectorAll("[data-catalog-filter]"));
     const mobileMedia = window.matchMedia("(max-width: 767px)");
     let state = parseStateFromUrl(new URLSearchParams(window.location.search), sections);
     let isDrawerOpen = false;
+    let isSortOpen = false;
+
+    const syncOverlayLock = () => {
+      document.body.classList.toggle("catalog-filters-open", isDrawerOpen || isSortOpen);
+    };
 
     const syncDrawerAccessibility = () => {
       if (!(sidebar instanceof HTMLElement) || !(backdrop instanceof HTMLElement)) return;
@@ -327,8 +363,8 @@ const configJson = JSON.stringify(
         sidebar.classList.remove("is-open");
         sidebar.removeAttribute("inert");
         backdrop.hidden = true;
-        document.body.classList.remove("catalog-filters-open");
         if (filterButton instanceof HTMLButtonElement) filterButton.setAttribute("aria-expanded", "false");
+        syncOverlayLock();
         return;
       }
 
@@ -336,21 +372,46 @@ const configJson = JSON.stringify(
         sidebar.classList.add("is-open");
         sidebar.removeAttribute("inert");
         backdrop.hidden = false;
-        document.body.classList.add("catalog-filters-open");
       } else {
         sidebar.classList.remove("is-open");
         sidebar.setAttribute("inert", "");
         backdrop.hidden = true;
-        document.body.classList.remove("catalog-filters-open");
       }
 
       if (filterButton instanceof HTMLButtonElement) {
         filterButton.setAttribute("aria-expanded", isDrawerOpen ? "true" : "false");
       }
+
+      syncOverlayLock();
+    };
+
+    const syncSortAccessibility = () => {
+      if (!(sortSheet instanceof HTMLElement) || !(sortBackdrop instanceof HTMLElement)) return;
+
+      if (!mobileMedia.matches) {
+        isSortOpen = false;
+        sortSheet.hidden = true;
+        sortSheet.setAttribute("aria-hidden", "true");
+        sortBackdrop.hidden = true;
+        if (sortTrigger instanceof HTMLButtonElement) sortTrigger.setAttribute("aria-expanded", "false");
+        syncOverlayLock();
+        return;
+      }
+
+      sortSheet.hidden = !isSortOpen;
+      sortSheet.setAttribute("aria-hidden", isSortOpen ? "false" : "true");
+      sortBackdrop.hidden = !isSortOpen;
+
+      if (sortTrigger instanceof HTMLButtonElement) {
+        sortTrigger.setAttribute("aria-expanded", isSortOpen ? "true" : "false");
+      }
+
+      syncOverlayLock();
     };
 
     const openDrawer = () => {
       if (!mobileMedia.matches) return;
+      closeSort();
       isDrawerOpen = true;
       syncDrawerAccessibility();
     };
@@ -358,6 +419,18 @@ const configJson = JSON.stringify(
     const closeDrawer = () => {
       isDrawerOpen = false;
       syncDrawerAccessibility();
+    };
+
+    const openSort = () => {
+      if (!mobileMedia.matches) return;
+      closeDrawer();
+      isSortOpen = true;
+      syncSortAccessibility();
+    };
+
+    const closeSort = () => {
+      isSortOpen = false;
+      syncSortAccessibility();
     };
 
     const syncInputsFromState = () => {
@@ -368,6 +441,11 @@ const configJson = JSON.stringify(
       if (sortSelect instanceof HTMLSelectElement) {
         sortSelect.value = state.sort;
       }
+
+      sortOptionButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.setAttribute("aria-pressed", button.dataset.sortValue === state.sort ? "true" : "false");
+      });
 
       filterInputs.forEach((input) => {
         if (!(input instanceof HTMLInputElement)) return;
@@ -470,6 +548,7 @@ const configJson = JSON.stringify(
     syncInputsFromState();
     render();
     syncDrawerAccessibility();
+    syncSortAccessibility();
 
     if (filterButton instanceof HTMLButtonElement) {
       filterButton.addEventListener("click", () => {
@@ -478,12 +557,27 @@ const configJson = JSON.stringify(
       });
     }
 
+    if (sortTrigger instanceof HTMLButtonElement) {
+      sortTrigger.addEventListener("click", () => {
+        if (isSortOpen) closeSort();
+        else openSort();
+      });
+    }
+
     if (closeButton instanceof HTMLButtonElement) {
       closeButton.addEventListener("click", closeDrawer);
     }
 
+    if (sortCloseButton instanceof HTMLButtonElement) {
+      sortCloseButton.addEventListener("click", closeSort);
+    }
+
     if (backdrop instanceof HTMLElement) {
       backdrop.addEventListener("click", closeDrawer);
+    }
+
+    if (sortBackdrop instanceof HTMLElement) {
+      sortBackdrop.addEventListener("click", closeSort);
     }
 
     if (applyButton instanceof HTMLButtonElement) {
@@ -491,10 +585,15 @@ const configJson = JSON.stringify(
     }
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && isDrawerOpen) closeDrawer();
+      if (event.key !== "Escape") return;
+      if (isDrawerOpen) closeDrawer();
+      if (isSortOpen) closeSort();
     });
 
-    mobileMedia.addEventListener("change", syncDrawerAccessibility);
+    mobileMedia.addEventListener("change", () => {
+      syncDrawerAccessibility();
+      syncSortAccessibility();
+    });
 
     if (searchInput instanceof HTMLInputElement) {
       searchInput.addEventListener("input", () => {
@@ -507,6 +606,16 @@ const configJson = JSON.stringify(
         applyState({ ...state, sort: sortSelect.value });
       });
     }
+
+    sortOptionButtons.forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.addEventListener("click", () => {
+        const sortValue = button.dataset.sortValue;
+        if (!sortValue) return;
+        applyState({ ...state, sort: sortValue });
+        closeSort();
+      });
+    });
 
     filterInputs.forEach((input) => {
       if (!(input instanceof HTMLInputElement)) return;

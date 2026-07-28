@@ -197,7 +197,6 @@ for (const requiredPhrase of [
   "Контакти",
   "Матеріали готуються",
   "Написати в Telegram",
-  "Що написати",
   "Ваше замовлення",
   "Оформити замовлення",
   "Статистика сайту",
@@ -265,9 +264,14 @@ if (publicationsPage.includes(pendingArticleSlug)) {
 }
 
 const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");
-for (const requiredContactMarker of ["tel:+380500272882", "https://flora-aroma.com.ua", "nursery-irrigation.jpg"]) {
+for (const requiredContactMarker of ["tel:+380500272882", "https://flora-aroma.com.ua"]) {
   if (!contactsPage.includes(requiredContactMarker)) {
     fail(`Contacts page is missing: ${requiredContactMarker}`);
+  }
+}
+for (const removedContactMarker of ["Що написати", "nursery-irrigation.jpg"]) {
+  if (contactsPage.includes(removedContactMarker)) {
+    fail(`Contacts page should not include removed content: ${removedContactMarker}`);
   }
 }
 
