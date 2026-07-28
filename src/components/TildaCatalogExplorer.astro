@@ -313,7 +313,7 @@ const configJson = JSON.stringify(
     const applyButton = root.querySelector("[data-catalog-apply]");
     const applyLabel = root.querySelector("[data-catalog-apply-label]");
     const filterInputs = Array.from(root.querySelectorAll("[data-catalog-filter]"));
-    const mobileMedia = window.matchMedia("(max-width: 960px)");
+    const mobileMedia = window.matchMedia("(max-width: 767px)");
     let state = parseStateFromUrl(new URLSearchParams(window.location.search), sections);
     let isDrawerOpen = false;
 
