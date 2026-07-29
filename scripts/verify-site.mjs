@@ -108,8 +108,8 @@ const rows = parseCsvRows(productsCsv.trim());
 const headers = rows[0].map((header) => header.replace(/^\uFEFF/, ""));
 const productRows = rows.slice(1);
 
-if (productRows.length !== 44) {
-  fail(`Expected 44 product rows, found ${productRows.length}.`);
+if (productRows.length !== 49) {
+  fail(`Expected 49 product rows, found ${productRows.length}.`);
 }
 
 for (const requiredColumn of [
@@ -337,6 +337,6 @@ for (const forbiddenPublicSecret of ["CF_ANALYTICS_API_TOKEN", "replace_with_acc
 
 if (!failed) {
   console.log(
-    "Site verification passed: unified header is present, contacts page is rebuilt, publications stay fail-closed without placeholder covers, 44 products remain intact, and public cart/analytics markers are still wired."
+    `Site verification passed: unified header is present, contacts page is rebuilt, publications stay fail-closed without placeholder covers, ${productRows.length} products remain intact, and public cart/analytics markers are still wired.`
   );
 }

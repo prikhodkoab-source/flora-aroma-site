@@ -890,5 +890,39 @@ export const productCatalog = {
         "unit": "шт."
       }
     ]
+  },
+  "PLANT-0073": {
+    "name": "Лаванда вузьколиста 'Hidcote'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0073-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0087": {
+    "name": "Чебрець повзучий",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0087-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
+        "unit": "шт."
+      },
+      {
+        "variant_id": "VAR-PLANT-0087-P9",
+        "container_type_id": "POT-P9",
+        "format_code": "P9",
+        "container": "Горщик P9",
+        "price": 55,
+        "unit": "шт."
+      }
+    ]
   }
 };
