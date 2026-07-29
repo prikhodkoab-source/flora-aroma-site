@@ -33,6 +33,14 @@ export const productCatalog = {
     "name": "Аквілегія низька 'Columbine Dwarf Mixed'",
     "variants": [
       {
+        "variant_id": "VAR-PLANT-0058-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
+        "unit": "шт."
+      },
+      {
         "variant_id": "VAR-PLANT-0058-P9",
         "container_type_id": "POT-P9",
         "format_code": "P9",
@@ -107,6 +115,14 @@ export const productCatalog = {
         "container": "CASSETTE-HIKO-V120SS",
         "price": 40,
         "unit": "шт."
+      },
+      {
+        "variant_id": "VAR-PLANT-0002-P9",
+        "container_type_id": "POT-P9",
+        "format_code": "P9",
+        "container": "Горщик P9",
+        "price": 55,
+        "unit": "шт."
       }
     ]
   },
@@ -135,19 +151,6 @@ export const productCatalog = {
         "format_code": "P15",
         "container": "Горщик P15",
         "price": 95,
-        "unit": "шт."
-      }
-    ]
-  },
-  "PLANT-0064": {
-    "name": "Волошка синя 'Низька махрова суміш'",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0064-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
         "unit": "шт."
       }
     ]
@@ -220,19 +223,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0086": {
-    "name": "Звіробій звичайний",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0086-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0051": {
     "name": "Каламінта котовникова",
     "variants": [
@@ -287,6 +277,14 @@ export const productCatalog = {
     "name": "Котівник котячий",
     "variants": [
       {
+        "variant_id": "VAR-PLANT-0014-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 35,
+        "unit": "шт."
+      },
+      {
         "variant_id": "VAR-PLANT-0014-P11",
         "container_type_id": "POT-P11",
         "format_code": "P11",
@@ -325,19 +323,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0027": {
-    "name": "Левиний зів",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0027-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0035": {
     "name": "Левізія 'Elise Mix'",
     "variants": [
@@ -347,19 +332,6 @@ export const productCatalog = {
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
         "price": 45,
-        "unit": "шт."
-      }
-    ]
-  },
-  "PLANT-0011": {
-    "name": "Люпин багатолистий",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0011-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
         "unit": "шт."
       }
     ]
@@ -469,19 +441,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0012": {
-    "name": "Нігелла дамаська 'Персидська троянда'",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0012-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0077": {
     "name": "Орегано звичайне",
     "variants": [
@@ -537,27 +496,6 @@ export const productCatalog = {
       },
       {
         "variant_id": "VAR-PLANT-0024-P11",
-        "container_type_id": "POT-P11",
-        "format_code": "P11",
-        "container": "Горщик P11",
-        "price": 65,
-        "unit": "шт."
-      }
-    ]
-  },
-  "PLANT-0079": {
-    "name": "Пижмо щиткове",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0079-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
-        "unit": "шт."
-      },
-      {
-        "variant_id": "VAR-PLANT-0079-P11",
         "container_type_id": "POT-P11",
         "format_code": "P11",
         "container": "Горщик P11",
@@ -658,6 +596,14 @@ export const productCatalog = {
   "PLANT-0032": {
     "name": "Сосна звичайна",
     "variants": [
+      {
+        "variant_id": "VAR-PLANT-0032-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 25,
+        "unit": "шт."
+      },
       {
         "variant_id": "VAR-PLANT-0032-P11",
         "container_type_id": "POT-P11",
@@ -921,6 +867,19 @@ export const productCatalog = {
         "format_code": "P9",
         "container": "Горщик P9",
         "price": 55,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0028": {
+    "name": "Сосна кримська",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0028-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
         "unit": "шт."
       }
     ]

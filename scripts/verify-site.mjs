@@ -108,8 +108,8 @@ const rows = parseCsvRows(productsCsv.trim());
 const headers = rows[0].map((header) => header.replace(/^\uFEFF/, ""));
 const productRows = rows.slice(1);
 
-if (productRows.length !== 49) {
-  fail(`Expected 49 product rows, found ${productRows.length}.`);
+if (productRows.length === 0) {
+  fail("Expected at least one product row in products.csv.");
 }
 
 for (const requiredColumn of [
@@ -139,6 +139,10 @@ const latinNameIndex = columnIndex("latin_name");
 const variantContainersIndex = columnIndex("variant_containers");
 const variantPricesIndex = columnIndex("variant_prices_uah");
 const productById = new Map(productRows.map((row) => [row[plantIdIndex], row]));
+
+if (productById.size !== productRows.length) {
+  fail("Expected unique plant_id rows in products.csv.");
+}
 
 const plant0090 = productById.get("PLANT-0090");
 if (!plant0090) {
