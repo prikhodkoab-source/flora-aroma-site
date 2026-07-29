@@ -851,5 +851,44 @@ export const productCatalog = {
         "unit": "шт."
       }
     ]
+  },
+  "PLANT-0085": {
+    "name": "Костриця Готьє",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0085-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 49,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0069": {
+    "name": "Едельвейс альпійський",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0069-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0010": {
+    "name": "Ковила тонка",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0010-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 30,
+        "unit": "шт."
+      }
+    ]
   }
 };
