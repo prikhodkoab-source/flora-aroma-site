@@ -331,7 +331,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 45,
+        "price": 40,
         "unit": "шт."
       }
     ]
@@ -526,6 +526,14 @@ export const productCatalog = {
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
         "price": 30,
+        "unit": "шт."
+      },
+      {
+        "variant_id": "VAR-PLANT-0039-P9",
+        "container_type_id": "POT-P9",
+        "format_code": "P9",
+        "container": "Горщик P9",
+        "price": 55,
         "unit": "шт."
       }
     ]
@@ -780,7 +788,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 40,
+        "price": 35,
         "unit": "шт."
       }
     ]
@@ -806,7 +814,15 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 49,
+        "price": 30,
+        "unit": "шт."
+      },
+      {
+        "variant_id": "VAR-PLANT-0085-P11",
+        "container_type_id": "POT-P11",
+        "format_code": "P11",
+        "container": "Горщик P11",
+        "price": 65,
         "unit": "шт."
       }
     ]
