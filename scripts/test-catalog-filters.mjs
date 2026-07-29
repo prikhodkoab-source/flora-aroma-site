@@ -82,7 +82,14 @@ function productMatchesFilters(product, filters) {
   if (filters.purpose?.length && !filters.purpose.some((value) => product.purpose.includes(value))) return false;
   if (filters.height?.length && !filters.height.some((value) => matchesHeightBand(product, value))) return false;
   if (filters.flowering?.length && !filters.flowering.some((value) => product.flowering.includes(value))) return false;
-  if (filters.category?.length && !filters.category.includes(product.categoryValue)) return false;
+  if (
+    filters.category?.length &&
+    !filters.category.some((value) =>
+      value === "ornamental-grass-category" ? Boolean(product.isOrnamentalGrass) : value === product.categoryValue
+    )
+  ) {
+    return false;
+  }
   if (filters.format?.length && !filters.format.some((value) => product.formats.includes(value))) return false;
   if (filters.price?.length && !filters.price.some((value) => matchesPriceBand(product, value))) return false;
   return true;
@@ -106,10 +113,8 @@ assert.ok(hasOption("price", "50-100"), "Price filter is missing 50-100.");
 assert.ok(hasLabel("format", "0,12 л"), "Format filter is missing 0,12 л.");
 assert.ok(hasLabel("format", "0,4 л"), "Format filter is missing 0,4 л.");
 
-assert.ok(
-  !hasLabel("category", "Злаки") && !hasLabel("category", "Кущі"),
-  "Catalog filters must not invent category labels that are absent in the public export."
-);
+assert.ok(hasLabel("category", "Злаки"), "Category filter is missing Злаки.");
+assert.ok(!hasLabel("category", "Кущі"), "Catalog filters must not invent unsupported category labels.");
 
 for (const expectedQuickPick of [
   "sunny",
@@ -124,10 +129,7 @@ for (const expectedQuickPick of [
   assert.ok(quickPickById.has(expectedQuickPick), `Missing quick pick: ${expectedQuickPick}`);
 }
 
-assert.ok(
-  !quickPickById.has("ornamental-grasses"),
-  "The ornamental grasses quick pick must stay hidden until a matching public category exists."
-);
+assert.ok(quickPickById.has("ornamental-grasses"), "Missing quick pick: ornamental-grasses.");
 
 for (const [id, quickPick] of quickPickById.entries()) {
   const matchedCount = products.filter((product) => productMatchesFilters(product, quickPick.filters ?? {})).length;
@@ -147,6 +149,10 @@ assert.ok(!festuca.purpose.includes("pollinator"), "PLANT-0048 must not be marke
 assert.ok(
   !productMatchesFilters(festuca, { purpose: ["pollinator"] }),
   "PLANT-0048 must not match the pollinator quick filter."
+);
+assert.ok(
+  productMatchesFilters(festuca, { category: ["ornamental-grass-category"] }),
+  "PLANT-0048 must match the Злаки category filter."
 );
 
 const firstPartShadeProduct = products.find((product) => product.sun.includes("part-sun"));

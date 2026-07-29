@@ -58,6 +58,7 @@ export type CatalogProductIndex = {
   latinName: string;
   categoryLabel: string;
   categoryValue: string;
+  isOrnamentalGrass: boolean;
   summary: string;
   searchText: string;
   sun: string[];
@@ -152,6 +153,7 @@ const formatOrder: Record<string, number> = {
 
 const categoryOrder = [
   "Декоративні багаторічники",
+  "Злаки",
   "Ароматичні рослини",
   "Пряні рослини",
   "Лікарські рослини",
@@ -301,6 +303,11 @@ function matchesPriceBand(index: CatalogProductIndex, value: string): boolean {
   return false;
 }
 
+function matchesCategoryValue(index: CatalogProductIndex, value: string): boolean {
+  if (value === "ornamental-grass-category") return index.isOrnamentalGrass;
+  return index.categoryValue === value;
+}
+
 function buildOptionCounts<T extends readonly { value: string; label: string }[]>(
   indexes: CatalogProductIndex[],
   definitions: T,
@@ -338,6 +345,7 @@ export function buildProductFilterIndex(product: Product, sortIndex = 0): Catalo
   const sun = splitList(product.sun_exposure).map(normalizeSunValue);
   const moisture = splitList(product.moisture);
   const purpose = getPurposeValues(product);
+  const useCases = new Set(splitList(product.use_cases));
   const formats = getFormatCodes(product);
   const flowering = getMonthValues(product);
   const categoryValue = slugify(product.category);
@@ -350,6 +358,7 @@ export function buildProductFilterIndex(product: Product, sortIndex = 0): Catalo
     latinName: product.latin_name,
     categoryLabel: product.category,
     categoryValue,
+    isOrnamentalGrass: useCases.has("ornamental_grass"),
     summary: product.summary,
     searchText: normalizeText(
       [
@@ -386,9 +395,17 @@ export function buildCatalogFilterSections(products: Product[]): CatalogFilterSe
 
   const dynamicCategories = Array.from(
     indexes.reduce((map, item) => {
-      const current = map.get(item.categoryValue) ?? { value: item.categoryValue, label: item.categoryLabel, count: 0 };
-      current.count += 1;
-      map.set(item.categoryValue, current);
+      const upsert = (value: string, label: string) => {
+        const current = map.get(value) ?? { value, label, count: 0 };
+        current.count += 1;
+        map.set(value, current);
+      };
+
+      upsert(item.categoryValue, item.categoryLabel);
+      if (item.isOrnamentalGrass) {
+        upsert("ornamental-grass-category", "Злаки");
+      }
+
       return map;
     }, new Map<string, CatalogFilterOption>())
       .values()
@@ -479,7 +496,7 @@ export function buildCatalogQuickPicks(products: Product[]): CatalogQuickPick[] 
 
   const spicyCategory = categories?.get("Пряні рослини");
   const medicinalCategory = categories?.get("Лікарські рослини");
-  const grassCategory = Array.from(categories?.entries() ?? []).find(([label]) => /злак/i.test(label))?.[1];
+  const grassCategory = categories?.get("Злаки");
 
   const definitions: Omit<CatalogQuickPick, "count">[] = [
     { id: "sunny", label: "Для сонця", filters: { sun: ["full-sun"] } },
@@ -556,7 +573,7 @@ export function matchesCatalogFilters(index: CatalogProductIndex, state: Catalog
   if (state.purpose.length > 0 && !state.purpose.some((value) => index.purpose.includes(value))) return false;
   if (state.height.length > 0 && !state.height.some((value) => matchesHeightBand(index, value))) return false;
   if (state.flowering.length > 0 && !state.flowering.some((value) => index.flowering.includes(value))) return false;
-  if (state.category.length > 0 && !state.category.includes(index.categoryValue)) return false;
+  if (state.category.length > 0 && !state.category.some((value) => matchesCategoryValue(index, value))) return false;
   if (state.format.length > 0 && !state.format.some((value) => index.formats.includes(value))) return false;
   if (state.price.length > 0 && !state.price.some((value) => matchesPriceBand(index, value))) return false;
 
