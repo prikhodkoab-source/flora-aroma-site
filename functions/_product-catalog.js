@@ -109,14 +109,6 @@ export const productCatalog = {
     "name": "Безсмертник піщаний",
     "variants": [
       {
-        "variant_id": "VAR-PLANT-0002-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 40,
-        "unit": "шт."
-      },
-      {
         "variant_id": "VAR-PLANT-0002-P9",
         "container_type_id": "POT-P9",
         "format_code": "P9",
