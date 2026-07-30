@@ -254,6 +254,14 @@ const configJson = JSON.stringify(
     return false;
   };
 
+  const matchesCategoryValue = (product, value) => {
+    if (value === "ornamental-grass-category") {
+      return Boolean(product.isOrnamentalGrass);
+    }
+
+    return value === product.categoryValue;
+  };
+
   const productMatchesState = (product, state) => {
     const search = normalizeText(state.search);
     if (search && !product.searchText.includes(search)) return false;
@@ -262,7 +270,7 @@ const configJson = JSON.stringify(
     if (state.purpose.length > 0 && !state.purpose.some((value) => product.purpose.includes(value))) return false;
     if (state.height.length > 0 && !state.height.some((value) => matchesHeightBand(product, value))) return false;
     if (state.flowering.length > 0 && !state.flowering.some((value) => product.flowering.includes(value))) return false;
-    if (state.category.length > 0 && !state.category.includes(product.categoryValue)) return false;
+    if (state.category.length > 0 && !state.category.some((value) => matchesCategoryValue(product, value))) return false;
     if (state.format.length > 0 && !state.format.some((value) => product.formats.includes(value))) return false;
     if (state.price.length > 0 && !state.price.some((value) => matchesPriceBand(product, value))) return false;
     return true;
