@@ -7,8 +7,34 @@ language: uk
 title: "Ароматний бордюр із пряних і запашних рослин"
 excerpt: "Готова ідея ароматного бордюру з поточного асортименту: постійна основа, декоративні акценти, окрема свіжа зона і сезонні пряні доповнення."
 category: "Тематична добірка Flora & Aroma"
-coverImage: "/images/tilda-clone/hero-greenhouse.jpg"
-coverImageAlt: "Рослини Flora & Aroma у теплиці"
+coverImage: "/images/plants/local/plant-0051-format-02.jpg"
+coverImageAlt: "Каламінта котовникова у касеті Flora & Aroma"
+coverMediaAssetId: PHOTO-0334
+articleMedia:
+  - mediaAssetId: PHOTO-0334
+    src: "/images/plants/local/plant-0051-format-02.jpg"
+    alt: "Каламінта котовникова у касеті Flora & Aroma"
+    caption: "Каламінта котовникова — м’який ароматний край для сонячного бордюру."
+    sourceType: own
+    placement: cover
+    sortOrder: 0
+    rightsStatus: approved
+  - mediaAssetId: PHOTO-0329
+    src: "/images/plants/local/plant-0074-format-01.jpg"
+    alt: "Рута запашна у касеті Flora & Aroma"
+    caption: "Рута запашна додає бордюру сизо-зелену фактуру й виразний аромат."
+    sourceType: own
+    placement: body
+    sortOrder: 10
+    rightsStatus: approved
+  - mediaAssetId: PHOTO-0333
+    src: "/images/plants/local/plant-0077-format-02.jpg"
+    alt: "Орегано звичайне у касеті Flora & Aroma"
+    caption: "Орегано звичайне формує пряну багаторічну основу композиції."
+    sourceType: own
+    placement: body
+    sortOrder: 20
+    rightsStatus: approved
 relatedPlantIds:
   - PLANT-0084
   - PLANT-0051
@@ -26,9 +52,9 @@ relatedPlantIds:
 seoTitle: "Ароматний бордюр із пряних рослин | Flora & Aroma"
 seoDescription: "Добір рослин для ароматного бордюру Flora & Aroma: сухий бордюр, пряний сад біля кухні та змішані комбінації з актуального асортименту."
 publishedAt: 2026-07-20T00:00:00.000Z
-updatedAt: 2026-07-20T00:00:00.000Z
-publicationStatus: pending_operator_review
-mediaRightsStatus: pending_operator_review
+updatedAt: 2026-07-30T00:00:00.000Z
+publicationStatus: approved
+mediaRightsStatus: approved
 ---
 
 Ароматний бордюр — це посадка, яку хочеться відчувати зблизька: біля доріжки, тераси, кухонної зони або сонячного краю квітника. У такому бордюрі важливі не лише квіти, а й запах листя, фактура, м’який край посадки і можливість зібрати рослини під конкретний стиль саду.

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { selectPublicPublications, validatePublicationEntries } from "../src/lib/publication-policy.mjs";
@@ -198,9 +199,30 @@ assert.throws(
   /must have rightsStatus=approved/
 );
 
-const pendingContent = read("src/content/publications/aromatnyi-bordiur-priani-zapashni-roslyny.md");
-assert.match(pendingContent, /publicationStatus:\s*pending_operator_review/);
-assert.match(pendingContent, /mediaRightsStatus:\s*pending_operator_review/);
+const approvedContent = read("src/content/publications/aromatnyi-bordiur-priani-zapashni-roslyny.md");
+assert.match(approvedContent, /publicationStatus:\s*approved/);
+assert.match(approvedContent, /mediaRightsStatus:\s*approved/);
+assert.match(approvedContent, /coverMediaAssetId:\s*PHOTO-0334/);
+for (const mediaAssetId of ["PHOTO-0334", "PHOTO-0329", "PHOTO-0333"]) {
+  assert.match(approvedContent, new RegExp(`mediaAssetId:\\s*${mediaAssetId}`));
+}
+
+const approvedMediaHashes = new Map([
+  ["public/images/plants/local/plant-0051-format-02.jpg", "ba78cc87cb196b1502cd8a080c88cea0fed60cadbf9c3fe9263464982bfaf69e"],
+  ["public/images/plants/local/plant-0074-format-01.jpg", "8104e0604d611f9b792e915418d1a05a86f61ba13ef9bf6633b8109020147e0f"],
+  ["public/images/plants/local/plant-0077-format-02.jpg", "e6091ad539063eebd7d93f55b8153ffa5a0bc78e32d126f36b950e2ca8a83631"]
+]);
+for (const [mediaPath, expectedHash] of approvedMediaHashes) {
+  assert.equal(existsSync(join(root, mediaPath)), true, `${mediaPath} must exist`);
+  const actualHash = createHash("sha256").update(readFileSync(join(root, mediaPath))).digest("hex");
+  assert.equal(actualHash, expectedHash, `${mediaPath} must match the operator-approved SHA-256`);
+}
+
+const redirectsSource = read("public/_redirects");
+assert.match(
+  redirectsSource,
+  /\/aromatnyi-bordiur-priani-zapashni-roslyny\/\s+\/publications\/aromatnyi-bordiur-priani-zapashni-roslyny\/\s+301/
+);
 
 assert.equal(existsSync(join(root, "src/pages/publications/[slug].astro")), true);
 assert.equal(existsSync(join(root, "src/pages/[slug].astro")), false);
@@ -256,7 +278,7 @@ const contactsSource = read("src/pages/contacts.astro");
 assert.match(contactsSource, /navKey="contacts"/);
 assert.match(contactsSource, /siteContacts\.consultationTelegramUrl/);
 assert.match(contactsSource, /siteContacts\.phoneHref/);
-assert.match(contactsSource, /flora-aroma\.com\.ua/);
+assert.match(contactsSource, /siteContacts\.emailHref/);
 assert.doesNotMatch(contactsSource, /Що написати/);
 assert.doesNotMatch(contactsSource, /nursery-irrigation\.jpg/);
 
@@ -287,5 +309,5 @@ assert.match(contractSource, /at least 5 unique approved images/i);
 assert.match(contractSource, /unknown.+forbidden/i);
 
 console.log(
-  "Publications tests passed: shared navigation is wired through BaseLayout, mobile header order stays hamburger/logo/cart, pending content stays private, and approved-only media thresholds fail closed."
+  "Publications tests passed: shared navigation is wired through BaseLayout, approved media hashes match, and publication thresholds fail closed."
 );

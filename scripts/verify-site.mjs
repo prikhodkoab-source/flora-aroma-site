@@ -4,7 +4,7 @@ import { join } from "node:path";
 const cwd = typeof process !== "undefined" ? process.cwd() : globalThis.nodeRepl?.cwd;
 const root = existsSync(join(cwd, "data", "products.csv")) ? cwd : join(cwd, "flora-aroma-site");
 const siteBase = "https://flora-aroma-site.pages.dev";
-const pendingArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
+const approvedArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
 let failed = false;
 
 function fail(message) {
@@ -76,14 +76,18 @@ for (const requiredPage of [
   }
 }
 
-if (existsSync(join(root, "dist", "publications", pendingArticleSlug, "index.html"))) {
-  fail("Pending publication must not generate a public article route.");
+if (!existsSync(join(root, "dist", "publications", approvedArticleSlug, "index.html"))) {
+  fail("Approved publication must generate a public article route.");
 }
 
 for (const requiredAsset of [
   "public/images/tilda-clone/hero-greenhouse.jpg",
   "public/images/tilda-clone/tilda-logo.png",
   "public/images/site/nursery-irrigation.jpg",
+  "public/images/plants/local/plant-0051-format-02.jpg",
+  "public/images/plants/local/plant-0074-format-01.jpg",
+  "public/images/plants/local/plant-0077-format-02.jpg",
+  "public/_redirects",
   "public/cart.js",
   "functions/_analytics.js",
   "functions/api/analytics/event.js",
@@ -199,7 +203,6 @@ for (const requiredPhrase of [
   "Перейти до асортименту",
   "Поради та ідеї",
   "Контакти",
-  "Матеріали готуються",
   "Написати в Telegram",
   "Ваше замовлення",
   "Оформити замовлення",
@@ -229,8 +232,8 @@ for (const requiredMarker of [
   'data-quick-pick-id="part-shade"',
   'data-quick-pick-id="dry-sites"',
   'data-quick-pick-id="pollinators"',
-  "publications-empty",
-  "publication-catalog-cta",
+  "publication-card__image-link",
+  "publication-detail__gallery",
   "tilda-cart-page",
   "data-cart-add",
   "data-cart-page",
@@ -260,11 +263,28 @@ const publicationsPage = readFileSync(join(root, "dist", "publications", "index.
 if (publicationsPage.includes("hero-greenhouse.jpg")) {
   fail("Publications index must not use the greenhouse placeholder image.");
 }
-if (publicationsPage.includes("publication-card__image-link")) {
-  fail("Empty publications page must not render article cards.");
+if (!publicationsPage.includes("publication-card__image-link")) {
+  fail("Publications page must render the approved article card.");
 }
-if (publicationsPage.includes(pendingArticleSlug)) {
-  fail("Pending publication slug leaked into publications index.");
+if (!publicationsPage.includes(approvedArticleSlug)) {
+  fail("Approved publication is missing from publications index.");
+}
+if (!publicationsPage.includes("plant-0051-format-02.jpg")) {
+  fail("Approved publication cover is missing from publications index.");
+}
+
+const approvedArticlePage = readFileSync(
+  join(root, "dist", "publications", approvedArticleSlug, "index.html"),
+  "utf8"
+);
+for (const requiredArticleMarker of [
+  "plant-0051-format-02.jpg",
+  "plant-0074-format-01.jpg",
+  "plant-0077-format-02.jpg"
+]) {
+  if (!approvedArticlePage.includes(requiredArticleMarker)) {
+    fail(`Approved article is missing media: ${requiredArticleMarker}`);
+  }
 }
 
 const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");
@@ -284,8 +304,11 @@ const publicationIndexUrl = `${siteBase}/publications/`;
 if (!sitemap.includes(publicationIndexUrl)) {
   fail("Expected /publications/ in sitemap.");
 }
-if (sitemap.includes(`${siteBase}/publications/${pendingArticleSlug}/`) || sitemap.includes(`${siteBase}/${pendingArticleSlug}/`)) {
-  fail("Pending publication must not appear in sitemap.");
+if (!sitemap.includes(`${siteBase}/publications/${approvedArticleSlug}/`)) {
+  fail("Approved publication must appear in sitemap.");
+}
+if (sitemap.includes(`${siteBase}/${approvedArticleSlug}/`)) {
+  fail("Legacy article URL must redirect and must not appear as a sitemap canonical.");
 }
 if (sitemap.includes("https://flora-aroma.com.ua")) {
   fail("Main-domain URLs must not appear in sitemap.");
