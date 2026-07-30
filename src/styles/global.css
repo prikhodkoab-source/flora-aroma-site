@@ -2239,13 +2239,55 @@ body.site-menu-open {
 }
 
 .site-contact-card {
-  padding: 28px;
+  padding: 22px 24px;
   border: 1px solid var(--border-color);
   background: #ffffff;
 }
 
 .site-contact-card--wide {
   grid-column: 1 / -1;
+}
+
+.site-contact-card--compact {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.site-contact-card--compact p {
+  margin: 0;
+}
+
+.site-contact-card__icon {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: #000000;
+}
+
+.site-contact-card__icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.site-contact-card__label {
+  margin: 0;
+  color: #596254;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-contact-card--socials {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .site-contact-card h2 {
@@ -2268,26 +2310,42 @@ body.site-menu-open {
 }
 
 .site-social-links {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .site-social-link {
   display: inline-flex;
-  min-height: 56px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
-  padding: 0 22px;
-  border: 1px solid #000000;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid var(--border-color-strong, #000000);
   border-radius: 999px;
   background: #ffffff;
   color: #000000;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   line-height: 1;
   text-decoration: none;
+}
+
+.site-social-link__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-social-link__icon svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  fill: currentColor;
 }
 
 .site-social-link--disabled {
@@ -3242,8 +3300,12 @@ body.site-menu-open {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .site-social-links {
-    grid-template-columns: minmax(0, 1fr);
+  .site-contact-card {
+    padding: 18px 20px;
+  }
+
+  .site-contact-card--compact {
+    gap: 12px;
   }
 
   .tilda-hero-content h1 {

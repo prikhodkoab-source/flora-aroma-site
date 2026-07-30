@@ -268,7 +268,7 @@ if (publicationsPage.includes(pendingArticleSlug)) {
 }
 
 const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");
-for (const requiredContactMarker of ["tel:+380500272882", "https://flora-aroma.com.ua"]) {
+for (const requiredContactMarker of ["tel:+380500272882", "mailto:Flora_%26_Aroma@gmail.com"]) {
   if (!contactsPage.includes(requiredContactMarker)) {
     fail(`Contacts page is missing: ${requiredContactMarker}`);
   }
