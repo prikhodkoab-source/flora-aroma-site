@@ -2267,6 +2267,35 @@ body.site-menu-open {
   text-decoration: none;
 }
 
+.site-social-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.site-social-link {
+  display: inline-flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border: 1px solid #000000;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.site-social-link--disabled {
+  border-color: var(--border-color);
+  color: #8c9487;
+  pointer-events: none;
+}
+
 .site-page__media {
   margin: 42px 0 0;
 }
@@ -3210,6 +3239,10 @@ body.site-menu-open {
   }
 
   .site-contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-social-links {
     grid-template-columns: minmax(0, 1fr);
   }
 
