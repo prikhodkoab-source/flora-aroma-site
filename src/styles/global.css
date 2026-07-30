@@ -2231,21 +2231,16 @@ body.site-menu-open {
   text-decoration: none;
 }
 
-.site-contact-grid {
+.site-contact-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
+  gap: 18px;
   margin-top: 42px;
 }
 
 .site-contact-card {
-  padding: 22px 24px;
-  border: 1px solid var(--border-color);
-  background: #ffffff;
-}
-
-.site-contact-card--wide {
-  grid-column: 1 / -1;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .site-contact-card--compact {
@@ -2276,20 +2271,6 @@ body.site-menu-open {
   display: block;
 }
 
-.site-contact-card__label {
-  margin: 0;
-  color: #596254;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.site-contact-card--socials {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
 .site-contact-card h2 {
   margin: 0;
   font-size: 18px;
@@ -2297,10 +2278,10 @@ body.site-menu-open {
 }
 
 .site-contact-card p {
-  margin: 14px 0 0;
-  color: #596254;
+  margin: 0;
+  color: #000000;
   font-size: 18px;
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .site-contact-card a {
@@ -2309,49 +2290,22 @@ body.site-menu-open {
   text-decoration: none;
 }
 
-.site-social-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.site-social-link {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 16px;
-  border: 1px solid var(--border-color-strong, #000000);
-  border-radius: 999px;
-  background: #ffffff;
+.site-contact-card--link {
   color: #000000;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
   text-decoration: none;
 }
 
-.site-social-link__icon {
-  display: inline-flex;
-  width: 16px;
-  height: 16px;
-  align-items: center;
-  justify-content: center;
+.site-contact-card--disabled {
+  color: #8c9487;
 }
 
-.site-social-link__icon svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-  fill: currentColor;
-}
-
-.site-social-link--disabled {
+.site-contact-card--disabled .site-contact-card__icon {
   border-color: var(--border-color);
   color: #8c9487;
-  pointer-events: none;
+}
+
+.site-contact-card--disabled p {
+  color: #8c9487;
 }
 
 .site-page__media {
@@ -3294,14 +3248,6 @@ body.site-menu-open {
 
   .site-page__intro > p:last-of-type {
     font-size: 18px;
-  }
-
-  .site-contact-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .site-contact-card {
-    padding: 18px 20px;
   }
 
   .site-contact-card--compact {
