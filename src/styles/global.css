@@ -129,6 +129,7 @@ body.site-menu-open {
   display: block;
   width: 80px;
   height: auto;
+  mix-blend-mode: difference;
 }
 
 .site-header__logo-image--dark {
