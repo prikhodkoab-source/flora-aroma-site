@@ -971,7 +971,8 @@ body.site-menu-open {
   inset: 0;
   display: block;
   background-position: center;
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   transition: opacity 0.2s ease-in-out;
 }
 
@@ -1702,7 +1703,9 @@ body.site-menu-open {
 }
 
 .tilda-product-gallery__stage {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 0;
   border: 0;
@@ -1712,9 +1715,11 @@ body.site-menu-open {
 
 .tilda-product-gallery__stage img {
   display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: min(78vh, 900px);
+  object-fit: contain;
 }
 
 .tilda-product-gallery__thumbs {
@@ -1725,6 +1730,11 @@ body.site-menu-open {
 }
 
 .tilda-product-gallery__thumbs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
   padding: 0;
   border: 1px solid transparent;
   background: #ffffff;
@@ -1738,8 +1748,8 @@ body.site-menu-open {
 .tilda-product-gallery__thumbs img {
   display: block;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
 }
 
 .tilda-product-info h1 {
