@@ -143,6 +143,16 @@ body.site-menu-open {
   display: block;
 }
 
+@media (prefers-color-scheme: dark) {
+  .site-header:not(.site-header--overlay) .site-header__logo-image--light {
+    display: none;
+  }
+
+  .site-header:not(.site-header--overlay) .site-header__logo-image--dark {
+    display: block;
+  }
+}
+
 .site-header__nav {
   display: flex;
   flex-wrap: wrap;
@@ -2635,7 +2645,7 @@ body.site-menu-open {
     display: flex;
     justify-content: space-between;
     width: calc(100% - 32px);
-    min-height: 78px;
+    min-height: 104px;
     gap: 12px;
   }
 
@@ -3262,7 +3272,7 @@ body.site-menu-open {
 
   .site-header__inner {
     width: calc(100% - 32px);
-    min-height: 72px;
+    min-height: 104px;
   }
 
   .site-page {

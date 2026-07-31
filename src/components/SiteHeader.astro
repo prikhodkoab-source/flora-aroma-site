@@ -92,6 +92,7 @@ const {
     const toggle = header.querySelector("[data-site-menu-toggle]");
     const menu = header.querySelector("[data-site-mobile-menu]");
     const backdrop = header.querySelector("[data-site-menu-backdrop]");
+    const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
     if (!(toggle instanceof HTMLButtonElement) || !(menu instanceof HTMLElement) || !(backdrop instanceof HTMLButtonElement)) {
       throw new Error("Site header menu controls are not available.");
@@ -102,7 +103,7 @@ const {
       const backgroundColor = window.getComputedStyle(header).backgroundColor;
       const match = backgroundColor.match(/\d+(?:\.\d+)?/g);
 
-      let isDark = isOverlay;
+      let isDark = isOverlay || colorScheme.matches;
 
       if (!isDark && match && match.length >= 3) {
         const [red, green, blue, alpha = "1"] = match.map(Number);
@@ -154,5 +155,6 @@ const {
 
     applyLogoTheme();
     window.addEventListener("resize", applyLogoTheme);
+    colorScheme.addEventListener?.("change", applyLogoTheme);
   }
 </script>
