@@ -125,12 +125,21 @@ body.site-menu-open {
   text-decoration: none;
 }
 
-.site-header__logo-image {
+.site-header__logo-mark {
   display: block;
   width: 80px;
-  height: auto;
-  filter: brightness(0) invert(1);
-  mix-blend-mode: difference;
+  aspect-ratio: 1;
+  background: currentColor;
+  -webkit-mask: url("/images/tilda-clone/logo-white.png") center / contain no-repeat;
+  mask: url("/images/tilda-clone/logo-white.png") center / contain no-repeat;
+}
+
+.site-header__logo {
+  color: #111111;
+}
+
+.site-header--overlay .site-header__logo {
+  color: #ffffff;
 }
 
 .site-header__nav {
@@ -2637,7 +2646,7 @@ body.site-menu-open {
     transform: translate(-50%, -50%);
   }
 
-  .site-header__logo-image {
+  .site-header__logo-mark {
     width: 92px;
   }
 
