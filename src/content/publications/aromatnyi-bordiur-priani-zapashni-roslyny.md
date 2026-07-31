@@ -1,14 +1,57 @@
 ---
 publicationId: WC-CR-20260712-AROMATIC-BORDER
 approvedRevision: 1ee002dd9a0005fe
-approvedPreviewHash: e6f5ca0584cdbcc1
+approvedPreviewHash: 63a6edd8916448f9
 slug: aromatnyi-bordiur-priani-zapashni-roslyny
 language: uk
 title: "Ароматний бордюр із пряних і запашних рослин"
 excerpt: "Готова ідея ароматного бордюру з поточного асортименту: постійна основа, декоративні акценти, окрема свіжа зона і сезонні пряні доповнення."
 category: "Тематична добірка Flora & Aroma"
-coverImage: "/images/tilda-clone/hero-greenhouse.jpg"
-coverImageAlt: "Рослини Flora & Aroma у теплиці"
+coverImage: "/images/publications/aromatic-border/01-dry-aromatic-border.png"
+coverImageAlt: "AI-візуалізація сухого ароматного бордюру з чебрецем, орегано, шавлією, лавандою, рутою та агастахе"
+coverMediaAssetId: GEN-AROMATIC-BORDER-01
+bodyMediaLayout: inline
+articleMedia:
+  - mediaAssetId: GEN-AROMATIC-BORDER-01
+    src: "/images/publications/aromatic-border/01-dry-aromatic-border.png"
+    alt: "AI-візуалізація сухого ароматного бордюру з чебрецем, орегано, шавлією, лавандою, рутою та агастахе"
+    caption: "AI-візуалізація: сухий ароматний бордюр із низьким чебрецем, середнім ярусом орегано й шавлії та вищими акцентами лаванди, рути й агастахе."
+    sourceType: generated
+    placement: cover
+    sortOrder: 0
+    rightsStatus: approved
+  - mediaAssetId: GEN-AROMATIC-BORDER-02
+    src: "/images/publications/aromatic-border/02-terrace-aromatic-border.png"
+    alt: "AI-візуалізація ароматного бордюру біля тераси з окремим контейнерним розмарином"
+    caption: "AI-візуалізація: м’який край із каламінти й чебрецю біля тераси, шавлія та орегано в середньому ярусі, агастахе й лаванда позаду, розмарин окремо в контейнері."
+    sourceType: generated
+    placement: body
+    sortOrder: 10
+    rightsStatus: approved
+  - mediaAssetId: GEN-AROMATIC-BORDER-03
+    src: "/images/publications/aromatic-border/03-kitchen-herb-garden.png"
+    alt: "AI-візуалізація пряного саду біля кухні з сезонними травами та м’ятою в контейнері"
+    caption: "AI-візуалізація: кухонний пряний сад із чебрецем по краю, орегано й шавлією в основі, сезонними базиліком, майораном і чабером та м’ятою в окремій ємності."
+    sourceType: generated
+    placement: body
+    sortOrder: 20
+    rightsStatus: approved
+  - mediaAssetId: GEN-AROMATIC-BORDER-04
+    src: "/images/publications/aromatic-border/04-decorative-aromatic-border.png"
+    alt: "AI-візуалізація декоративного ароматного бордюру з каламінтою, шавлією, лавандою, рутою та агастахе"
+    caption: "AI-візуалізація: декоративний ароматний бордюр із повітряною каламінтою, сріблясто-зеленим середнім ярусом та вертикальними акцентами агастахе."
+    sourceType: generated
+    placement: body
+    sortOrder: 30
+    rightsStatus: approved
+  - mediaAssetId: GEN-AROMATIC-BORDER-05
+    src: "/images/publications/aromatic-border/05-mixed-aromatic-border.png"
+    alt: "AI-візуалізація змішаного ароматного бордюру з окремою свіжою зоною для м’яти"
+    caption: "AI-візуалізація: змішана композиція з сухим багаторічним ядром, сезонними пряними кишенями, фізично відділеною свіжою зоною для м’яти та розмарином у контейнері."
+    sourceType: generated
+    placement: body
+    sortOrder: 40
+    rightsStatus: approved
 relatedPlantIds:
   - PLANT-0084
   - PLANT-0051
@@ -23,12 +66,91 @@ relatedPlantIds:
   - PLANT-0098
   - PLANT-0089
   - PLANT-0033
+relatedPlantCards:
+  - mediaAssetId: P1-CARD-PLANT-0084
+    plantId: PLANT-0084
+    src: "/images/plant-cards/aromatic-border/plant-0084-p1.png"
+    alt: "Картка рослини Агастахе фенхельне Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0051
+    plantId: PLANT-0051
+    src: "/images/plant-cards/aromatic-border/plant-0051-p1.png"
+    alt: "Картка рослини Каламінта котовникова Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0055
+    plantId: PLANT-0055
+    src: "/images/plant-cards/aromatic-border/plant-0055-p1.jpg"
+    alt: "Картка рослини Лаванда широколиста Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0037
+    plantId: PLANT-0037
+    src: "/images/plant-cards/aromatic-border/plant-0037-p1.jpg"
+    alt: "Картка рослини М’ята гірська Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0044
+    plantId: PLANT-0044
+    src: "/images/plant-cards/aromatic-border/plant-0044-p1.png"
+    alt: "Картка рослини Майоран садовий Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0081
+    plantId: PLANT-0081
+    src: "/images/plant-cards/aromatic-border/plant-0081-p1.png"
+    alt: "Картка рослини М’ята перцева Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0077
+    plantId: PLANT-0077
+    src: "/images/plant-cards/aromatic-border/plant-0077-p1.png"
+    alt: "Картка рослини Орегано звичайне Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0066
+    plantId: PLANT-0066
+    src: "/images/plant-cards/aromatic-border/plant-0066-p1.png"
+    alt: "Картка рослини Розмарин лікарський Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0074
+    plantId: PLANT-0074
+    src: "/images/plant-cards/aromatic-border/plant-0074-p1.png"
+    alt: "Картка рослини Рута запашна Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0082
+    plantId: PLANT-0082
+    src: "/images/plant-cards/aromatic-border/plant-0082-p1.png"
+    alt: "Картка рослини Шавлія лікарська Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0098
+    plantId: PLANT-0098
+    src: "/images/plant-cards/aromatic-border/plant-0098-p1.png"
+    alt: "Картка рослини Чебрець звичайний Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0089
+    plantId: PLANT-0089
+    src: "/images/plant-cards/aromatic-border/plant-0089-p1.png"
+    alt: "Картка рослини Базилік зелений Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
+  - mediaAssetId: P1-CARD-PLANT-0033
+    plantId: PLANT-0033
+    src: "/images/plant-cards/aromatic-border/plant-0033-p1.png"
+    alt: "Картка рослини Чабер садовий Flora & Aroma"
+    sourceType: generated
+    rightsStatus: approved
 seoTitle: "Ароматний бордюр із пряних рослин | Flora & Aroma"
 seoDescription: "Добір рослин для ароматного бордюру Flora & Aroma: сухий бордюр, пряний сад біля кухні та змішані комбінації з актуального асортименту."
 publishedAt: 2026-07-20T00:00:00.000Z
-updatedAt: 2026-07-20T00:00:00.000Z
-publicationStatus: pending_operator_review
-mediaRightsStatus: pending_operator_review
+updatedAt: 2026-07-31T00:00:00.000Z
+publicationStatus: approved
+mediaRightsStatus: approved
 ---
 
 Ароматний бордюр — це посадка, яку хочеться відчувати зблизька: біля доріжки, тераси, кухонної зони або сонячного краю квітника. У такому бордюрі важливі не лише квіти, а й запах листя, фактура, м’який край посадки і можливість зібрати рослини під конкретний стиль саду.
@@ -80,9 +202,19 @@ mediaRightsStatus: pending_operator_review
 
 Біля тераси добре працює м’який ароматний край з каламінти і чебрецю, середній план із шавлії та орегано і виразні акценти з агастахе або лаванди. Розмарин тут доречний як окремий контейнерний акцент, який можна поставити ближче до зони відпочинку.
 
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/02-terrace-aromatic-border.png" alt="AI-візуалізація ароматного бордюру біля тераси з окремим контейнерним розмарином" loading="lazy" />
+  <figcaption>AI-візуалізація: м’який край із каламінти й чебрецю біля тераси, шавлія та орегано в середньому ярусі, агастахе й лаванда позаду, розмарин окремо в контейнері.</figcaption>
+</figure>
+
 ## Варіант 3. Пряний сад біля кухні
 
 Для кухонної зони основу можна будувати навколо чебрецю, орегано і шавлії, а майоран, базилік і чабер додавати як сезонні пряні акценти. М’яту краще посадити окремо або в контейнер, щоб її легко було контролювати і збирати.
+
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/03-kitchen-herb-garden.png" alt="AI-візуалізація пряного саду біля кухні з сезонними травами та м’ятою в контейнері" loading="lazy" />
+  <figcaption>AI-візуалізація: кухонний пряний сад із чебрецем по краю, орегано й шавлією в основі, сезонними базиліком, майораном і чабером та м’ятою в окремій ємності.</figcaption>
+</figure>
 
 ## Який ароматний бордюр вам ближчий?
 
@@ -90,9 +222,19 @@ mediaRightsStatus: pending_operator_review
 - Пряний — акцент на кухонних ароматах: чебрець, орегано, шавлія, чабер, майоран, базилік.
 - Змішаний — постійна основа з чебрецю, орегано і шавлії плюс декоративні та сезонні акценти.
 
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/04-decorative-aromatic-border.png" alt="AI-візуалізація декоративного ароматного бордюру з каламінтою, шавлією, лавандою, рутою та агастахе" loading="lazy" />
+  <figcaption>AI-візуалізація: декоративний ароматний бордюр із повітряною каламінтою, сріблясто-зеленим середнім ярусом та вертикальними акцентами агастахе.</figcaption>
+</figure>
+
 ## Догляд
 
 Після посадки рослинам потрібен час на укорінення. Для сухішого ядра важливі сонце, дренаж і помірний полив без застою води. М’ятні рослини краще контролювати окремо, а сезонні пряні культури оновлювати як літнє доповнення. Остаточний добір варто робити після розуміння місця: сонце, ґрунт, полив, висота посадки і бажаний ефект.
+
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/05-mixed-aromatic-border.png" alt="AI-візуалізація змішаного ароматного бордюру з окремою свіжою зоною для м’яти" loading="lazy" />
+  <figcaption>AI-візуалізація: змішана композиція з сухим багаторічним ядром, сезонними пряними кишенями, фізично відділеною свіжою зоною для м’яти та розмарином у контейнері.</figcaption>
+</figure>
 
 ## Як замовити
 
