@@ -963,7 +963,7 @@ body.site-menu-open {
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: #eef2e9;
+  background: var(--page-background);
 }
 
 .tilda-product-card__image {
@@ -1709,7 +1709,7 @@ body.site-menu-open {
   width: 100%;
   padding: 0;
   border: 0;
-  background: #f5f5f5;
+  background: var(--page-background);
   cursor: zoom-in;
 }
 
@@ -1737,7 +1737,7 @@ body.site-menu-open {
   overflow: hidden;
   padding: 0;
   border: 1px solid transparent;
-  background: #ffffff;
+  background: var(--page-background);
   cursor: pointer;
 }
 
