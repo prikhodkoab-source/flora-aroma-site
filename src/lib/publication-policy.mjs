@@ -16,6 +16,7 @@ export const MEDIA_RIGHTS_STATUSES = new Set([
 
 export const MEDIA_SOURCE_TYPES = new Set(["own", "supplier", "generated", "unknown"]);
 export const MEDIA_PLACEMENTS = new Set(["cover", "body"]);
+export const BODY_MEDIA_LAYOUTS = new Set(["gallery", "inline"]);
 
 function hasText(value) {
   return typeof value === "string" && value.trim().length > 0;
@@ -66,6 +67,7 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     const publicationId = hasText(data.publicationId) ? data.publicationId.trim() : "";
     const slug = hasText(data.slug) ? data.slug.trim() : "";
     const mediaItems = Array.isArray(data.articleMedia) ? data.articleMedia : [];
+    const relatedPlantIds = Array.isArray(data.relatedPlantIds) ? data.relatedPlantIds : [];
     const relatedPlantCards = Array.isArray(data.relatedPlantCards) ? data.relatedPlantCards : [];
     const mediaIds = new Map();
     const relatedPlantCardIds = new Map();
@@ -94,6 +96,9 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     }
     if (!MEDIA_RIGHTS_STATUSES.has(data.mediaRightsStatus)) {
       errors.push(`${label}: unsupported mediaRightsStatus`);
+    }
+    if (!BODY_MEDIA_LAYOUTS.has(data.bodyMediaLayout ?? "gallery")) {
+      errors.push(`${label}: unsupported bodyMediaLayout`);
     }
 
     for (const field of ["title", "excerpt", "category"]) {
@@ -182,15 +187,28 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     if (!hasText(data.approvedPreviewHash)) errors.push(`${label}: approved publication requires approvedPreviewHash`);
     if (!hasText(data.language)) errors.push(`${label}: approved publication requires language`);
     if (!hasText(entry.body)) errors.push(`${label}: approved publication requires body`);
+    if (relatedPlantIds.length === 0) {
+      errors.push(`${label}: approved publication requires at least one related public plant card or link`);
+    }
 
     const { minImages, minControlledImages, minBodyImages } = mediaThresholds(entry);
     const uniqueMedia = uniqueMediaItems(data);
     const coverMediaId = hasText(data.coverMediaAssetId) ? data.coverMediaAssetId.trim() : "";
     const coverMedia = coverMediaId ? uniqueMedia.get(coverMediaId) : null;
-    const controlledMediaCount = [...uniqueMedia.values()].filter((item) =>
-      ["own", "generated"].includes(item.sourceType)
+    const controlledMediaCount = [...uniqueMedia.values()].filter(
+      (item) => ["own", "generated"].includes(item.sourceType) && item.src.startsWith("/images/")
     ).length;
     const bodyMediaCount = [...uniqueMedia.values()].filter((item) => item.placement === "body").length;
+
+    if ((data.bodyMediaLayout ?? "gallery") === "inline") {
+      const body = typeof entry.body === "string" ? entry.body : "";
+      for (const item of uniqueMedia.values()) {
+        if (item.placement !== "body") continue;
+        if (![item.src, item.alt, item.caption].every((value) => body.includes(value))) {
+          errors.push(`${label}: inline body media ${item.mediaAssetId} must appear in the article with matching src, alt, and caption`);
+        }
+      }
+    }
 
     if (!coverMediaId) {
       errors.push(`${label}: approved publication requires coverMediaAssetId`);
@@ -225,7 +243,9 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
       errors.push(`${label}: approved publication requires at least ${minImages} unique images`);
     }
     if (controlledMediaCount < minControlledImages) {
-      errors.push(`${label}: approved publication requires at least ${minControlledImages} controlled images`);
+      errors.push(
+        `${label}: approved publication requires at least ${minControlledImages} controlled images (own/generated site-local visualizations)`
+      );
     }
     if (bodyMediaCount < minBodyImages) {
       errors.push(`${label}: approved publication requires at least ${minBodyImages} body images`);
@@ -241,7 +261,7 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     }
 
     if (relatedPlantCards.length > 0) {
-      for (const plantId of data.relatedPlantIds ?? []) {
+      for (const plantId of relatedPlantIds) {
         if (!relatedPlantCardIds.has(plantId)) {
           errors.push(`${label}: approved publication is missing related plant card ${plantId}`);
         }
@@ -256,7 +276,7 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
       }
     }
 
-    for (const plantId of data.relatedPlantIds ?? []) {
+    for (const plantId of relatedPlantIds) {
       if (!publicPlantIds.has(plantId)) {
         errors.push(`${label}: unknown public relatedPlantId ${plantId}`);
       }

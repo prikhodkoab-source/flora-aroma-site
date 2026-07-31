@@ -46,6 +46,7 @@ const publications = defineCollection({
       coverImageAlt: z.string().trim().min(1).optional(),
       coverMediaAssetId: z.string().trim().min(1).optional(),
       articleMedia: z.array(articleMediaItem).default([]),
+      bodyMediaLayout: z.enum(["gallery", "inline"]).default("gallery"),
       relatedPlantIds: z.array(z.string().trim().regex(/^PLANT-\d{4}$/)).default([]),
       relatedPlantCards: z.array(relatedPlantCardItem).default([]),
       seoTitle: z.string().trim().min(1).optional(),

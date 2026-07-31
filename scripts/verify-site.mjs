@@ -233,7 +233,6 @@ for (const requiredMarker of [
   'data-quick-pick-id="dry-sites"',
   'data-quick-pick-id="pollinators"',
   "publication-card__image-link",
-  "publication-detail__gallery",
   "tilda-cart-page",
   "data-cart-add",
   "data-cart-page",
@@ -300,6 +299,31 @@ for (const requiredArticleMarker of [
   if (!approvedArticlePage.includes(requiredArticleMarker)) {
     fail(`Approved article is missing media: ${requiredArticleMarker}`);
   }
+}
+
+const inlineBodyMedia = [
+  "02-terrace-aromatic-border.png",
+  "03-kitchen-herb-garden.png",
+  "04-decorative-aromatic-border.png",
+  "05-mixed-aromatic-border.png"
+];
+let previousInlineMediaIndex = -1;
+for (const mediaMarker of inlineBodyMedia) {
+  const mediaIndex = approvedArticlePage.indexOf(mediaMarker);
+  if (mediaIndex <= previousInlineMediaIndex) {
+    fail(`Approved article inline media order is invalid: ${mediaMarker}`);
+  }
+  previousInlineMediaIndex = mediaIndex;
+}
+if ((approvedArticlePage.match(/<figure class="publication-inline-media">/g) ?? []).length !== 4) {
+  fail("Approved article must render four inline body visualizations.");
+}
+if (approvedArticlePage.includes('<div class="publication-detail__gallery">')) {
+  fail("Approved inline-media article must not render a duplicate bottom gallery.");
+}
+const relatedPlantsIndex = approvedArticlePage.indexOf('class="collection-plants"');
+if (relatedPlantsIndex <= previousInlineMediaIndex) {
+  fail("Related plant cards must render after all inline article visualizations.");
 }
 
 const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");

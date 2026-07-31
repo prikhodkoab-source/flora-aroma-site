@@ -1,7 +1,7 @@
 ---
 publicationId: WC-CR-20260712-AROMATIC-BORDER
 approvedRevision: 1ee002dd9a0005fe
-approvedPreviewHash: 6d2e5f7a3abd08fc
+approvedPreviewHash: 63a6edd8916448f9
 slug: aromatnyi-bordiur-priani-zapashni-roslyny
 language: uk
 title: "Ароматний бордюр із пряних і запашних рослин"
@@ -10,6 +10,7 @@ category: "Тематична добірка Flora & Aroma"
 coverImage: "/images/publications/aromatic-border/01-dry-aromatic-border.png"
 coverImageAlt: "AI-візуалізація сухого ароматного бордюру з чебрецем, орегано, шавлією, лавандою, рутою та агастахе"
 coverMediaAssetId: GEN-AROMATIC-BORDER-01
+bodyMediaLayout: inline
 articleMedia:
   - mediaAssetId: GEN-AROMATIC-BORDER-01
     src: "/images/publications/aromatic-border/01-dry-aromatic-border.png"
@@ -201,9 +202,19 @@ mediaRightsStatus: approved
 
 Біля тераси добре працює м’який ароматний край з каламінти і чебрецю, середній план із шавлії та орегано і виразні акценти з агастахе або лаванди. Розмарин тут доречний як окремий контейнерний акцент, який можна поставити ближче до зони відпочинку.
 
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/02-terrace-aromatic-border.png" alt="AI-візуалізація ароматного бордюру біля тераси з окремим контейнерним розмарином" loading="lazy" />
+  <figcaption>AI-візуалізація: м’який край із каламінти й чебрецю біля тераси, шавлія та орегано в середньому ярусі, агастахе й лаванда позаду, розмарин окремо в контейнері.</figcaption>
+</figure>
+
 ## Варіант 3. Пряний сад біля кухні
 
 Для кухонної зони основу можна будувати навколо чебрецю, орегано і шавлії, а майоран, базилік і чабер додавати як сезонні пряні акценти. М’яту краще посадити окремо або в контейнер, щоб її легко було контролювати і збирати.
+
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/03-kitchen-herb-garden.png" alt="AI-візуалізація пряного саду біля кухні з сезонними травами та м’ятою в контейнері" loading="lazy" />
+  <figcaption>AI-візуалізація: кухонний пряний сад із чебрецем по краю, орегано й шавлією в основі, сезонними базиліком, майораном і чабером та м’ятою в окремій ємності.</figcaption>
+</figure>
 
 ## Який ароматний бордюр вам ближчий?
 
@@ -211,9 +222,19 @@ mediaRightsStatus: approved
 - Пряний — акцент на кухонних ароматах: чебрець, орегано, шавлія, чабер, майоран, базилік.
 - Змішаний — постійна основа з чебрецю, орегано і шавлії плюс декоративні та сезонні акценти.
 
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/04-decorative-aromatic-border.png" alt="AI-візуалізація декоративного ароматного бордюру з каламінтою, шавлією, лавандою, рутою та агастахе" loading="lazy" />
+  <figcaption>AI-візуалізація: декоративний ароматний бордюр із повітряною каламінтою, сріблясто-зеленим середнім ярусом та вертикальними акцентами агастахе.</figcaption>
+</figure>
+
 ## Догляд
 
 Після посадки рослинам потрібен час на укорінення. Для сухішого ядра важливі сонце, дренаж і помірний полив без застою води. М’ятні рослини краще контролювати окремо, а сезонні пряні культури оновлювати як літнє доповнення. Остаточний добір варто робити після розуміння місця: сонце, ґрунт, полив, висота посадки і бажаний ефект.
+
+<figure class="publication-inline-media">
+  <img src="/images/publications/aromatic-border/05-mixed-aromatic-border.png" alt="AI-візуалізація змішаного ароматного бордюру з окремою свіжою зоною для м’яти" loading="lazy" />
+  <figcaption>AI-візуалізація: змішана композиція з сухим багаторічним ядром, сезонними пряними кишенями, фізично відділеною свіжою зоною для м’яти та розмарином у контейнері.</figcaption>
+</figure>
 
 ## Як замовити
 

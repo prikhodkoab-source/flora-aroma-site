@@ -62,7 +62,9 @@ function fixture(overrides = {}) {
       coverImageAlt: coverMedia?.alt,
       coverMediaAssetId: coverMedia?.mediaAssetId,
       articleMedia,
-      relatedPlantIds: [],
+      bodyMediaLayout: "gallery",
+      relatedPlantIds: ["PLANT-0002"],
+      relatedPlantCards: [],
       seoTitle: "Valid publication — Flora & Aroma",
       seoDescription: "Valid SEO description",
       publishedAt: new Date("2026-07-17T00:00:00Z"),
@@ -95,6 +97,10 @@ assert.throws(
 );
 
 assert.throws(() => validatePublicationEntries([fixture({ data: { publicationId: "" } })], publicPlants), /missing publicationId/);
+assert.throws(
+  () => validatePublicationEntries([fixture({ data: { relatedPlantIds: [], relatedPlantCards: [] } })], publicPlants),
+  /requires at least one related public plant card or link/
+);
 assert.throws(() => validatePublicationEntries([fixture({ data: { relatedPlantIds: ["PLANT-9999"] } })], publicPlants), /unknown public relatedPlantId/);
 assert.throws(() => validatePublicationEntries([fixture({ data: { coverMediaAssetId: "" } })], publicPlants), /requires coverMediaAssetId/);
 
@@ -142,6 +148,46 @@ const generatedMediaArticle = fixture({
   }
 });
 assert.doesNotThrow(() => validatePublicationEntries([generatedMediaArticle], publicPlants));
+
+const inlineArticleMedia = defaultArticleMedia();
+const inlineArticleBody = [
+  "слово ".repeat(240).trim(),
+  ...inlineArticleMedia
+    .filter((item) => item.placement === "body")
+    .map(
+      (item) =>
+        `<figure class="publication-inline-media"><img src="${item.src}" alt="${item.alt}" /><figcaption>${item.caption}</figcaption></figure>`
+    )
+].join("\n");
+assert.doesNotThrow(() =>
+  validatePublicationEntries(
+    [fixture({ body: inlineArticleBody, data: { articleMedia: inlineArticleMedia, bodyMediaLayout: "inline" } })],
+    publicPlants
+  )
+);
+assert.throws(
+  () => validatePublicationEntries([fixture({ data: { bodyMediaLayout: "inline" } })], publicPlants),
+  /inline body media MEDIA-ASSET-0002 must appear/
+);
+
+assert.throws(
+  () =>
+    validatePublicationEntries(
+      [
+        fixture({
+          data: {
+            articleMedia: [
+              buildMedia("MEDIA-ASSET-0001", "cover", "generated", "approved", { src: "https://example.com/cover.jpg" }),
+              buildMedia("MEDIA-ASSET-0002", "body", "generated", "approved", { src: "https://example.com/body.jpg" }),
+              buildMedia("MEDIA-ASSET-0003", "body", "supplier")
+            ]
+          }
+        })
+      ],
+      publicPlants
+    ),
+  /own\/generated site-local visualizations/
+);
 
 assert.throws(
   () =>
@@ -248,6 +294,8 @@ const approvedContent = read("src/content/publications/aromatnyi-bordiur-priani-
 assert.match(approvedContent, /publicationStatus:\s*approved/);
 assert.match(approvedContent, /mediaRightsStatus:\s*approved/);
 assert.match(approvedContent, /coverMediaAssetId:\s*GEN-AROMATIC-BORDER-01/);
+assert.match(approvedContent, /bodyMediaLayout:\s*inline/);
+assert.equal((approvedContent.match(/<figure class="publication-inline-media">/g) ?? []).length, 4);
 for (const mediaAssetId of [
   "GEN-AROMATIC-BORDER-01",
   "GEN-AROMATIC-BORDER-02",
@@ -376,6 +424,11 @@ assert.match(detailSource, /Рослини з цієї публікації/);
 assert.match(detailSource, /href="\/publications\/"/);
 assert.match(detailSource, /href="\/shop\/"/);
 assert.match(detailSource, /publication-detail__gallery/);
+assert.match(detailSource, /data\.bodyMediaLayout !== "inline"/);
+assert.match(detailSource, /publication-inline-media/);
+assert.match(detailSource, /return product \? \[\{ product, card \}\] : \[\];/);
+assert.match(detailSource, /\{card && <img/);
+assert.match(detailSource, /collection-plant-card--link-only/);
 
 const sitemapSource = read("src/pages/sitemap-index.xml.ts");
 assert.match(sitemapSource, /\/publications\/\$\{publication\.data\.slug\}\//);
@@ -387,9 +440,12 @@ assert.match(notFoundSource, /Поради та ідеї/);
 const contractSource = read("docs/publications-content-contract.md");
 assert.match(contractSource, /coverMediaAssetId/);
 assert.match(contractSource, /articleMedia/);
+assert.match(contractSource, /bodyMediaLayout=inline/);
 assert.match(contractSource, /at least 3 unique approved images/i);
 assert.match(contractSource, /at least 5 unique approved images/i);
 assert.match(contractSource, /unknown.+forbidden/i);
+assert.match(contractSource, /at least one related public plant card or link/i);
+assert.match(contractSource, /generated or copied.+visualizations/i);
 
 console.log(
   "Publications tests passed: shared navigation is wired through BaseLayout, approved media hashes match, and publication thresholds fail closed."

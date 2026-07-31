@@ -38,6 +38,7 @@ category: Public category
 coverImage: /images/publications/approved-image.jpg
 coverImageAlt: Approved accessible description
 coverMediaAssetId: MEDIA-ASSET-0001
+bodyMediaLayout: gallery
 articleMedia:
   - mediaAssetId: MEDIA-ASSET-0001
     src: /images/publications/approved-image.jpg
@@ -80,7 +81,8 @@ No example file is stored as an approved public entry unless it has passed opera
 - `slug` is unique and stable because it defines the article URL.
 - A slug change requires an approved redirect plan.
 - `coverMediaAssetId` must reference one item in `articleMedia`.
-- `relatedPlantIds` may be empty. Every populated ID must exist in the current public product catalog.
+- `bodyMediaLayout=gallery` renders approved body media after the Markdown body; `bodyMediaLayout=inline` requires every body media item to appear in the body with the exact registered `src`, `alt`, and `caption`.
+- An approved publication must have at least one `relatedPlantIds` value, and every populated ID must exist in the current public product catalog.
 - When `relatedPlantCards` is populated, every card must reference one `relatedPlantIds` value and use a unique `plantId` and `mediaAssetId`.
 
 ## Allowed statuses
@@ -128,13 +130,16 @@ For a public `approved + approved` entry it additionally requires:
 - `coverMediaAssetId`;
 - `coverImage` and `coverImageAlt`;
 - cover image path and alt must match the approved cover media item;
+- inline body media must keep the exact registered path, accessible text, and caption in the article body;
 - all media items must have `rightsStatus=approved`;
 - no media item may use `sourceType=unknown`;
 - a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 controlled (`own` or `generated`), and at least 2 body images;
 - a long article (over 1200 words) must have at least 5 unique approved images, at least 3 controlled (`own` or `generated`), and at least 4 body images;
 - duplicate `mediaAssetId` values do not increase image counts;
-- every related plant must exist in the public site catalog.
-- if `relatedPlantCards` is used, every related plant must have exactly one approved non-unknown card.
+- every approved article must include generated or copied site-local visualizations that satisfy the controlled-media threshold;
+- every approved article must have at least one related public plant card or link;
+- every related plant must exist in the public site catalog so the renderer can link to `/plants/<slug>/`;
+- if `relatedPlantCards` is used, every related plant must have exactly one approved non-unknown card; otherwise the renderer must show a link-only plant entry and must not invent a placeholder image.
 
 Validation errors stop the build. Internal notes, operator comments, source dumps, credentials, customer data, exact stock quantities, and internal costs are outside the public contract and must not be exported.
 
@@ -142,6 +147,7 @@ Validation errors stop the build. Internal notes, operator comments, source dump
 
 - A greenhouse placeholder cannot be reused as the cover for an unrelated article about a plant, pollinators, or a naturalistic planting theme.
 - `generated` media may count as controlled media only after exact operator approval and must be described publicly as an illustration or AI visualization.
+- Controlled generated or copied (`own`) visualizations count only when they are stored as site-local `/images/` assets.
 - Generated composition images do not replace real product evidence; related plant cards must remain based on approved plant media and exact Flora catalog identity.
 - `supplier` media may be approved, but it does not count toward the minimum controlled-media requirement.
 - `unknown` media is forbidden for public articles.
