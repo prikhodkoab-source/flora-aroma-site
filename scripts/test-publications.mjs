@@ -29,6 +29,18 @@ function defaultArticleMedia() {
   ];
 }
 
+function buildPlantCard(plantId, rightsStatus = "approved", overrides = {}) {
+  return {
+    mediaAssetId: `P1-CARD-${plantId}`,
+    plantId,
+    src: `/images/plant-cards/${plantId.toLowerCase()}.png`,
+    alt: `Plant card ${plantId}`,
+    sourceType: "generated",
+    rightsStatus,
+    ...overrides
+  };
+}
+
 function fixture(overrides = {}) {
   const dataOverrides = overrides.data ?? {};
   const articleMedia = dataOverrides.articleMedia ?? defaultArticleMedia();
@@ -110,15 +122,26 @@ assert.throws(
             articleMedia: [
               buildMedia("MEDIA-ASSET-0001", "cover", "own"),
               buildMedia("MEDIA-ASSET-0002", "body", "supplier"),
-              buildMedia("MEDIA-ASSET-0003", "body", "generated")
+              buildMedia("MEDIA-ASSET-0003", "body", "supplier")
             ]
           }
         })
       ],
       publicPlants
     ),
-  /at least 2 own images/
+  /at least 2 controlled images/
 );
+
+const generatedMediaArticle = fixture({
+  data: {
+    articleMedia: [
+      buildMedia("MEDIA-ASSET-0001", "cover", "generated"),
+      buildMedia("MEDIA-ASSET-0002", "body", "generated"),
+      buildMedia("MEDIA-ASSET-0003", "body", "generated")
+    ]
+  }
+});
+assert.doesNotThrow(() => validatePublicationEntries([generatedMediaArticle], publicPlants));
 
 assert.throws(
   () =>
@@ -199,18 +222,78 @@ assert.throws(
   /must have rightsStatus=approved/
 );
 
+assert.doesNotThrow(() =>
+  validatePublicationEntries(
+    [fixture({ data: { relatedPlantIds: ["PLANT-0002"], relatedPlantCards: [buildPlantCard("PLANT-0002")] } })],
+    publicPlants
+  )
+);
+assert.throws(
+  () =>
+    validatePublicationEntries(
+      [
+        fixture({
+          data: {
+            relatedPlantIds: ["PLANT-0002"],
+            relatedPlantCards: [buildPlantCard("PLANT-0002", "pending_operator_review")]
+          }
+        })
+      ],
+      publicPlants
+    ),
+  /related plant card PLANT-0002 must have rightsStatus=approved/
+);
+
 const approvedContent = read("src/content/publications/aromatnyi-bordiur-priani-zapashni-roslyny.md");
 assert.match(approvedContent, /publicationStatus:\s*approved/);
 assert.match(approvedContent, /mediaRightsStatus:\s*approved/);
-assert.match(approvedContent, /coverMediaAssetId:\s*PHOTO-0334/);
-for (const mediaAssetId of ["PHOTO-0334", "PHOTO-0329", "PHOTO-0333"]) {
+assert.match(approvedContent, /coverMediaAssetId:\s*GEN-AROMATIC-BORDER-01/);
+for (const mediaAssetId of [
+  "GEN-AROMATIC-BORDER-01",
+  "GEN-AROMATIC-BORDER-02",
+  "GEN-AROMATIC-BORDER-03",
+  "GEN-AROMATIC-BORDER-04",
+  "GEN-AROMATIC-BORDER-05"
+]) {
   assert.match(approvedContent, new RegExp(`mediaAssetId:\\s*${mediaAssetId}`));
+}
+for (const plantId of [
+  "PLANT-0084",
+  "PLANT-0051",
+  "PLANT-0055",
+  "PLANT-0037",
+  "PLANT-0044",
+  "PLANT-0081",
+  "PLANT-0077",
+  "PLANT-0066",
+  "PLANT-0074",
+  "PLANT-0082",
+  "PLANT-0098",
+  "PLANT-0089",
+  "PLANT-0033"
+]) {
+  assert.match(approvedContent, new RegExp(`mediaAssetId:\\s*P1-CARD-${plantId}`));
 }
 
 const approvedMediaHashes = new Map([
-  ["public/images/plants/local/plant-0051-format-02.jpg", "ba78cc87cb196b1502cd8a080c88cea0fed60cadbf9c3fe9263464982bfaf69e"],
-  ["public/images/plants/local/plant-0074-format-01.jpg", "8104e0604d611f9b792e915418d1a05a86f61ba13ef9bf6633b8109020147e0f"],
-  ["public/images/plants/local/plant-0077-format-02.jpg", "e6091ad539063eebd7d93f55b8153ffa5a0bc78e32d126f36b950e2ca8a83631"]
+  ["public/images/publications/aromatic-border/01-dry-aromatic-border.png", "3843dc21eb32121178b02b1bd8659939057cc2e40ad45e30e285466d2c5853c4"],
+  ["public/images/publications/aromatic-border/02-terrace-aromatic-border.png", "11c58260c5257526c66636531b3417105557cc7532a69c6aaec8f3417da94e50"],
+  ["public/images/publications/aromatic-border/03-kitchen-herb-garden.png", "627f51e1f2cb617aa93e9da9b7922937c72e2fc34576549056151f1ee522ff92"],
+  ["public/images/publications/aromatic-border/04-decorative-aromatic-border.png", "b9dbd8447b9131aea5bd755331bbea78bd992838e8f77756ce523d92a0f5b29e"],
+  ["public/images/publications/aromatic-border/05-mixed-aromatic-border.png", "1dbe39aa1705804d0c2ee8b28110c929e30c0cd15fe96216a9fe60fbe52e631d"],
+  ["public/images/plant-cards/aromatic-border/plant-0033-p1.png", "b74c15d237589eb19e398daf241d4a38fff318ad69038b7ea1a70fb9661791d2"],
+  ["public/images/plant-cards/aromatic-border/plant-0037-p1.jpg", "9cec1caf8344e3a68335bc61cc4702f95e22cde934783b29996c5424e4f2cf46"],
+  ["public/images/plant-cards/aromatic-border/plant-0044-p1.png", "31ff6983646465ec379df0a2be8d73f6a715d46ca88104851b81b30c9615bc21"],
+  ["public/images/plant-cards/aromatic-border/plant-0051-p1.png", "0e3f58692d74baafc11ea78c83b42c353fae3026da06a409c72bdc45fc2a6c0a"],
+  ["public/images/plant-cards/aromatic-border/plant-0055-p1.jpg", "74f4a44bdcd71b27c92817c4322e089ac54a90643f56ceb89288776c08e004c2"],
+  ["public/images/plant-cards/aromatic-border/plant-0066-p1.png", "84be96f79458c25fa19f7aea6fa2ddc0d66e814fd725f6c7a6773e37c6a5e27e"],
+  ["public/images/plant-cards/aromatic-border/plant-0074-p1.png", "b6041cbe5afaebf999c6582a424e06411d030d17ed4f2288136b2f97a43b202f"],
+  ["public/images/plant-cards/aromatic-border/plant-0077-p1.png", "d121ce66d1daa3c1cb77de78bba6ba3794d3600afee96eae2465b9ba1e91dbfd"],
+  ["public/images/plant-cards/aromatic-border/plant-0081-p1.png", "a606eb3bf07b40984f3d15025d0b4f019cc07fdfdbbed3e543014b1f956288ce"],
+  ["public/images/plant-cards/aromatic-border/plant-0082-p1.png", "bdbcdabf2a7d5e6f9342b3579014efa8cae4715f859b7811bc356c90478062ab"],
+  ["public/images/plant-cards/aromatic-border/plant-0084-p1.png", "c35c7f493808a285801e5b9c61db69638942cdd39535ce2f67e59864dc9580fe"],
+  ["public/images/plant-cards/aromatic-border/plant-0089-p1.png", "cf2c68ed927cb92b435466c87d8bec38fa9cdddd6a3c6a5eaa65759549250fae"],
+  ["public/images/plant-cards/aromatic-border/plant-0098-p1.png", "2f07f79a7b1d7311615fc760205c591e9f42e8c0d3133a80c8ad967373438039"]
 ]);
 for (const [mediaPath, expectedHash] of approvedMediaHashes) {
   assert.equal(existsSync(join(root, mediaPath)), true, `${mediaPath} must exist`);

@@ -55,7 +55,15 @@ articleMedia:
     placement: body
     sortOrder: 10
     rightsStatus: approved
-relatedPlantIds: []
+relatedPlantIds:
+  - PLANT-0001
+relatedPlantCards:
+  - mediaAssetId: P1-CARD-PLANT-0001
+    plantId: PLANT-0001
+    src: /images/plant-cards/plant-0001-p1.png
+    alt: Approved plant card
+    sourceType: generated
+    rightsStatus: approved
 seoTitle: Search title
 seoDescription: Search description
 publishedAt: 2026-07-17T00:00:00Z
@@ -73,6 +81,7 @@ No example file is stored as an approved public entry unless it has passed opera
 - A slug change requires an approved redirect plan.
 - `coverMediaAssetId` must reference one item in `articleMedia`.
 - `relatedPlantIds` may be empty. Every populated ID must exist in the current public product catalog.
+- When `relatedPlantCards` is populated, every card must reference one `relatedPlantIds` value and use a unique `plantId` and `mediaAssetId`.
 
 ## Allowed statuses
 
@@ -82,6 +91,8 @@ mediaRightsStatus=pending_operator_review|approved|restricted|rejected|expired
 articleMedia[].rightsStatus=pending_operator_review|approved|restricted|rejected|expired
 articleMedia[].sourceType=own|supplier|generated|unknown
 articleMedia[].placement=cover|body
+relatedPlantCards[].rightsStatus=pending_operator_review|approved|restricted|rejected|expired
+relatedPlantCards[].sourceType=own|supplier|generated|unknown
 ```
 
 The public build selects only:
@@ -106,6 +117,7 @@ For every collection entry the build validates:
 - valid `relatedPlantIds` array;
 - `articleMedia` unique by `mediaAssetId`;
 - every media object has `src`, `alt`, `caption`, `sourceType`, `placement`, `sortOrder`, and `rightsStatus`.
+- every related plant card has `mediaAssetId`, `plantId`, `src`, `alt`, `sourceType`, and `rightsStatus`.
 
 For a public `approved + approved` entry it additionally requires:
 
@@ -118,18 +130,20 @@ For a public `approved + approved` entry it additionally requires:
 - cover image path and alt must match the approved cover media item;
 - all media items must have `rightsStatus=approved`;
 - no media item may use `sourceType=unknown`;
-- a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 `own`, and at least 2 body images;
-- a long article (over 1200 words) must have at least 5 unique approved images, at least 3 `own`, and at least 4 body images;
+- a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 controlled (`own` or `generated`), and at least 2 body images;
+- a long article (over 1200 words) must have at least 5 unique approved images, at least 3 controlled (`own` or `generated`), and at least 4 body images;
 - duplicate `mediaAssetId` values do not increase image counts;
 - every related plant must exist in the public site catalog.
+- if `relatedPlantCards` is used, every related plant must have exactly one approved non-unknown card.
 
 Validation errors stop the build. Internal notes, operator comments, source dumps, credentials, customer data, exact stock quantities, and internal costs are outside the public contract and must not be exported.
 
 ## Media rules
 
 - A greenhouse placeholder cannot be reused as the cover for an unrelated article about a plant, pollinators, or a naturalistic planting theme.
-- `generated` media may exist as an approved illustration, but it does not count toward the minimum `own` photo requirement.
-- `supplier` media may be approved, but it does not count toward the minimum `own` photo requirement.
+- `generated` media may count as controlled media only after exact operator approval and must be described publicly as an illustration or AI visualization.
+- Generated composition images do not replace real product evidence; related plant cards must remain based on approved plant media and exact Flora catalog identity.
+- `supplier` media may be approved, but it does not count toward the minimum controlled-media requirement.
 - `unknown` media is forbidden for public articles.
 - Every public image must resolve through an approved media registry item and keep a stable `mediaAssetId`.
 

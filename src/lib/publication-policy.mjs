@@ -47,8 +47,8 @@ function uniqueMediaItems(data = {}) {
 function mediaThresholds(entry) {
   const longArticle = articleWordCount(entry) > 1200;
   return longArticle
-    ? { minImages: 5, minOwnImages: 3, minBodyImages: 4 }
-    : { minImages: 3, minOwnImages: 2, minBodyImages: 2 };
+    ? { minImages: 5, minControlledImages: 3, minBodyImages: 4 }
+    : { minImages: 3, minControlledImages: 2, minBodyImages: 2 };
 }
 
 export function isPublicPublication(entry) {
@@ -66,7 +66,10 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     const publicationId = hasText(data.publicationId) ? data.publicationId.trim() : "";
     const slug = hasText(data.slug) ? data.slug.trim() : "";
     const mediaItems = Array.isArray(data.articleMedia) ? data.articleMedia : [];
+    const relatedPlantCards = Array.isArray(data.relatedPlantCards) ? data.relatedPlantCards : [];
     const mediaIds = new Map();
+    const relatedPlantCardIds = new Map();
+    const relatedPlantCardMediaIds = new Map();
 
     if (!publicationId) {
       errors.push(`${label}: missing publicationId`);
@@ -108,6 +111,9 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     if (!Array.isArray(mediaItems)) {
       errors.push(`${label}: articleMedia must be an array`);
     }
+    if (!Array.isArray(relatedPlantCards)) {
+      errors.push(`${label}: relatedPlantCards must be an array`);
+    }
 
     for (const item of mediaItems) {
       if (!hasText(item.mediaAssetId)) {
@@ -133,6 +139,34 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
       if (!hasText(item.caption)) errors.push(`${label}: articleMedia ${item.mediaAssetId} missing caption`);
     }
 
+    for (const card of relatedPlantCards) {
+      if (!hasText(card.mediaAssetId)) {
+        errors.push(`${label}: related plant card is missing mediaAssetId`);
+      } else if (relatedPlantCardMediaIds.has(card.mediaAssetId)) {
+        errors.push(`${label}: duplicate related plant card media ${card.mediaAssetId}`);
+      } else {
+        relatedPlantCardMediaIds.set(card.mediaAssetId, card);
+      }
+      if (!hasText(card.plantId)) {
+        errors.push(`${label}: related plant card is missing plantId`);
+      } else if (relatedPlantCardIds.has(card.plantId)) {
+        errors.push(`${label}: duplicate related plant card ${card.plantId}`);
+      } else {
+        relatedPlantCardIds.set(card.plantId, card);
+      }
+      if (!MEDIA_SOURCE_TYPES.has(card.sourceType)) {
+        errors.push(`${label}: unsupported related plant card sourceType ${card.sourceType}`);
+      }
+      if (!MEDIA_RIGHTS_STATUSES.has(card.rightsStatus)) {
+        errors.push(`${label}: unsupported related plant card rightsStatus ${card.rightsStatus}`);
+      }
+      if (!hasText(card.src)) errors.push(`${label}: related plant card ${card.plantId} missing src`);
+      if (!hasText(card.alt)) errors.push(`${label}: related plant card ${card.plantId} missing alt`);
+      if (hasText(card.plantId) && !(data.relatedPlantIds ?? []).includes(card.plantId)) {
+        errors.push(`${label}: related plant card ${card.plantId} is not listed in relatedPlantIds`);
+      }
+    }
+
     if (hasText(data.coverMediaAssetId) && !mediaIds.has(data.coverMediaAssetId)) {
       errors.push(`${label}: coverMediaAssetId ${data.coverMediaAssetId} not found in articleMedia`);
     }
@@ -149,11 +183,13 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     if (!hasText(data.language)) errors.push(`${label}: approved publication requires language`);
     if (!hasText(entry.body)) errors.push(`${label}: approved publication requires body`);
 
-    const { minImages, minOwnImages, minBodyImages } = mediaThresholds(entry);
+    const { minImages, minControlledImages, minBodyImages } = mediaThresholds(entry);
     const uniqueMedia = uniqueMediaItems(data);
     const coverMediaId = hasText(data.coverMediaAssetId) ? data.coverMediaAssetId.trim() : "";
     const coverMedia = coverMediaId ? uniqueMedia.get(coverMediaId) : null;
-    const ownMediaCount = [...uniqueMedia.values()].filter((item) => item.sourceType === "own").length;
+    const controlledMediaCount = [...uniqueMedia.values()].filter((item) =>
+      ["own", "generated"].includes(item.sourceType)
+    ).length;
     const bodyMediaCount = [...uniqueMedia.values()].filter((item) => item.placement === "body").length;
 
     if (!coverMediaId) {
@@ -188,8 +224,8 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     if (uniqueMedia.size < minImages) {
       errors.push(`${label}: approved publication requires at least ${minImages} unique images`);
     }
-    if (ownMediaCount < minOwnImages) {
-      errors.push(`${label}: approved publication requires at least ${minOwnImages} own images`);
+    if (controlledMediaCount < minControlledImages) {
+      errors.push(`${label}: approved publication requires at least ${minControlledImages} controlled images`);
     }
     if (bodyMediaCount < minBodyImages) {
       errors.push(`${label}: approved publication requires at least ${minBodyImages} body images`);
@@ -201,6 +237,22 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
       }
       if (item.rightsStatus !== "approved") {
         errors.push(`${label}: approved publication media ${item.mediaAssetId} must have rightsStatus=approved`);
+      }
+    }
+
+    if (relatedPlantCards.length > 0) {
+      for (const plantId of data.relatedPlantIds ?? []) {
+        if (!relatedPlantCardIds.has(plantId)) {
+          errors.push(`${label}: approved publication is missing related plant card ${plantId}`);
+        }
+      }
+      for (const card of relatedPlantCards) {
+        if (card.sourceType === "unknown") {
+          errors.push(`${label}: approved publication cannot include unknown related plant card source`);
+        }
+        if (card.rightsStatus !== "approved") {
+          errors.push(`${label}: related plant card ${card.plantId} must have rightsStatus=approved`);
+        }
       }
     }
 

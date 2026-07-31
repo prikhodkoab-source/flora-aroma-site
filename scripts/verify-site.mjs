@@ -269,7 +269,7 @@ if (!publicationsPage.includes("publication-card__image-link")) {
 if (!publicationsPage.includes(approvedArticleSlug)) {
   fail("Approved publication is missing from publications index.");
 }
-if (!publicationsPage.includes("plant-0051-format-02.jpg")) {
+if (!publicationsPage.includes("01-dry-aromatic-border.png")) {
   fail("Approved publication cover is missing from publications index.");
 }
 
@@ -278,9 +278,24 @@ const approvedArticlePage = readFileSync(
   "utf8"
 );
 for (const requiredArticleMarker of [
-  "plant-0051-format-02.jpg",
-  "plant-0074-format-01.jpg",
-  "plant-0077-format-02.jpg"
+  "01-dry-aromatic-border.png",
+  "02-terrace-aromatic-border.png",
+  "03-kitchen-herb-garden.png",
+  "04-decorative-aromatic-border.png",
+  "05-mixed-aromatic-border.png",
+  "plant-0033-p1.png",
+  "plant-0037-p1.jpg",
+  "plant-0044-p1.png",
+  "plant-0051-p1.png",
+  "plant-0055-p1.jpg",
+  "plant-0066-p1.png",
+  "plant-0074-p1.png",
+  "plant-0077-p1.png",
+  "plant-0081-p1.png",
+  "plant-0082-p1.png",
+  "plant-0084-p1.png",
+  "plant-0089-p1.png",
+  "plant-0098-p1.png"
 ]) {
   if (!approvedArticlePage.includes(requiredArticleMarker)) {
     fail(`Approved article is missing media: ${requiredArticleMarker}`);
