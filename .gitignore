@@ -11,3 +11,6 @@ dist/
 # Local photo review artifacts
 reports/tmp-*/
 reports/*-numbered.jpg
+
+# Local browser profiles may contain cookies and session state
+reports/chrome-ui-profile/

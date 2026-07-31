@@ -24,7 +24,12 @@ const { Content } = await render(publication);
 const coverMedia = getCoverMedia(publication);
 const bodyMedia = getBodyMedia(publication);
 const productById = new Map(getProducts().map((product) => [product.plant_id, product]));
-const collectionProducts = data.relatedPlantIds.map((plantId) => productById.get(plantId)).filter(Boolean);
+const plantCardById = new Map(data.relatedPlantCards.map((card) => [card.plantId, card]));
+const collectionProducts = data.relatedPlantIds.flatMap((plantId) => {
+  const product = productById.get(plantId);
+  const card = plantCardById.get(plantId);
+  return product ? [{ product, card }] : [];
+});
 const publishedDate = new Intl.DateTimeFormat("uk-UA", {
   day: "numeric",
   month: "long",
@@ -60,7 +65,7 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
           </figure>
         )}
         <Content />
-        {bodyMedia.length > 0 && (
+        {data.bodyMediaLayout !== "inline" && bodyMedia.length > 0 && (
           <div class="publication-detail__gallery">
             {bodyMedia.map((item) => (
               <figure class="publication-detail__media">
@@ -73,27 +78,27 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
       </article>
 
       {collectionProducts.length > 0 && (
-        <aside class="collection-plants" aria-label="Рослини з цієї публікації">
+        <section class="collection-plants" aria-label="Рослини з цієї публікації">
           <h2>Рослини з цієї публікації</h2>
-          <p>Показуємо тільки публічні картки рослин. Наявність і формат контейнера підтверджує оператор.</p>
+          <p>Наявність і формат контейнера підтверджує оператор перед замовленням.</p>
           <div class="collection-plant-list">
             {
-              collectionProducts.map((product) => {
-                const image = product.primary_image_path || "/images/tilda-clone/tilda-logo.png";
-                return (
-                  <a class="collection-plant-card" href={`/plants/${product.slug}/`}>
-                    <img src={image} alt={`${product.name_uk} (${product.latin_name})`} loading="lazy" />
+              collectionProducts.map(({ product, card }) => (
+                  <a
+                    class:list={["collection-plant-card", { "collection-plant-card--link-only": !card }]}
+                    href={`/plants/${product.slug}/`}
+                  >
+                    {card && <img src={card.src} alt={card.alt} loading="lazy" />}
                     <span>
                       <strong>{product.name_uk}</strong>
                       <em>{product.latin_name}</em>
                       <small>{formatProductStartingPrice(product)}</small>
                     </span>
                   </a>
-                );
-              })
+                ))
             }
           </div>
-        </aside>
+        </section>
       )}
     </div>
   </section>
@@ -155,13 +160,25 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
 
   .collection-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 56px;
+    grid-template-columns: minmax(0, 820px);
+    justify-content: center;
+    gap: 72px;
     align-items: start;
   }
 
   .collection-article {
     min-width: 0;
+  }
+
+  .collection-article .publication-detail__media {
+    min-width: 0;
+  }
+
+  .collection-article .publication-detail__media img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
   }
 
   .collection-article :global(h2) {
@@ -193,12 +210,27 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
     padding-left: 22px;
   }
 
+  .collection-article :global(.publication-inline-media) {
+    margin: 30px 0 40px;
+  }
+
+  .collection-article :global(.publication-inline-media img) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .collection-article :global(.publication-inline-media figcaption) {
+    margin-top: 10px;
+    color: #596254;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
   .collection-plants {
-    position: sticky;
-    top: 28px;
-    padding: 28px;
-    border: 1px solid #dbe5d6;
-    background: #f8fbf5;
+    padding-top: 48px;
+    border-top: 1px solid #dbe5d6;
   }
 
   .collection-plants h2 {
@@ -217,23 +249,44 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
 
   .collection-plant-list {
     display: grid;
-    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
   }
 
   .collection-plant-card {
     display: grid;
-    grid-template-columns: 82px minmax(0, 1fr);
-    gap: 14px;
-    align-items: center;
+    grid-template-rows: auto 1fr;
+    gap: 12px;
+    align-content: start;
+    padding: 10px;
+    border: 1px solid #dbe5d6;
+    border-radius: 6px;
+    background: #ffffff;
     color: #20241d;
     text-decoration: none;
   }
 
+  .collection-plant-card--link-only {
+    grid-template-rows: 1fr;
+    align-items: center;
+    min-height: 160px;
+    padding: 24px;
+    background: #f7faf4;
+  }
+
+  .collection-plant-card--link-only span {
+    padding: 0;
+  }
+
   .collection-plant-card img {
-    width: 82px;
-    height: 82px;
-    object-fit: cover;
-    background: #e5eadf;
+    width: 100%;
+    aspect-ratio: 941 / 1672;
+    object-fit: contain;
+    background: #f8f8f4;
+  }
+
+  .collection-plant-card span {
+    padding: 0 4px 6px;
   }
 
   .collection-plant-card strong,
@@ -314,8 +367,11 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
     }
 
     .collection-plants {
-      position: static;
-      padding: 22px;
+      padding-top: 38px;
+    }
+
+    .collection-plant-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -342,13 +398,13 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
       font-size: 17px;
     }
 
-    .collection-plant-card {
-      grid-template-columns: 72px minmax(0, 1fr);
+    .collection-plant-list {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .collection-plant-card img {
-      width: 72px;
-      height: 72px;
+    .collection-plant-card {
+      width: min(100%, 320px);
+      justify-self: center;
     }
 
     .collection-cta h2 {
