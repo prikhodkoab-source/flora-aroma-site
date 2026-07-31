@@ -129,32 +129,8 @@ body.site-menu-open {
   display: block;
   width: 80px;
   height: auto;
-}
-
-.site-header__logo-image--light {
-  filter: brightness(0);
-}
-
-.site-header__logo-image--dark {
-  display: none;
-}
-
-.site-header[data-logo-theme="dark"] .site-header__logo-image--light {
-  display: none;
-}
-
-.site-header[data-logo-theme="dark"] .site-header__logo-image--dark {
-  display: block;
-}
-
-@media (prefers-color-scheme: dark) {
-  .site-header:not(.site-header--overlay) .site-header__logo-image--light {
-    display: none;
-  }
-
-  .site-header:not(.site-header--overlay) .site-header__logo-image--dark {
-    display: block;
-  }
+  filter: brightness(0) invert(1);
+  mix-blend-mode: difference;
 }
 
 .site-header__nav {
