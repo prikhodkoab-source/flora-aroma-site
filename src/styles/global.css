@@ -2004,10 +2004,17 @@ body.site-menu-open {
 
 .tilda-submit {
   width: 100%;
+  border-radius: 999px;
+}
+
+.tilda-cart-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .tilda-cart-continue {
-  margin-top: 12px;
+  margin-top: 0;
   border: 1px solid #000000;
   background: #ffffff;
   color: #000000;
