@@ -1977,6 +1977,10 @@ body.site-menu-open {
   width: 100%;
 }
 
+.tilda-cart-continue {
+  margin-top: 12px;
+}
+
 .tilda-cart-products {
   display: grid;
   gap: 24px;
