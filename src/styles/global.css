@@ -2008,6 +2008,9 @@ body.site-menu-open {
 
 .tilda-cart-continue {
   margin-top: 12px;
+  border: 1px solid #000000;
+  background: #ffffff;
+  color: #000000;
 }
 
 .tilda-cart-products {
