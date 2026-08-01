@@ -2223,6 +2223,23 @@ body.site-menu-open {
   margin-left: auto;
 }
 
+.publications-page .site-header {
+  border-bottom-color: transparent;
+}
+
+.publications-page .site-page {
+  padding-top: 36px;
+}
+
+.publications-page .site-page__intro > p:last-of-type {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.publications-page .publications-section {
+  padding-top: 36px;
+}
+
 .site-page__actions {
   display: flex;
   flex-wrap: wrap;
@@ -3267,6 +3284,19 @@ body.site-menu-open {
   .site-page {
     width: min(100% - 40px, 900px);
     padding: 48px 0 84px;
+  }
+
+  .publications-page .site-page {
+    padding-top: 22px;
+  }
+
+  .publications-page .site-page__intro > p:last-of-type {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .publications-page .publications-section {
+    padding-top: 28px;
   }
 
   .site-page__intro h1 {

@@ -12,6 +12,7 @@ type Props = {
   showHeader?: boolean;
   navKey?: SiteNavKey | null;
   headerVariant?: "solid" | "overlay";
+  bodyClass?: string;
   ogType?: "website" | "article";
   articlePublishedTime?: string;
   articleModifiedTime?: string;
@@ -25,6 +26,7 @@ const {
   showHeader = true,
   navKey = null,
   headerVariant = "solid",
+  bodyClass,
   ogType = "website",
   articlePublishedTime,
   articleModifiedTime
@@ -54,7 +56,7 @@ const socialImageUrl = image ? new URL(image, Astro.site) : null;
     <meta name="twitter:card" content="summary_large_image" />
     <title>{title}</title>
   </head>
-  <body class:list={["tilda-clone-body", headerVariant === "overlay" && "tilda-clone-body--overlay-header"]}>
+  <body class:list={["tilda-clone-body", headerVariant === "overlay" && "tilda-clone-body--overlay-header", bodyClass]}>
     {showHeader && <SiteHeader navKey={navKey} variant={headerVariant} showCart={showCart} />}
     <main>
       <slot />
