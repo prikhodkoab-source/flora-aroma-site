@@ -135,7 +135,7 @@ body.site-menu-open {
 }
 
 .site-header__logo {
-  color: #111111;
+  color: #24492e;
 }
 
 .site-header--overlay .site-header__logo {
@@ -3269,7 +3269,7 @@ body.site-menu-open {
   }
 
   .site-header {
-    border-bottom-color: #efefef;
+    border-bottom-color: transparent;
   }
 
   .site-header--overlay {
