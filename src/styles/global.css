@@ -416,8 +416,15 @@ body.site-menu-open {
 .tilda-text-block p {
   margin: 0;
   color: #000000;
+  font-family: var(--body-font);
   font-size: 20px;
+  font-weight: 400;
   line-height: 1.55;
+}
+
+.tilda-text-block--about p {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .tilda-list-section {
