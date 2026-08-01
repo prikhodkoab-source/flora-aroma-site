@@ -39,11 +39,12 @@
       <div class="tilda-payment">
         <div class="tilda-input-title">Спосіб оплати</div>
         <label><input type="radio" name="paymentsystem" value="banktransfer" /> <span>Безготівкова оплата</span></label>
-        <label><input type="radio" name="paymentsystem" value="cash" checked /> <span>Готівкою при отриманні</span></label>
+        <label><input type="radio" name="paymentsystem" value="cash" checked /> <span>Готівкою (передплата)</span></label>
       </div>
 
       <p class="tilda-cart-safety">Наявність, об'єм і можливість резерву підтвердить оператор.</p>
       <button class="tilda-submit" type="button" data-cart-submit>Оформити замовлення</button>
+      <a class="tilda-submit tilda-cart-continue" href="/shop/">Повернутися до покупок</a>
       <p class="tilda-cart-status" data-cart-status aria-live="polite"></p>
       <textarea class="tilda-cart-message" data-cart-message readonly hidden></textarea>
     </form>
