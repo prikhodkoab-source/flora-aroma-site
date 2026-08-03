@@ -1,5 +1,7 @@
 ---
 publicationId: WC-CR-20260803-UKRAINE-HARDINESS-ZONES
+approvedRevision: 3afb592d1419cdfe
+approvedPreviewHash: b22db48eb560f6c9
 slug: zony-morozostiikosti-ukrainy
 language: uk
 title: "Зони морозостійкості України: як читати USDA-зони й обирати рослини"
@@ -17,7 +19,7 @@ articleMedia:
     sourceType: generated
     placement: cover
     sortOrder: 0
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-02
     src: "/images/publications/ukraine-hardiness-zones/02-ghcnd-station-zones.png"
     alt: "Карта України з точками метеостанцій, класифікованими за USDA-зонами від 5a до 7b за даними 1991–2020 років"
@@ -25,7 +27,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 10
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-02-MOBILE
     src: "/images/publications/ukraine-hardiness-zones/02-ghcnd-station-zones-mobile.png"
     alt: "Карта України з точками метеостанцій, класифікованими за USDA-зонами від 5a до 7b за даними 1991–2020 років"
@@ -33,7 +35,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 11
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-03
     src: "/images/publications/ukraine-hardiness-zones/03-usda-zone-scale.png"
     alt: "Таблиця температурних меж підзон USDA від 4a до 9a у градусах Цельсія"
@@ -41,7 +43,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 20
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-03-MOBILE
     src: "/images/publications/ukraine-hardiness-zones/03-usda-zone-scale-mobile.png"
     alt: "Таблиця температурних меж підзон USDA від 4a до 9a у градусах Цельсія"
@@ -49,7 +51,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 21
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-04
     src: "/images/publications/ukraine-hardiness-zones/04-garden-microclimates.png"
     alt: "Зимовий сад із теплою цегляною стіною, живоплотом, відкритою морозною улоговиною та рослиною в контейнері"
@@ -57,7 +59,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 30
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-05
     src: "/images/publications/ukraine-hardiness-zones/05-five-checks.png"
     alt: "Інфографіка з п'ятьма перевірками перед купівлею багаторічника: зона, мікроклімат, ґрунт, рослина і план захисту"
@@ -65,7 +67,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 40
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
   - mediaAssetId: GEN-UKRAINE-HARDINESS-05-MOBILE
     src: "/images/publications/ukraine-hardiness-zones/05-five-checks-mobile.png"
     alt: "Інфографіка з п'ятьма перевірками перед купівлею багаторічника: зона, мікроклімат, ґрунт, рослина і план захисту"
@@ -73,7 +75,7 @@ articleMedia:
     sourceType: generated
     placement: body
     sortOrder: 41
-    rightsStatus: pending_operator_review
+    rightsStatus: approved
 relatedPlantIds:
   - PLANT-0098
   - PLANT-0077
@@ -113,9 +115,10 @@ relatedPlantCards:
     rightsStatus: approved
 seoTitle: "Зони морозостійкості України: карта, шкала USDA і вибір рослин"
 seoDescription: "Як читати USDA-зони морозостійкості в Україні, перевірити мікроклімат ділянки й безпечніше обирати багаторічні рослини."
+publishedAt: 2026-08-03T00:00:00.000Z
 updatedAt: 2026-08-03T00:00:00.000Z
-publicationStatus: pending_operator_review
-mediaRightsStatus: pending_operator_review
+publicationStatus: approved
+mediaRightsStatus: approved
 ---
 
 Позначки **USDA 5b**, **6a** чи **7b** часто бачимо в описах багаторічників. Вони корисні, бо дають спільну температурну шкалу для порівняння рослин і місцевостей. Але номер зони не відповідає на всі запитання: чи переживе рослина мокру зиму, крижаний вітер, різку відлигу, весняний заморозок або зимівлю в контейнері.
