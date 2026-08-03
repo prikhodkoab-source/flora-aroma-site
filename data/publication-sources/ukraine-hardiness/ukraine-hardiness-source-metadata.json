@@ -1,0 +1,16 @@
+{
+  "generated_from": {
+    "ghcnd_stations": "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt",
+    "ghcnd_inventory": "https://www.ncei.noaa.gov/pub/data/ghcn/daily/ghcnd-inventory.txt",
+    "ghcnd_station_template": "https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/{station_id}.csv.gz",
+    "ukraine_boundary": "https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/UKR/ADM0/geoBoundaries-UKR-ADM0.geojson"
+  },
+  "period": "1991-2020",
+  "station_count": 23,
+  "minimum_days_per_year": 250,
+  "minimum_cold_season_days": 100,
+  "minimum_valid_years": 20,
+  "snapshot_sha256": "c14c172d83529918d55c393e21d4454bc4eeea7ebede95ce72a17f835acd2352",
+  "boundary_sha256": "a24186ba62303d653efdbb2d91eddbac263619899d85a5802ac845e0a93e480a",
+  "publication_note": "Point observations only. No interpolation was used; the illustration is not an official Ukrainian hardiness-zone map and cannot replace local station records or site observation."
+}
