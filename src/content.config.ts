@@ -4,7 +4,7 @@ import { glob } from "astro/loaders";
 const publicationStatuses = ["draft", "pending_operator_review", "approved", "suspended", "archived"] as const;
 const mediaRightsStatuses = ["pending_operator_review", "approved", "restricted", "rejected", "expired"] as const;
 const mediaSourceTypes = ["own", "supplier", "generated", "unknown"] as const;
-const mediaPlacements = ["cover", "body"] as const;
+const mediaPlacements = ["cover", "body", "social"] as const;
 
 const articleMediaItem = z.object({
   mediaAssetId: z.string().trim().min(1),
@@ -14,7 +14,17 @@ const articleMediaItem = z.object({
   sourceType: z.enum(mediaSourceTypes),
   placement: z.enum(mediaPlacements),
   sortOrder: z.number().int().nonnegative(),
-  rightsStatus: z.enum(mediaRightsStatuses)
+  rightsStatus: z.enum(mediaRightsStatuses),
+  checksum: z.string().trim().regex(/^[0-9a-f]{64}$/).optional(),
+  width: z.number().int().positive().optional(),
+  height: z.number().int().positive().optional(),
+  mimeType: z.enum(["image/jpeg", "image/png", "image/webp"]).optional(),
+  isAiGenerated: z.boolean().optional(),
+  originalMediaAssetId: z.string().trim().min(1).optional(),
+  derivativeSpec: z.string().trim().optional(),
+  relatedPlantIds: z.array(z.string().trim().regex(/^PLANT-\d{4}$/)).default([]),
+  targetChannel: z.enum(["site_blog", "facebook"]).optional(),
+  approvalStatus: z.enum(["pending_operator_review", "approved", "rejected", "stale"]).optional()
 });
 
 const relatedPlantCardItem = z.object({
@@ -35,6 +45,10 @@ const publications = defineCollection({
   schema: z
     .object({
       publicationId: z.string().trim().min(1),
+      draftRevision: z.string().trim().regex(/^[0-9a-f]{16}$/).optional(),
+      mediaManifestHash: z.string().trim().regex(/^[0-9a-f]{64}$/).optional(),
+      mediaGateStatus: z.enum(["blocked_waiting_for_photography", "ready_for_operator_review"]).optional(),
+      mediaApprovalStatus: z.enum(["pending_operator_review", "blocked_waiting_for_photography"]).optional(),
       approvedRevision: z.string().trim().min(1).optional(),
       approvedPreviewHash: z.string().trim().min(1).optional(),
       slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),

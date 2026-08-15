@@ -1,5 +1,9 @@
 ---
 publicationId: WC-CR-20260815-GARDEN-FASHION-2026
+draftRevision: 76a90697f3bb6b06
+mediaManifestHash: 4027346b0e90ccc7569c4749600bf275864242e105136876fbb5fae66fd2264c
+mediaGateStatus: blocked_waiting_for_photography
+mediaApprovalStatus: blocked_waiting_for_photography
 slug: sadova-moda-2026-pryrodnyi-sad-speka
 language: uk
 title: "Садова мода 2026: природний сад, що витримує спеку"
