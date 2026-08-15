@@ -51,7 +51,7 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
       <a class="publication-back" href="/publications/">Поради та ідеї</a>
       <p class="collection-eyebrow">{data.category} · {publishedDate}</p>
       <h1>{data.title}</h1>
-      <p class="collection-lead">{data.excerpt}</p>
+      <p class="collection-lead">{data.subtitle ?? data.excerpt}</p>
     </div>
   </section>
 

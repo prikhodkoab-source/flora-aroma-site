@@ -296,6 +296,33 @@ assert.match(approvedContent, /mediaRightsStatus:\s*approved/);
 assert.match(approvedContent, /coverMediaAssetId:\s*GEN-AROMATIC-BORDER-01/);
 assert.match(approvedContent, /bodyMediaLayout:\s*inline/);
 assert.equal((approvedContent.match(/<figure class="publication-inline-media">/g) ?? []).length, 4);
+
+const gardenFashionDraft = read("src/content/publications/sadova-moda-2026-pryrodnyi-sad-speka.md");
+assert.match(gardenFashionDraft, /publicationId:\s*WC-CR-20260815-GARDEN-FASHION-2026/);
+assert.match(gardenFashionDraft, /slug:\s*sadova-moda-2026-pryrodnyi-sad-speka/);
+assert.match(
+  gardenFashionDraft,
+  /subtitle:\s*"Чому на зміну формальним квітникам приходять злаки, ароматичні трави, посухостійкі багаторічники та рослини для запилювачів"/
+);
+assert.match(gardenFashionDraft, /publicationStatus:\s*draft/);
+assert.match(gardenFashionDraft, /mediaRightsStatus:\s*pending_operator_review/);
+assert.match(gardenFashionDraft, /articleMedia:\s*\[\]/);
+assert.doesNotMatch(gardenFashionDraft, /approvedRevision:/);
+assert.doesNotMatch(gardenFashionDraft, /approvedPreviewHash:/);
+assert.doesNotMatch(gardenFashionDraft, /publishedAt:/);
+assert.doesNotMatch(gardenFashionDraft, /coverImage:/);
+for (const plantId of ["PLANT-0009", "PLANT-0085", "PLANT-0087"]) {
+  assert.match(gardenFashionDraft, new RegExp(`relatedPlantIds:[\\s\\S]*${plantId}`));
+}
+for (const route of [
+  "/plants/ekhinatseia-purpurova-plant-0009/",
+  "/plants/kostrytsia-hotie-plant-0085/",
+  "/plants/chebrets-povzuchyi-plant-0087/",
+  "/shop/"
+]) {
+  assert.match(gardenFashionDraft, new RegExp(route.replaceAll("/", "\\/")));
+}
+assert.doesNotMatch(gardenFashionDraft, /\b(?:UAH|грн)\b/u);
 for (const mediaAssetId of [
   "GEN-AROMATIC-BORDER-01",
   "GEN-AROMATIC-BORDER-02",

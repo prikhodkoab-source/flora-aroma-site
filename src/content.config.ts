@@ -40,6 +40,7 @@ const publications = defineCollection({
       slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
       language: z.string().trim().min(2).optional(),
       title: z.string().trim().min(1),
+      subtitle: z.string().trim().min(1).optional(),
       excerpt: z.string().trim().min(1),
       category: z.string().trim().min(1),
       coverImage: z.string().trim().min(1).optional(),
