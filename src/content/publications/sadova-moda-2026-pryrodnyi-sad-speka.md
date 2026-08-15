@@ -1,7 +1,7 @@
 ---
 publicationId: WC-CR-20260815-GARDEN-FASHION-2026
-draftRevision: 73af6778689402f0
-mediaManifestHash: 72f4bddf232e376403d0ac0223e32dd63ef3282a467ee7e534f2a6342b708edd
+draftRevision: e596411a75626164
+mediaManifestHash: 60f86bed99ad0d48961174e701e0b0cc88199ac5bce98d448d72d5717cda05ed
 mediaGateStatus: blocked_waiting_for_photography
 mediaApprovalStatus: blocked_waiting_for_photography
 slug: sadova-moda-2026-pryrodnyi-sad-speka
