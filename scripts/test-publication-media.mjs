@@ -11,7 +11,7 @@ import {
 } from "../src/lib/publication-policy.mjs";
 
 const contentId = "WC-CR-20260815-GARDEN-FASHION-2026";
-const revision = "82c5000fdf35e7f6";
+const revision = "73af6778689402f0";
 const publicRoot = mkdtempSync(join(tmpdir(), "flora-publication-media-"));
 const imageRoot = join(publicRoot, "images");
 mkdirSync(imageRoot);
@@ -145,8 +145,8 @@ try {
   assert.throws(() => validatePreviewMediaFiles(entry, publicRoot), /checksum mismatch/);
 
   const articleFixture = readFileSync("src/content/publications/sadova-moda-2026-pryrodnyi-sad-speka.md", "utf8");
-  assert.match(articleFixture, /draftRevision:\s*82c5000fdf35e7f6/);
-  assert.match(articleFixture, /mediaManifestHash:\s*ed38dc8978cf03669121196440bc2b89930a80418944e01c35929ccbf4622013/);
+  assert.match(articleFixture, /draftRevision:\s*73af6778689402f0/);
+  assert.match(articleFixture, /mediaManifestHash:\s*72f4bddf232e376403d0ac0223e32dd63ef3282a467ee7e534f2a6342b708edd/);
   assert.match(articleFixture, /mediaGateStatus:\s*blocked_waiting_for_photography/);
   assert.match(articleFixture, /publicationStatus:\s*draft/);
   assert.match(articleFixture, /articleMedia:\s*\[\]/);
