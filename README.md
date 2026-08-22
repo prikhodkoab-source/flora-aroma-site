@@ -4,8 +4,9 @@ New repository-managed public storefront for Flora & Aroma.
 
 Current role:
 
-- Tilda remains the temporary public storefront.
-- This site is the future Codex-managed storefront.
+- Cloudflare Pages serves the production storefront at `https://flora-aroma.com.ua/`.
+- Tilda is retired and not in use; it is not a production dependency or migration task.
+- `flora-aroma-site.pages.dev` remains the deployment and preview verification host.
 - `data/products.csv` is a public catalog export, not an accounting source of truth.
 - Stock, reserve, order, payment, and delivery writes remain disabled here.
 
@@ -28,7 +29,9 @@ npm run build
 
 Deployment target:
 
-- GitHub to Cloudflare Pages or Netlify after preview verification.
+- Production: GitHub `main` to Cloudflare Pages at `https://flora-aroma.com.ua/`.
+- Branch previews: Cloudflare Pages preview deployments from non-production branches.
+- Netlify is not used for the production storefront.
 
 Recommended build settings:
 

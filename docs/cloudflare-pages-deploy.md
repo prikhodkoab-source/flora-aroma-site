@@ -45,4 +45,6 @@ If `npm run build` is blocked by Windows script execution, use:
 - `data/products.csv` is a public storefront export, not accounting truth.
 - Exact internal stock is not published.
 - Website requests continue through W2 and create draft orders only.
-- Tilda remains live until preview verification and separate DNS approval.
+- Production is served by Cloudflare Pages at `https://flora-aroma.com.ua/` from the `main` branch.
+- Tilda is retired/not in use and is not a production dependency or pending migration task.
+- `flora-aroma-site.pages.dev` remains the deployment and preview verification host.

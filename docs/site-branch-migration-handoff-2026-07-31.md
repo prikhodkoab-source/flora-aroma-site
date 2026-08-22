@@ -1,5 +1,7 @@
 # Site branch migration handoff
 
+> Historical handoff from 2026-07-31. Superseded on 2026-08-22 by the verified production state: Website migration **COMPLETE**, production platform **Cloudflare Pages**, production domain `flora-aroma.com.ua`, Tilda **RETIRED / NOT IN USE**, Tilda dependency **NONE**. The adoption and prohibition steps below describe the state at handoff time and are retained as historical evidence.
+
 ## Branch decision
 
 The active storefront development base is `feature/tilda-style-redesign`, not `main`.
@@ -14,7 +16,7 @@ The active storefront development base is `feature/tilda-style-redesign`, not `m
 
 ## Migration artifacts
 
-The Git integration branch is the canonical migration artifact. It carries the complete files and history; no binary patch or copied source tree is required.
+The Git integration branch was the canonical migration artifact for this handoff. It carries the complete files and history; no binary patch or copied source tree is required.
 
 Machine-readable metadata is stored in:
 
