@@ -901,5 +901,44 @@ export const productCatalog = {
         "unit": "шт."
       }
     ]
+  },
+  "PLANT-0095": {
+    "name": "Шавлія дібровна 'Merleau Compact Blue'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0095-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 35,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0096": {
+    "name": "Шавлія дібровна 'Rosakönigin'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0096-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 35,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0097": {
+    "name": "Шавлія дібровна 'Blaukönigin'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0097-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 35,
+        "unit": "шт."
+      }
+    ]
   }
 };

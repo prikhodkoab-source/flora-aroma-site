@@ -95,7 +95,7 @@ function productMatchesFilters(product, filters) {
   return true;
 }
 
-assert.equal(products.length, 46, "Expected 46 public catalog products in the built shop config.");
+assert.equal(products.length, 49, "Expected 49 public catalog products in the built shop config.");
 
 assert.ok(
   products.some((product) => product.plantId === "PLANT-0091"),
@@ -108,6 +108,24 @@ assert.ok(
 assert.ok(
   products.some((product) => product.plantId === "PLANT-0099"),
   "Expected approved Salvia officinalis 'Purpurascens' in the public catalog."
+);
+for (const [plantId, cultivar] of [
+  ["PLANT-0095", "Merleau Compact Blue"],
+  ["PLANT-0096", "Rosakönigin"],
+  ["PLANT-0097", "Blaukönigin"]
+]) {
+  const product = products.find((item) => item.plantId === plantId);
+  assert.ok(product, `Expected approved Salvia nemorosa '${cultivar}' in the public catalog.`);
+  assert.equal(product.price, 35, `${cultivar} should use the approved 35 UAH price.`);
+  assert.ok(product.formatLabels.includes("0,12 л"), `${cultivar} should expose the public 0,12 л volume.`);
+}
+const blauköniginImagePaths = [
+  ...new Set(shopHtml.match(/\/images\/plants\/local\/plant-0097-local-gallery-0[12]\.jpg/g) ?? [])
+];
+assert.deepEqual(
+  blauköniginImagePaths,
+  ["/images/plants/local/plant-0097-local-gallery-01.jpg"],
+  "Blaukönigin must publish only the operator-approved first photo."
 );
 assert.ok(
   !products.some((product) => product.plantId === "PLANT-0014"),
