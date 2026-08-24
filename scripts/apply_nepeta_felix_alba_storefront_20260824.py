@@ -58,25 +58,44 @@ PRODUCT_ROWS = (
             "та сизо-сірим ароматним листям. Формує рівномірний компактний "
             "столоноутворювальний покрив, рясно цвіте до заморозків і приваблює бджіл."
         ),
-        "ecology_text": "Сухий, добре дренований ґрунт середньої родючості.",
-        "agrotechnics_text": "Полив і фактичну готовність рослин підтверджує оператор.",
-        "use_text": "Ґрунтопокривні посадки, медоносні композиції та квітучі контейнери.",
+        "ecology_text": "Сонце або півтінь; сухий, добре дренований ґрунт середньої родючості.",
+        "agrotechnics_text": (
+            "Після висадки контролювати вологість до вкорінення; надалі полив "
+            "коригувати за умовами ділянки. Фактичну готовність рослин підтверджує оператор."
+        ),
+        "use_text": (
+            "Ґрунтопокривні посадки, передній план квітників, медоносні композиції "
+            "та квітучі контейнери."
+        ),
         "full_description": (
-            "Низькорослий багаторічний котівник із глибокими лілово-синіми квітками "
-            "та сизо-сірим ароматним листям. Формує рівномірний компактний "
-            "столоноутворювальний покрив, рясно цвіте до заморозків і приваблює бджіл. "
-            "Підходить для сухого, добре дренованого ґрунту середньої родючості, "
-            "ґрунтопокривних посадок, медоносних композицій і квітучих контейнерів."
+            "Котівник гроновидний 'Felix' (Nepeta racemosa 'Felix') — низькорослий "
+            "багаторічний сорт із глибокими лілово-синіми квітками та сизо-сірим "
+            "ароматним листям. Формує рівномірний компактний столоноутворювальний "
+            "покрив заввишки близько 25 см, рясно квітує від травня до жовтня та "
+            "приваблює бджіл. Найкраще розвивається на сонці або в півтіні, у сухому, "
+            "добре дренованому ґрунті середньої родючості й не переносить тривалого "
+            "застою води. Після висадки потребує контролю вологості до вкорінення; "
+            "надалі полив коригують за умовами ділянки. Підходить для ґрунтопокривних "
+            "посадок, переднього плану квітників, медоносних композицій і квітучих "
+            "контейнерів. Зимостійка в більшості регіонів України за умови дренованого "
+            "ґрунту (USDA 3–8)."
         ),
         "content_status": "operator_approved",
-        "source_names": "Jelitto Perennial Seeds",
-        "source_urls": "https://www.jelitto.com/Seed/Perennials/NEPETA%2Bracemosa%2BFelix%2BPortion%2Bs.html",
+        "source_names": "Jelitto Perennial Seeds; Royal Horticultural Society",
+        "source_urls": (
+            "https://www.jelitto.com/Seed/Perennials/NEPETA%2Bracemosa%2BFelix%2BPortion%2Bs.html; "
+            "https://www.rhs.org.uk/plants/360438/nepeta-racemosa-felix/details"
+        ),
         "source_confidence": "high",
-        "source_note": "Official cultivar page checked; operator approved card and selected local photos on 2026-08-24.",
+        "source_note": (
+            "Official Jelitto cultivar page checked for cultivar traits and USDA zone; "
+            "exact RHS cultivar profile checked for full sun / partial shade; operator "
+            "approved page copy on 2026-08-24."
+        ),
         "seo_title": "Котівник гроновидний Felix — саджанці Flora & Aroma",
         "seo_description": "Котівник гроновидний Felix у контейнері 0,12 л. Ціна 35 грн; наявність підтверджує оператор.",
         "image_path": "/images/plants/local/plant-0091-local-01.jpg; /images/plants/local/plant-0091-local-02.jpg",
-        "sun_exposure": "",
+        "sun_exposure": "full_sun;part_sun",
         "moisture": "dry",
         "height_cm_min": "25",
         "height_cm_max": "25",
@@ -108,23 +127,42 @@ PRODUCT_ROWS = (
             "Багаторічний столоноутворювальний котівник із чисто-білими квітками. "
             "Формує ґрунтопокривні посадки, цвіте у перший рік і є кормовою рослиною для бджіл."
         ),
-        "ecology_text": "Сухий, добре дренований ґрунт.",
-        "agrotechnics_text": "Полив і фактичну готовність рослин підтверджує оператор.",
-        "use_text": "Ґрунтопокривні та медоносні посадки.",
+        "ecology_text": "Сонце або півтінь; сухий, добре дренований ґрунт.",
+        "agrotechnics_text": (
+            "Після висадки контролювати вологість до вкорінення; надалі полив "
+            "коригувати за умовами ділянки. Фактичну готовність рослин підтверджує оператор."
+        ),
+        "use_text": (
+            "Світлі ґрунтопокривні композиції, передній план квітників і медоносні посадки."
+        ),
         "full_description": (
-            "Багаторічний столоноутворювальний котівник із чисто-білими квітками. "
-            "Формує ґрунтопокривні посадки, цвіте у перший рік і є кормовою рослиною для бджіл. "
-            "Підходить для сухого, добре дренованого ґрунту та медоносних композицій."
+            "Котівник гроновидний 'Alba' (Nepeta racemosa 'Alba') — багаторічний "
+            "столоноутворювальний сорт із чисто-білими квітками. Формує невисокий "
+            "ґрунтопокривний масив заввишки близько 30 см, може зацвісти у перший рік "
+            "вирощування, квітує від травня до вересня та є кормовою рослиною для бджіл. "
+            "Найкраще розвивається на сонці або в півтіні, у сухому, добре дренованому "
+            "ґрунті й не переносить тривалого застою води. Після висадки потребує "
+            "контролю вологості до вкорінення; надалі полив коригують за умовами "
+            "ділянки. Підходить для світлих ґрунтопокривних композицій, переднього "
+            "плану квітників і медоносних посадок. Зимостійка в більшості регіонів "
+            "України за умови дренованого ґрунту (USDA 3–8)."
         ),
         "content_status": "operator_approved",
-        "source_names": "Jelitto Perennial Seeds",
-        "source_urls": "https://www.jelitto.com/Seed/Perennials/NEPETA%2Bracemosa%2BAlba%2BPortion%2Bs.html",
+        "source_names": "Jelitto Perennial Seeds; Royal Horticultural Society",
+        "source_urls": (
+            "https://www.jelitto.com/Seed/Perennials/NEPETA%2Bracemosa%2BAlba%2BPortion%2Bs.html; "
+            "https://www.rhs.org.uk/plants/129199/nepeta-racemosa-alba/details"
+        ),
         "source_confidence": "high",
-        "source_note": "Official cultivar page checked; operator approved card and selected local photos on 2026-08-24.",
+        "source_note": (
+            "Official Jelitto cultivar page checked for cultivar traits and USDA zone; "
+            "exact RHS cultivar profile checked for full sun / partial shade; operator "
+            "approved page copy on 2026-08-24."
+        ),
         "seo_title": "Котівник гроновидний Alba — саджанці Flora & Aroma",
         "seo_description": "Котівник гроновидний Alba з білими квітками у контейнері 0,12 л. Ціна 40 грн.",
         "image_path": "/images/plants/local/plant-0092-local-01.jpg; /images/plants/local/plant-0092-local-02.jpg",
-        "sun_exposure": "",
+        "sun_exposure": "full_sun;part_sun",
         "moisture": "dry",
         "height_cm_min": "30",
         "height_cm_max": "30",
