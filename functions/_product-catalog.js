@@ -265,35 +265,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0014": {
-    "name": "Котівник котячий",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0014-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
-        "unit": "шт."
-      },
-      {
-        "variant_id": "VAR-PLANT-0014-P11",
-        "container_type_id": "POT-P11",
-        "format_code": "P11",
-        "container": "Горщик P11",
-        "price": 65,
-        "unit": "шт."
-      },
-      {
-        "variant_id": "VAR-PLANT-0014-P13",
-        "container_type_id": "POT-P13",
-        "format_code": "P13",
-        "container": "Горщик P13",
-        "price": 85,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0055": {
     "name": "Лаванда широколиста",
     "variants": [
@@ -888,6 +859,32 @@ export const productCatalog = {
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
         "price": 30,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0091": {
+    "name": "Котівник гроновидний 'Felix'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0091-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 35,
+        "unit": "шт."
+      }
+    ]
+  },
+  "PLANT-0092": {
+    "name": "Котівник гроновидний 'Alba'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0092-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 40,
         "unit": "шт."
       }
     ]

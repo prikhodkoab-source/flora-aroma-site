@@ -95,7 +95,20 @@ function productMatchesFilters(product, filters) {
   return true;
 }
 
-assert.equal(products.length, 44, "Expected 44 public catalog products in the built shop config.");
+assert.equal(products.length, 45, "Expected 45 public catalog products in the built shop config.");
+
+assert.ok(
+  products.some((product) => product.plantId === "PLANT-0091"),
+  "Expected approved Nepeta racemosa 'Felix' in the public catalog."
+);
+assert.ok(
+  products.some((product) => product.plantId === "PLANT-0092"),
+  "Expected approved Nepeta racemosa 'Alba' in the public catalog."
+);
+assert.ok(
+  !products.some((product) => product.plantId === "PLANT-0014"),
+  "Suspended Nepeta cataria must not appear in the public catalog."
+);
 
 for (const expectedSection of ["sun", "moisture", "purpose", "height", "flowering", "category", "format", "price"]) {
   assert.ok(sectionById.has(expectedSection), `Missing catalog filter section: ${expectedSection}`);
