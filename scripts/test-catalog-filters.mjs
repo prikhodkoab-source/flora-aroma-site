@@ -95,7 +95,7 @@ function productMatchesFilters(product, filters) {
   return true;
 }
 
-assert.equal(products.length, 45, "Expected 45 public catalog products in the built shop config.");
+assert.equal(products.length, 46, "Expected 46 public catalog products in the built shop config.");
 
 assert.ok(
   products.some((product) => product.plantId === "PLANT-0091"),
@@ -104,6 +104,10 @@ assert.ok(
 assert.ok(
   products.some((product) => product.plantId === "PLANT-0092"),
   "Expected approved Nepeta racemosa 'Alba' in the public catalog."
+);
+assert.ok(
+  products.some((product) => product.plantId === "PLANT-0099"),
+  "Expected approved Salvia officinalis 'Purpurascens' in the public catalog."
 );
 assert.ok(
   !products.some((product) => product.plantId === "PLANT-0014"),
