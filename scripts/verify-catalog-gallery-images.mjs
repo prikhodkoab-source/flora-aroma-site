@@ -6,11 +6,11 @@ import { chromium } from "playwright";
 const baseUrl = process.env.SITE_BASE_URL || "http://127.0.0.1:4323";
 const cases = [
   ["PLANT-0032", "/plants/sosna-zvychaina-plant-0032/", "/images/plants/local/plant-0032-format-01.jpg", "/images/plants/local/plant-0032-card-01.png", null],
-  ["PLANT-0091", "/plants/kotivnyk-hronovydnyi-felix-plant-0091/", "/images/plants/local/plant-0091-format-01.jpg", "/images/plants/local/plant-0091-card-01.png", [1200, 1600]],
-  ["PLANT-0092", "/plants/kotivnyk-hronovydnyi-alba-plant-0092/", "/images/plants/local/plant-0092-format-01.jpg", "/images/plants/local/plant-0092-card-01.png", [1200, 1600]],
-  ["PLANT-0096", "/plants/shavliia-dibrovna-rosak-nigin-plant-0096/", "/images/plants/local/plant-0096-format-01.jpg", "/images/plants/local/plant-0096-card-01.png", [1200, 1600]],
-  ["PLANT-0097", "/plants/shavliia-dibrovna-blauk-nigin-plant-0097/", "/images/plants/local/plant-0097-format-01.jpg", "/images/plants/local/plant-0097-card-01.png", [1200, 1600]],
-  ["PLANT-0099", "/plants/shavliia-likarska-purpurascens-plant-0099/", "/images/plants/local/plant-0099-format-01.jpg", "/images/plants/local/plant-0099-card-01.png", [1200, 1600]],
+  ["PLANT-0091", "/plants/kotivnyk-hronovydnyi-felix-plant-0091/", "/images/plants/local/plant-0091-format-01-v2.jpg", "/images/plants/local/plant-0091-card-01.png", [1200, 1600]],
+  ["PLANT-0092", "/plants/kotivnyk-hronovydnyi-alba-plant-0092/", "/images/plants/local/plant-0092-format-01-v2.jpg", "/images/plants/local/plant-0092-card-01.png", [1200, 1600]],
+  ["PLANT-0096", "/plants/shavliia-dibrovna-rosak-nigin-plant-0096/", "/images/plants/local/plant-0096-format-01-v2.jpg", "/images/plants/local/plant-0096-card-01.png", [1200, 1600]],
+  ["PLANT-0097", "/plants/shavliia-dibrovna-blauk-nigin-plant-0097/", "/images/plants/local/plant-0097-format-01-v2.jpg", "/images/plants/local/plant-0097-card-01.png", [1200, 1600]],
+  ["PLANT-0099", "/plants/shavliia-likarska-purpurascens-plant-0099/", "/images/plants/local/plant-0099-format-01-v2.jpg", "/images/plants/local/plant-0099-card-01.png", [1200, 1600]],
 ];
 
 const browser = await chromium.launch({

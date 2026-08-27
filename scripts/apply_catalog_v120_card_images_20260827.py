@@ -21,41 +21,41 @@ GALLERIES = {
     ),
     "PLANT-0091": (
         "/images/plants/local/plant-0091-local-01.jpg",
-        "/images/plants/local/plant-0091-format-01.jpg",
+        "/images/plants/local/plant-0091-format-01-v2.jpg",
         "/images/plants/local/plant-0091-local-02.jpg",
         "/images/plants/local/plant-0091-card-01.png",
     ),
     "PLANT-0092": (
         "/images/plants/local/plant-0092-local-01.jpg",
-        "/images/plants/local/plant-0092-format-01.jpg",
+        "/images/plants/local/plant-0092-format-01-v2.jpg",
         "/images/plants/local/plant-0092-local-02.jpg",
         "/images/plants/local/plant-0092-card-01.png",
     ),
     "PLANT-0096": (
         "/images/plants/local/plant-0096-local-gallery-01.jpg",
-        "/images/plants/local/plant-0096-format-01.jpg",
+        "/images/plants/local/plant-0096-format-01-v2.jpg",
         "/images/plants/local/plant-0096-local-gallery-02.jpg",
         "/images/plants/local/plant-0096-card-01.png",
     ),
     "PLANT-0097": (
         "/images/plants/local/plant-0097-local-gallery-01.jpg",
-        "/images/plants/local/plant-0097-format-01.jpg",
+        "/images/plants/local/plant-0097-format-01-v2.jpg",
         "/images/plants/local/plant-0097-card-01.png",
     ),
     "PLANT-0099": (
         "/images/plants/local/plant-0099-local-gallery-01.jpg",
-        "/images/plants/local/plant-0099-format-01.jpg",
+        "/images/plants/local/plant-0099-format-01-v2.jpg",
         "/images/plants/local/plant-0099-local-gallery-02.jpg",
         "/images/plants/local/plant-0099-card-01.png",
     ),
 }
 
 NEW_IMAGES = (
-    ("PLANT-0091", "plant-0091-format-01.jpg", "Изображения/Котівник гроновидний 'Felix' V-120.jpg", "Котівник гроновидний 'Felix' — формат V-120", "4571BC38042211D2B6ADE138B232E4E0EC355A1698A9FCC7F1A380019AEB2E1C", "container_photo_operator_approved_2026-08-27"),
-    ("PLANT-0092", "plant-0092-format-01.jpg", "Изображения/Котівник гроновидний 'Alba' V-120.jpg", "Котівник гроновидний 'Alba' — формат V-120", "93214D043265E16675DE3C082B883FF99D4BF994A12E5EBA033BD34280CECA32", "container_photo_operator_approved_2026-08-27"),
-    ("PLANT-0096", "plant-0096-format-01.jpg", "Изображения/Шавлія дібровна ‘Rosakönigin’ V-120.jpg", "Шавлія дібровна 'Rosakönigin' — формат V-120", "694FE46E46804D778E2AE13498E2DFF0765D33D81E9CDD73F8A21B839203C82C", "container_photo_operator_approved_2026-08-27"),
-    ("PLANT-0097", "plant-0097-format-01.jpg", "Изображения/Шавлія дібровна ‘Blaukönigin’ V-120.jpg", "Шавлія дібровна 'Blaukönigin' — формат V-120", "4A74DB6D91E65D4AECE4CED0A26E9BD2A5F29C93000EECEDB862E3D6B20A03C2", "container_photo_operator_approved_2026-08-27"),
-    ("PLANT-0099", "plant-0099-format-01.jpg", "Изображения/Шавлія лікарська Purpurascens V-120.jpg", "Шавлія лікарська 'Purpurascens' — формат V-120", "FD54A18B5A63DA8AEB09840354D71CCCB884303C9B3DDC264015AF79F2D13AB6", "container_photo_operator_approved_2026-08-27"),
+    ("PLANT-0091", "plant-0091-format-01-v2.jpg", "Изображения/Котівник гроновидний 'Felix' V-120.jpg", "Котівник гроновидний 'Felix' — формат V-120", "4571BC38042211D2B6ADE138B232E4E0EC355A1698A9FCC7F1A380019AEB2E1C", "container_photo_operator_approved_2026-08-27"),
+    ("PLANT-0092", "plant-0092-format-01-v2.jpg", "Изображения/Котівник гроновидний 'Alba' V-120.jpg", "Котівник гроновидний 'Alba' — формат V-120", "93214D043265E16675DE3C082B883FF99D4BF994A12E5EBA033BD34280CECA32", "container_photo_operator_approved_2026-08-27"),
+    ("PLANT-0096", "plant-0096-format-01-v2.jpg", "Изображения/Шавлія дібровна ‘Rosakönigin’ V-120.jpg", "Шавлія дібровна 'Rosakönigin' — формат V-120", "694FE46E46804D778E2AE13498E2DFF0765D33D81E9CDD73F8A21B839203C82C", "container_photo_operator_approved_2026-08-27"),
+    ("PLANT-0097", "plant-0097-format-01-v2.jpg", "Изображения/Шавлія дібровна ‘Blaukönigin’ V-120.jpg", "Шавлія дібровна 'Blaukönigin' — формат V-120", "4A74DB6D91E65D4AECE4CED0A26E9BD2A5F29C93000EECEDB862E3D6B20A03C2", "container_photo_operator_approved_2026-08-27"),
+    ("PLANT-0099", "plant-0099-format-01-v2.jpg", "Изображения/Шавлія лікарська Purpurascens V-120.jpg", "Шавлія лікарська 'Purpurascens' — формат V-120", "FD54A18B5A63DA8AEB09840354D71CCCB884303C9B3DDC264015AF79F2D13AB6", "container_photo_operator_approved_2026-08-27"),
     ("PLANT-0032", "plant-0032-card-01.png", "Изображения/Картки рослин/Сосна звичайна.png", "Сосна звичайна — картка рослини", "45BCB579BBFC3B5CD31462A51E19D458DE497A06D3210D56FB668F4E90C1ADAB", "operator_approved_for_storefront_2026-08-27"),
     ("PLANT-0091", "plant-0091-card-01.png", "Изображения/Картки рослин/Котівник гроновидний 'Felix'.png", "Котівник гроновидний 'Felix' — картка рослини", "8FA5DF82A3533BE1A77482FBB3A1196746DEE75371E7508AD3179B71484D8AF2", "operator_approved_for_storefront_2026-08-27"),
     ("PLANT-0092", "plant-0092-card-01.png", "Изображения/Картки рослин/Котівник гроновидний 'Alba'.png", "Котівник гроновидний 'Alba' — картка рослини", "603315C4E8C5DFCF0E7D4D321A1FA6933745286AFDCB939B2BC7BF8657CA3E8F", "operator_approved_for_storefront_2026-08-27"),
@@ -65,11 +65,19 @@ NEW_IMAGES = (
 )
 
 V120_DIMENSIONS = {
-    "plant-0091-format-01.jpg": (1200, 1600),
-    "plant-0092-format-01.jpg": (1200, 1600),
-    "plant-0096-format-01.jpg": (1200, 1600),
-    "plant-0097-format-01.jpg": (1200, 1600),
-    "plant-0099-format-01.jpg": (1200, 1600),
+    "plant-0091-format-01-v2.jpg": (1200, 1600),
+    "plant-0092-format-01-v2.jpg": (1200, 1600),
+    "plant-0096-format-01-v2.jpg": (1200, 1600),
+    "plant-0097-format-01-v2.jpg": (1200, 1600),
+    "plant-0099-format-01-v2.jpg": (1200, 1600),
+}
+
+LEGACY_V120_PATHS = {
+    "/images/plants/local/plant-0091-format-01.jpg",
+    "/images/plants/local/plant-0092-format-01.jpg",
+    "/images/plants/local/plant-0096-format-01.jpg",
+    "/images/plants/local/plant-0097-format-01.jpg",
+    "/images/plants/local/plant-0099-format-01.jpg",
 }
 
 
@@ -109,7 +117,10 @@ def main() -> None:
 
     source_fields, source_rows = read_csv(IMAGE_SOURCES)
     new_paths = {f"/images/plants/local/{item[1]}" for item in NEW_IMAGES}
-    source_rows = [row for row in source_rows if row.get("image_path") not in new_paths]
+    excluded_paths = new_paths | LEGACY_V120_PATHS
+    source_rows = [
+        row for row in source_rows if row.get("image_path") not in excluded_paths
+    ]
 
     for plant_id, target_name, source_path, title, expected_hash, status in NEW_IMAGES:
         target = SITE / "public" / "images" / "plants" / "local" / target_name
