@@ -3,22 +3,34 @@ import { render } from "astro:content";
 import TildaCloneFooter from "../../components/TildaCloneFooter.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { formatProductStartingPrice, getProducts } from "../../lib/products";
-import { getApprovedPublications, getBodyMedia, getCoverMedia, type PublicPublication } from "../../lib/publications";
+import {
+  getApprovedPublications,
+  getBodyMedia,
+  getCoverMedia,
+  getDraftPreviewPublication,
+  type PublicPublication
+} from "../../lib/publications";
 
 export async function getStaticPaths() {
   const publications = await getApprovedPublications();
+  const draftPreview = await getDraftPreviewPublication();
 
-  return publications.map((publication) => ({
+  const paths = publications.map((publication) => ({
     params: { slug: publication.data.slug },
-    props: { publication }
+    props: { publication, previewMode: false }
   }));
+  if (draftPreview) {
+    paths.push({ params: { slug: draftPreview.data.slug }, props: { publication: draftPreview, previewMode: true } });
+  }
+  return paths;
 }
 
 type Props = {
   publication: PublicPublication;
+  previewMode: boolean;
 };
 
-const { publication } = Astro.props;
+const { publication, previewMode } = Astro.props;
 const { data } = publication;
 const { Content } = await render(publication);
 const coverMedia = getCoverMedia(publication);
@@ -30,11 +42,11 @@ const collectionProducts = data.relatedPlantIds.flatMap((plantId) => {
   const card = plantCardById.get(plantId);
   return product ? [{ product, card }] : [];
 });
-const publishedDate = new Intl.DateTimeFormat("uk-UA", {
+const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
   day: "numeric",
   month: "long",
   year: "numeric"
-}).format(data.publishedAt);
+}).format(data.publishedAt) : null;
 ---
 
 <BaseLayout
@@ -43,15 +55,17 @@ const publishedDate = new Intl.DateTimeFormat("uk-UA", {
   image={data.coverImage ?? null}
   navKey="publications"
   ogType="article"
-  articlePublishedTime={data.publishedAt.toISOString()}
+  articlePublishedTime={data.publishedAt?.toISOString()}
   articleModifiedTime={data.updatedAt?.toISOString()}
+  robots={previewMode ? "noindex,nofollow,noarchive" : undefined}
+  canonicalPath={previewMode ? null : undefined}
 >
   <section class="collection-hero">
     <div class="collection-shell">
       <a class="publication-back" href="/publications/">Поради та ідеї</a>
-      <p class="collection-eyebrow">{data.category} · {publishedDate}</p>
+      <p class="collection-eyebrow">{data.category} · {previewMode ? "Чернетка для перегляду" : publishedDate}</p>
       <h1>{data.title}</h1>
-      <p class="collection-lead">{data.excerpt}</p>
+      <p class="collection-lead">{data.subtitle ?? data.excerpt}</p>
     </div>
   </section>
 
