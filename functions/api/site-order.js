@@ -32,6 +32,17 @@ function firstChatId(env) {
   return cleanText(env.TELEGRAM_ALLOWED_USER_IDS, 200).split(/[,\s;]+/).filter(Boolean)[0] || "";
 }
 
+function telegramFetchErrorCode(error) {
+  const errorName = error instanceof Error ? error.name : "";
+  if (errorName === "AbortError" || errorName === "TimeoutError") {
+    return "telegram_timeout";
+  }
+  if (error instanceof TypeError) {
+    return "telegram_network_error";
+  }
+  return "telegram_fetch_failed";
+}
+
 function makeRequestId() {
   const timestamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
   const suffix = crypto.randomUUID().slice(0, 6).toUpperCase();
@@ -254,19 +265,24 @@ export async function onRequestPost(context) {
   let telegramStatus = "not_configured";
   let telegramError = "";
   if (token && chatId) {
-    const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        disable_web_page_preview: true
-      })
-    });
-    telegramStatus = telegramResponse.ok ? "sent" : "failed";
-    telegramError = telegramResponse.ok ? "" : `HTTP ${telegramResponse.status}`;
+    try {
+      const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          disable_web_page_preview: true
+        })
+      });
+      telegramStatus = telegramResponse.ok ? "sent" : "failed";
+      telegramError = telegramResponse.ok ? "" : `telegram_http_${telegramResponse.status}`;
+    } catch (error) {
+      telegramStatus = "failed";
+      telegramError = telegramFetchErrorCode(error);
+    }
   } else {
-    telegramError = "Telegram bindings are not configured.";
+    telegramError = "telegram_not_configured";
   }
   await context.env.SITE_REQUESTS_DB.prepare(
     "UPDATE site_orders SET telegram_status = ?, telegram_error = ? WHERE request_id = ?"

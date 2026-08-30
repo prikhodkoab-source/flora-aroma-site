@@ -5,6 +5,11 @@ import { onRequestGet, onRequestPost } from "../functions/api/site-order.js";
 const originalFetch = globalThis.fetch;
 const originalConsoleError = console.error;
 const sentMessages = [];
+let telegramFetchResult = async () =>
+  new Response(JSON.stringify({ ok: true, result: { message_id: 1 } }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" }
+  });
 
 class MockStatement {
   constructor(db, sql) {
@@ -128,10 +133,7 @@ class MockD1 {
 
 globalThis.fetch = async (url, options) => {
   sentMessages.push({ url: String(url), body: JSON.parse(options.body) });
-  return new Response(JSON.stringify({ ok: true, result: { message_id: 1 } }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" }
-  });
+  return telegramFetchResult();
 };
 
 const db = new MockD1();
@@ -189,14 +191,49 @@ assert.equal(db.orders.length, 1);
 assert.equal(db.items.length, 1);
 assert.equal(db.orders[0].delivery_method, "Нова пошта");
 assert.equal(db.orders[0].delivery_address, "Київ, відділення 1");
+assert.equal(db.orders[0].telegram_status, "sent");
+assert.equal(db.orders[0].telegram_error, "");
 
 const duplicate = await onRequestPost(context(validPayload));
 assert.equal((await duplicate.json()).duplicate, true);
 assert.equal(db.orders.length, 1);
 
+telegramFetchResult = async () => new Response("upstream failure", { status: 500 });
+const telegramHttpFailure = await onRequestPost(
+  context({
+    ...validPayload,
+    submissionId: "123e4567-e89b-42d3-a456-426614174001"
+  })
+);
+const telegramHttpFailureBody = await telegramHttpFailure.json();
+assert.equal(telegramHttpFailure.status, 200);
+assert.equal(telegramHttpFailureBody.ok, true);
+assert.equal(telegramHttpFailureBody.stored, true);
+assert.equal(telegramHttpFailureBody.telegramStatus, "failed");
+assert.equal(db.orders[1].telegram_status, "failed");
+assert.equal(db.orders[1].telegram_error, "telegram_http_500");
+
+telegramFetchResult = async () => {
+  throw new TypeError("sensitive upstream details must not be persisted");
+};
+const telegramFetchFailure = await onRequestPost(
+  context({
+    ...validPayload,
+    submissionId: "123e4567-e89b-42d3-a456-426614174002"
+  })
+);
+const telegramFetchFailureBody = await telegramFetchFailure.json();
+assert.equal(telegramFetchFailure.status, 200);
+assert.equal(telegramFetchFailureBody.ok, true);
+assert.equal(telegramFetchFailureBody.stored, true);
+assert.equal(telegramFetchFailureBody.telegramStatus, "failed");
+assert.equal(db.orders[2].telegram_status, "failed");
+assert.equal(db.orders[2].telegram_error, "telegram_network_error");
+assert.equal(db.orders[2].telegram_error.includes("sensitive"), false);
+
 const noTelegramPayload = {
   ...validPayload,
-  submissionId: "123e4567-e89b-42d3-a456-426614174001"
+  submissionId: "123e4567-e89b-42d3-a456-426614174003"
 };
 const noTelegram = await onRequestPost(
   context(noTelegramPayload, { TELEGRAM_TOKEN: "", TELEGRAM_CHAT_ID: "" })
@@ -205,14 +242,17 @@ const noTelegramBody = await noTelegram.json();
 assert.equal(noTelegram.status, 200);
 assert.equal(noTelegramBody.stored, true);
 assert.equal(noTelegramBody.telegramStatus, "not_configured");
-assert.equal(db.orders.length, 2);
+assert.equal(db.orders.length, 4);
+assert.equal(db.orders[3].telegram_status, "not_configured");
+assert.equal(db.orders[3].telegram_error, "telegram_not_configured");
+assert.equal(db.orders.some((order) => order.telegram_status === "pending"), false);
 
 const exportRequest = new Request("https://flora-aroma-site.pages.dev/api/site-orders", {
   headers: { Authorization: "Bearer sync-secret" }
 });
 const exported = await exportGet({ request: exportRequest, env });
 const exportedBody = await exported.json();
-assert.equal(exportedBody.rows.length, 2);
+assert.equal(exportedBody.rows.length, 4);
 assert.equal(exportedBody.rows[0].delivery_method, "Нова пошта");
 
 const ackRequest = new Request("https://flora-aroma-site.pages.dev/api/site-orders", {
@@ -239,7 +279,7 @@ assert.equal(emptyCart.status, 400);
 const forgedPrice = await onRequestPost(
   context({
     ...validPayload,
-    submissionId: "123e4567-e89b-42d3-a456-426614174002",
+    submissionId: "123e4567-e89b-42d3-a456-426614174004",
     items: [{ ...validPayload.items[0], price: 1 }]
   })
 );
