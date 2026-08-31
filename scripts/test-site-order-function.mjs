@@ -285,6 +285,32 @@ const forgedPrice = await onRequestPost(
 );
 assert.equal(forgedPrice.status, 400);
 
+const orderCountBeforeUnavailableProduct = db.orders.length;
+const unavailableProduct = await onRequestPost(
+  context({
+    ...validPayload,
+    submissionId: "123e4567-e89b-42d3-a456-426614174005",
+    items: [
+      {
+        plantId: "PLANT-0067",
+        variantId: "VAR-PLANT-0067-V120",
+        name: "Полин гіркий",
+        container: "0.12 л",
+        qty: 1,
+        price: 30,
+        unit: "шт."
+      }
+    ]
+  })
+);
+const unavailableProductBody = await unavailableProduct.json();
+assert.equal(unavailableProduct.status, 400);
+assert.equal(
+  unavailableProductBody.error,
+  "Одна з позицій не відповідає актуальному публічному каталогу."
+);
+assert.equal(db.orders.length, orderCountBeforeUnavailableProduct);
+
 const getResponse = onRequestGet();
 assert.equal(getResponse.status, 405);
 

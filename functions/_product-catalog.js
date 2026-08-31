@@ -467,19 +467,6 @@ export const productCatalog = {
       }
     ]
   },
-  "PLANT-0067": {
-    "name": "Полин гіркий",
-    "variants": [
-      {
-        "variant_id": "VAR-PLANT-0067-V120",
-        "container_type_id": "CASSETTE-HIKO-V120SS",
-        "format_code": "V-120",
-        "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
-        "unit": "шт."
-      }
-    ]
-  },
   "PLANT-0039": {
     "name": "Піщанка гірська 'Snowbank'",
     "variants": [
