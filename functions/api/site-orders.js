@@ -40,6 +40,7 @@ export async function onRequestGet(context) {
        o.telegram_status,
        i.line_no,
        i.plant_id,
+       i.variant_id,
        i.product_name,
        i.container,
        i.unit,

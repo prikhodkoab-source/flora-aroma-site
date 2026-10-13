@@ -110,12 +110,13 @@ class MockD1 {
         });
         results.push({ meta: { changes: 1 } });
       } else if (statement.sql.startsWith("INSERT INTO site_order_items")) {
-        const [request_id, line_no, plant_id, product_name, container, unit, qty, unit_price] =
+        const [request_id, line_no, plant_id, variant_id, product_name, container, unit, qty, unit_price] =
           statement.values;
         this.items.push({
           request_id,
           line_no,
           plant_id,
+          variant_id,
           product_name,
           container,
           unit,
@@ -189,6 +190,7 @@ assert.equal(successBody.stored, true);
 assert.equal(successBody.telegramStatus, "sent");
 assert.equal(db.orders.length, 1);
 assert.equal(db.items.length, 1);
+assert.equal(db.items[0].variant_id, validPayload.items[0].variantId);
 assert.equal(db.orders[0].delivery_method, "Нова пошта");
 assert.equal(db.orders[0].delivery_address, "Київ, відділення 1");
 assert.equal(db.orders[0].telegram_status, "sent");
@@ -253,6 +255,7 @@ const exportRequest = new Request("https://flora-aroma-site.pages.dev/api/site-o
 const exported = await exportGet({ request: exportRequest, env });
 const exportedBody = await exported.json();
 assert.equal(exportedBody.rows.length, 4);
+assert.equal(exportedBody.rows[0].variant_id, validPayload.items[0].variantId);
 assert.equal(exportedBody.rows[0].delivery_method, "Нова пошта");
 
 const ackRequest = new Request("https://flora-aroma-site.pages.dev/api/site-orders", {
@@ -285,6 +288,15 @@ const forgedPrice = await onRequestPost(
 );
 assert.equal(forgedPrice.status, 400);
 
+const forgedVariant = await onRequestPost(
+  context({
+    ...validPayload,
+    submissionId: "123e4567-e89b-42d3-a456-426614174006",
+    items: [{ ...validPayload.items[0], variantId: "VAR-PLANT-0041-P9" }]
+  })
+);
+assert.equal(forgedVariant.status, 400);
+
 const orderCountBeforeUnavailableProduct = db.orders.length;
 const unavailableProduct = await onRequestPost(
   context({
@@ -310,6 +322,17 @@ assert.equal(
   "Одна з позицій не відповідає актуальному публічному каталогу."
 );
 assert.equal(db.orders.length, orderCountBeforeUnavailableProduct);
+
+const misleadingContainer = await onRequestPost(
+  context({
+    ...validPayload,
+    submissionId: "123e4567-e89b-42d3-a456-426614174007",
+    items: [{ ...validPayload.items[0], container: "Горщик P9" }]
+  }, { TELEGRAM_TOKEN: "", TELEGRAM_CHAT_ID: "" })
+);
+assert.equal(misleadingContainer.status, 200);
+assert.equal(db.items.at(-1).variant_id, validPayload.items[0].variantId);
+assert.equal(db.items.at(-1).container, "0.12 л");
 
 const getResponse = onRequestGet();
 assert.equal(getResponse.status, 405);
