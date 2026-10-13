@@ -42,11 +42,12 @@ only after `SiteRequests.csv` and the workbook are safely synchronized.
 
 ## Operator notification handoff
 
-`SITE_ORDER_NOTIFICATION_MODE` defaults to `direct`, preserving the existing
-Pages Function Telegram alert. After Flora's pinned website status monitor has
-seeded its baseline, passed destination checks and run successfully on its
-ordinary schedule, set the Production Pages variable to `flora_monitor` and
-redeploy the reviewed Function. The Function then stores
+`SITE_ORDER_NOTIFICATION_MODE` defaults to `direct` if unset. The reviewed
+Wrangler configuration sets Production to `flora_monitor` after Flora's pinned
+website status monitor seeded its baseline, passed destination checks and ran
+successfully on its ordinary schedule. Preview remains `direct`; do not submit
+synthetic orders through Preview because it shares Production D1. In Production
+the Function then stores
 `telegram_status=deferred_to_flora_monitor` in D1 and does not call Telegram;
 Flora's 15-minute importer carries that marker into `SiteRequests`, and its
 separate status monitor sends the operator alert through the shared Prom/site
@@ -57,8 +58,8 @@ the direct send can finish; an older pending request is exported for recovery
 after a Function crash. Operator alerts are at least once and may be duplicated
 across that crash boundary; reconcile them by request ID.
 
-Keep `direct` during preparation. If the monitor fails after handoff, restore
-`direct` and inspect pending D1 requests and the Flora alert outbox. No mode
-changes accounting rows or customer messaging.
+If the monitor fails after handoff, restore `direct` in the reviewed Wrangler
+configuration, redeploy, and inspect pending D1 requests and the Flora alert
+outbox. No mode changes accounting rows or customer messaging.
 
 Do not commit `.dev.vars`, `.env`, the token, or the real chat ID.
