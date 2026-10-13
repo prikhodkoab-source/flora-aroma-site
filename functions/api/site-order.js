@@ -207,6 +207,12 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "Сховище заявок тимчасово не налаштоване." }, 503);
   }
 
+  const notificationMode = cleanText(context.env.SITE_ORDER_NOTIFICATION_MODE, 32) || "direct";
+  if (!["direct", "flora_monitor"].includes(notificationMode)) {
+    console.error("SITE_ORDER_NOTIFICATION_MODE is invalid.");
+    return json({ ok: false, error: "Сповіщення тимчасово не налаштовано." }, 503);
+  }
+
   const existing = await context.env.SITE_REQUESTS_DB.prepare(
     "SELECT request_id, telegram_status FROM site_orders WHERE submission_id = ?"
   )
@@ -264,9 +270,9 @@ export async function onRequestPost(context) {
   const token = cleanText(context.env.TELEGRAM_TOKEN, 256);
   const chatId = firstChatId(context.env);
   const message = buildTelegramMessage(requestId, validation.value);
-  let telegramStatus = "not_configured";
+  let telegramStatus = notificationMode === "flora_monitor" ? "deferred_to_flora_monitor" : "not_configured";
   let telegramError = "";
-  if (token && chatId) {
+  if (notificationMode === "direct" && token && chatId) {
     try {
       const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
@@ -283,7 +289,7 @@ export async function onRequestPost(context) {
       telegramStatus = "failed";
       telegramError = telegramFetchErrorCode(error);
     }
-  } else {
+  } else if (notificationMode === "direct") {
     telegramError = "telegram_not_configured";
   }
   await context.env.SITE_REQUESTS_DB.prepare(

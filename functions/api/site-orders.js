@@ -28,6 +28,9 @@ export async function onRequestGet(context) {
     return json({ ok: false, error: "Site request storage is not configured." }, 503);
   }
 
+  // Give the submitting Function time to record direct Telegram delivery.
+  // A crashed/persistently pending attempt becomes exportable after one minute.
+  const pendingCutoff = new Date(Date.now() - 60_000).toISOString();
   const result = await context.env.SITE_REQUESTS_DB.prepare(
     `SELECT
        o.request_id,
@@ -52,13 +55,14 @@ export async function onRequestGet(context) {
        SELECT request_id
        FROM site_orders
        WHERE sync_status = 'new'
+         AND (telegram_status != 'pending' OR received_at <= ?)
        ORDER BY received_at, request_id
        LIMIT ?
      )
      ORDER BY o.received_at, o.request_id, i.line_no
     `
   )
-    .bind(MAX_EXPORT_ORDERS)
+    .bind(pendingCutoff, MAX_EXPORT_ORDERS)
     .all();
 
   return json({ ok: true, rows: result.results || [] });
