@@ -118,7 +118,7 @@ function validatePayload(payload) {
         }
 
         if (variantId) {
-          return !variant.variant_id || variant.variant_id === variantId;
+          return variant.variant_id === variantId;
         }
 
         return variant.container === container;
@@ -129,6 +129,7 @@ function validatePayload(payload) {
       !/^PLANT-\d{4}$/.test(plantId) ||
       !catalogProduct ||
       !catalogVariant ||
+      !catalogVariant.variant_id ||
       !container ||
       qty === null ||
       price === null
@@ -138,9 +139,9 @@ function validatePayload(payload) {
 
     items.push({
       plantId,
-      variantId: catalogVariant.variant_id || variantId,
+      variantId: catalogVariant.variant_id,
       name: catalogProduct.name,
-      container: container || publicContainerLabel(catalogVariant),
+      container: publicContainerLabel(catalogVariant),
       unit: catalogVariant.unit,
       qty,
       price: Number(catalogVariant.price)
@@ -243,12 +244,13 @@ export async function onRequestPost(context) {
     ...validation.value.items.map((item, index) =>
       context.env.SITE_REQUESTS_DB.prepare(
         `INSERT INTO site_order_items (
-           request_id, line_no, plant_id, product_name, container, unit, qty, unit_price
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+           request_id, line_no, plant_id, variant_id, product_name, container, unit, qty, unit_price
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         requestId,
         index + 1,
         item.plantId,
+        item.variantId,
         item.name,
         item.container,
         item.unit,

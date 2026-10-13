@@ -29,6 +29,13 @@ Apply D1 migrations before the first live request:
 npm run db:migrate:remote
 ```
 
+For the `0002_site_order_variant_id.sql` rollout, apply the additive remote migration
+**before merging the Pages Function change to `main`**. `main` deploys automatically and
+the new Function requires the column. Verify the migration and then deploy the reviewed
+Function; keep the old Function available for rollback. Historical rows retain an empty
+`variant_id` and must not be guessed into a variant. The configured Preview binding
+points to the same D1 database, so do not submit synthetic orders through a preview URL.
+
 Flora reads new rows from the protected `/api/site-orders` endpoint and acknowledges them
 only after `SiteRequests.csv` and the workbook are safely synchronized.
 
