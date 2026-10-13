@@ -35,9 +35,10 @@ class MockStatement {
       throw new Error(`Unsupported all SQL: ${this.sql}`);
     }
     const pending = this.db.orders
-      .filter((order) => order.sync_status === "new")
+      .filter((order) => order.sync_status === "new" &&
+        (order.telegram_status !== "pending" || order.received_at <= this.values[0]))
       .sort((a, b) => a.received_at.localeCompare(b.received_at))
-      .slice(0, Number(this.values[0]));
+      .slice(0, Number(this.values[1]));
     const ids = new Set(pending.map((order) => order.request_id));
     return {
       results: this.db.items
@@ -249,12 +250,44 @@ assert.equal(db.orders[3].telegram_status, "not_configured");
 assert.equal(db.orders[3].telegram_error, "telegram_not_configured");
 assert.equal(db.orders.some((order) => order.telegram_status === "pending"), false);
 
+const telegramCountBeforeHandoff = sentMessages.length;
+const deferred = await onRequestPost(context(
+  { ...validPayload, submissionId: "123e4567-e89b-42d3-a456-426614174008" },
+  { SITE_ORDER_NOTIFICATION_MODE: "flora_monitor" }
+));
+assert.equal(deferred.status, 200);
+assert.equal((await deferred.json()).telegramStatus, "deferred_to_flora_monitor");
+assert.equal(db.orders.at(-1).telegram_status, "deferred_to_flora_monitor");
+assert.equal(sentMessages.length, telegramCountBeforeHandoff);
+
+const countBeforeInvalidMode = db.orders.length;
+const invalidMode = await onRequestPost(context(
+  { ...validPayload, submissionId: "123e4567-e89b-42d3-a456-426614174009" },
+  { SITE_ORDER_NOTIFICATION_MODE: "invalid" }
+));
+assert.equal(invalidMode.status, 503);
+assert.equal(db.orders.length, countBeforeInvalidMode);
+
 const exportRequest = new Request("https://flora-aroma-site.pages.dev/api/site-orders", {
   headers: { Authorization: "Bearer sync-secret" }
 });
+const pendingRow = {
+  ...db.orders[0], request_id: "SITE-TEST-PENDING",
+  received_at: new Date().toISOString(), telegram_status: "pending", sync_status: "new"
+};
+db.orders.push(pendingRow);
+db.items.push({ ...db.items[0], request_id: pendingRow.request_id });
+const duringNotification = await exportGet({ request: exportRequest, env });
+assert.equal((await duringNotification.json()).rows.length, 5);
+pendingRow.received_at = "2020-01-01T00:00:00.000Z";
+const afterTimeout = await exportGet({ request: exportRequest, env });
+assert.equal((await afterTimeout.json()).rows.length, 6);
+db.orders.pop();
+db.items.pop();
 const exported = await exportGet({ request: exportRequest, env });
 const exportedBody = await exported.json();
-assert.equal(exportedBody.rows.length, 4);
+assert.equal(exportedBody.rows.length, 5);
+assert.equal(exportedBody.rows.at(-1).telegram_status, "deferred_to_flora_monitor");
 assert.equal(exportedBody.rows[0].variant_id, validPayload.items[0].variantId);
 assert.equal(exportedBody.rows[0].delivery_method, "Нова пошта");
 
