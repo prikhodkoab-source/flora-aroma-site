@@ -927,5 +927,18 @@ export const productCatalog = {
         "unit": "шт."
       }
     ]
+  },
+  "PLANT-0093": {
+    "name": "Ехінацея пурпурова 'Doubledecker'",
+    "variants": [
+      {
+        "variant_id": "VAR-PLANT-0093-V120",
+        "container_type_id": "CASSETTE-HIKO-V120SS",
+        "format_code": "V-120",
+        "container": "CASSETTE-HIKO-V120SS",
+        "price": 45,
+        "unit": "шт."
+      }
+    ]
   }
 };

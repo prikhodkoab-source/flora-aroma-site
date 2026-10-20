@@ -95,7 +95,8 @@ function productMatchesFilters(product, filters) {
   return true;
 }
 
-assert.equal(products.length, 48, "Expected 48 public catalog products in the built shop config.");
+assert.equal(products.length, 49, "Expected 49 public catalog products in the built shop config.");
+assert.ok(products.some((product) => product.plantId === "PLANT-0093"), "Expected approved Doubledecker in the public catalog.");
 
 assert.ok(
   !products.some((product) => product.plantId === "PLANT-0067"),
