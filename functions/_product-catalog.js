@@ -412,7 +412,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -454,7 +454,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -496,7 +496,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
