@@ -1,176 +1,114 @@
+"""Generate the public PDF from the same approved prices as product cards."""
 from __future__ import annotations
 
 import csv
-import shutil
-import subprocess
+import os
 import tempfile
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
+from xml.sax.saxutils import escape
 
-from openpyxl import Workbook
-from openpyxl.drawing.image import Image
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-from openpyxl.utils import get_column_letter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Image, LongTable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PRODUCTS = ROOT / "data" / "products.csv"
-LOGO = ROOT / "public" / "images" / "logo.png"
-OUTPUT_DIR = ROOT / "public" / "downloads"
-OUTPUT_PDF = OUTPUT_DIR / "flora-aroma-price.pdf"
-SOFFICE_CANDIDATES = (
-    Path(r"C:\Program Files\LibreOffice\program\soffice.exe"),
-    Path(r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"),
-)
+PRODUCTS = ROOT / "data/products.csv"
+OUTPUT_PDF = ROOT / "public/downloads/flora-aroma-price.pdf"
+VOLUMES = {"V-120": "0,12", "V-265": "0,265", "P9": "0,4", "P10": "0,5", "P11": "0,6", "P12": "0,7", "P13": "1", "P15": "1,5", "P18": "2,4", "P19": "3", "P23": "5"}
 
 
-def split_values(value: str) -> list[str]:
-    return [item.strip() for item in value.split(";") if item.strip()]
+def split_values(value):
+    return [part.strip() for part in value.split(";") if part.strip()]
 
 
-def read_price_rows() -> list[dict[str, str]]:
-    with PRODUCTS.open("r", encoding="utf-8-sig", newline="") as handle:
-        products = list(csv.DictReader(handle))
-
-    rows: list[dict[str, str]] = []
+def read_price_rows():
+    with PRODUCTS.open(encoding="utf-8-sig", newline="") as stream:
+        products = list(csv.DictReader(stream))
+    rows, seen = [], set()
     for product in products:
-        containers = split_values(product.get("variant_containers", ""))
-        prices = split_values(product.get("variant_prices_uah", ""))
-        units = split_values(product.get("variant_units", ""))
-        if not containers:
-            containers = [product["container"]]
-            prices = [product["price_uah"]]
-            units = [product["unit"]]
-
-        if not (len(containers) == len(prices) == len(units)):
-            raise RuntimeError(f"variant_mismatch:{product['plant_id']}")
-
-        for container, price, unit in zip(containers, prices, units):
-            rows.append(
-                {
-                    "plant_id": product["plant_id"],
-                    "name_uk": product["name_uk"],
-                    "latin_name": product["latin_name"],
-                    "container": container,
-                    "price": f"{price} UAH/{unit}",
-                }
-            )
-
-    return sorted(rows, key=lambda row: (row["name_uk"], row["container"]))
+        ids = split_values(product["variant_ids"])
+        codes = split_values(product["variant_format_codes"])
+        prices = split_values(product["variant_prices_uah"])
+        if not ids or not (len(ids) == len(codes) == len(prices)):
+            raise ValueError(f"variant_mismatch:{product['plant_id']}")
+        for variant, code, price in zip(ids, codes, prices):
+            if variant in seen or code not in VOLUMES:
+                raise ValueError(f"duplicate_variant_or_unknown_volume:{variant}")
+            value = Decimal(price)
+            if not value.is_finite() or value <= 0:
+                raise ValueError(f"invalid_price:{variant}")
+            seen.add(variant)
+            rows.append({"variant_id": variant, "plant_id": product["plant_id"], "name_uk": product["name_uk"], "latin_name": product["latin_name"], "volume": VOLUMES[code] + " л", "price": format(value.normalize(), "f").replace(".", ",")})
+    return sorted(rows, key=lambda row: (row["name_uk"], Decimal(row["volume"].split()[0].replace(",", "."))))
 
 
-def build_workbook(rows: list[dict[str, str]], target: Path) -> None:
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Прайс"
-    ws.sheet_view.showGridLines = False
-
-    ws.merge_cells("B1:E2")
-    ws["B1"] = "FLORA & AROMA"
-    ws["B1"].font = Font(name="Arial", size=26, bold=True, color="1F5D42")
-    ws["B1"].alignment = Alignment(vertical="center")
-    ws.merge_cells("B3:E3")
-    ws["B3"] = "Актуальний асортимент рослин"
-    ws["B3"].font = Font(name="Arial", size=15, bold=True, color="18352B")
-    ws.merge_cells("B4:E4")
-    ws["B4"] = f"Дата формування: {date.today():%d.%m.%Y}  |  flora-aroma.com.ua  |  +380500272882"
-    ws["B4"].font = Font(name="Arial", size=9, color="66736F")
-
-    if LOGO.is_file():
-        logo = Image(LOGO)
-        logo.width = 92
-        logo.height = 92
-        ws.add_image(logo, "A1")
-
-    headers = ("plant_id", "Українська назва", "Латинська назва", "Горщик / касета", "Ціна")
-    header_row = 6
-    for column, header in enumerate(headers, start=1):
-        cell = ws.cell(header_row, column, header)
-        cell.font = Font(name="Arial", size=9, bold=True, color="18352B")
-        cell.fill = PatternFill("solid", fgColor="DDEEDF")
-        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-
-    thin = Side(style="thin", color="D8E4DC")
-    for row_index, row in enumerate(rows, start=header_row + 1):
-        values = (
-            row["plant_id"],
-            row["name_uk"],
-            row["latin_name"],
-            row["container"],
-            row["price"],
-        )
-        for column, value in enumerate(values, start=1):
-            cell = ws.cell(row_index, column, value)
-            cell.font = Font(name="Arial", size=8)
-            cell.alignment = Alignment(vertical="top", wrap_text=True)
-            cell.border = Border(bottom=thin)
-
-    widths = (15, 31, 29, 25, 15)
-    for column, width in enumerate(widths, start=1):
-        ws.column_dimensions[get_column_letter(column)].width = width
-
-    ws.row_dimensions[1].height = 36
-    ws.row_dimensions[2].height = 36
-    ws.row_dimensions[6].height = 28
-    ws.freeze_panes = "A7"
-    ws.auto_filter.ref = f"A6:E{header_row + len(rows)}"
-    ws.page_setup.orientation = "portrait"
-    ws.page_setup.paperSize = ws.PAPERSIZE_A4
-    ws.page_setup.fitToWidth = 1
-    ws.page_setup.fitToHeight = 0
-    ws.sheet_properties.pageSetUpPr.fitToPage = True
-    ws.print_options.horizontalCentered = True
-    ws.page_margins.left = 0.25
-    ws.page_margins.right = 0.25
-    ws.page_margins.top = 0.3
-    ws.page_margins.bottom = 0.3
-    ws.oddFooter.center.text = "Наявність і можливість резерву підтверджує оператор."
-    ws.oddFooter.center.size = 8
-    ws.oddFooter.center.color = "66736F"
-    wb.save(target)
+def register_fonts():
+    candidates = [Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts", Path("/usr/share/fonts/truetype/msttcorefonts")]
+    for folder in candidates:
+        regular, bold = folder / "arial.ttf", folder / "arialbd.ttf"
+        if regular.exists() and bold.exists():
+            pdfmetrics.registerFont(TTFont("PriceText", str(regular)))
+            pdfmetrics.registerFont(TTFont("PriceBold", str(bold)))
+            return
+    dejavu = Path("/usr/share/fonts/truetype/dejavu")
+    pdfmetrics.registerFont(TTFont("PriceText", str(dejavu / "DejaVuSans.ttf")))
+    pdfmetrics.registerFont(TTFont("PriceBold", str(dejavu / "DejaVuSans-Bold.ttf")))
 
 
-def find_soffice() -> Path:
-    configured = shutil.which("soffice")
-    if configured:
-        return Path(configured)
-    for candidate in SOFFICE_CANDIDATES:
-        if candidate.is_file():
-            return candidate
-    raise RuntimeError("LibreOffice soffice is required to generate the PDF")
+def build_pdf(rows, target):
+    register_fonts()
+    body = ParagraphStyle("PriceBody", fontName="PriceText", fontSize=9, leading=12, textColor=colors.HexColor("#23382e"))
+    small = ParagraphStyle("PriceSmall", parent=body, fontSize=8, leading=11, textColor=colors.HexColor("#55675d"))
+    title = ParagraphStyle("PriceTitle", parent=body, fontName="PriceBold", fontSize=22, leading=27, textColor=colors.HexColor("#1f5d42"))
+    doc = SimpleDocTemplate(str(target), pagesize=A4, rightMargin=30, leftMargin=30, topMargin=26, bottomMargin=42, title="Flora & Aroma - прайс рослин", author="Flora & Aroma")
+    story = []
+    heading = [Paragraph("FLORA &amp; AROMA", title), Paragraph("Актуальний асортимент рослин", body), Spacer(1, 5), Paragraph(f"{date.today():%d.%m.%Y} | flora-aroma.com.ua | +380 50 027 28 82", small)]
+    logo = ROOT / "public/images/logo.png"
+    if logo.exists():
+        header = Table([[Image(str(logo), width=65, height=65, kind="proportional"), heading]], colWidths=[78, 457])
+        header.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+        story.append(header)
+    else:
+        story.extend(heading)
+    story.append(Spacer(1, 16))
+    data = [["Рослина", "Латинська назва", "Об'єм", "Ціна, грн/шт."]]
+    for row in rows:
+        data.append([Paragraph(escape(row["name_uk"]), body), Paragraph(escape(row["latin_name"]), small), row["volume"], row["price"]])
+    table = LongTable(data, colWidths=[216, 175, 61, 83], repeatRows=1, hAlign="LEFT")
+    table.setStyle(TableStyle([
+        ("FONTNAME", (0, 0), (-1, 0), "PriceBold"), ("FONTNAME", (0, 1), (-1, -1), "PriceText"),
+        ("FONTSIZE", (0, 0), (-1, -1), 9), ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#23382e")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#ddeedf")),
+        ("LINEBELOW", (0, 0), (-1, 0), 0.8, colors.HexColor("#7d9f89")),
+        ("LINEBELOW", (0, 1), (-1, -1), 0.3, colors.HexColor("#d8e4dc")),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"), ("ALIGN", (2, 0), (-1, -1), "RIGHT"),
+        ("TOPPADDING", (0, 0), (-1, -1), 7), ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
+    ]))
+    story.append(table)
+
+    def footer(canvas, _doc):
+        canvas.setFont("PriceText", 8)
+        canvas.setFillColor(colors.HexColor("#55675d"))
+        canvas.drawString(30, 24, "Наявність і можливість резерву підтверджує оператор.")
+        canvas.drawRightString(A4[0] - 30, 24, str(_doc.page))
+
+    doc.build(story, onFirstPage=footer, onLaterPages=footer)
 
 
-def main() -> None:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+def main():
     rows = read_price_rows()
-    with tempfile.TemporaryDirectory(prefix="flora-price-") as temp_dir:
-        temp = Path(temp_dir)
-        workbook = temp / "flora-aroma-price.xlsx"
-        libreoffice_profile = temp / "libreoffice-profile"
-        libreoffice_profile.mkdir()
-        build_workbook(rows, workbook)
-        subprocess.run(
-            [
-                str(find_soffice()),
-                "--headless",
-                f"-env:UserInstallation={libreoffice_profile.as_uri()}",
-                "--convert-to",
-                "pdf",
-                "--outdir",
-                str(temp),
-                str(workbook),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        generated = temp / "flora-aroma-price.pdf"
-        if not generated.is_file():
-            raise RuntimeError("LibreOffice did not produce the expected PDF")
-        shutil.copy2(generated, OUTPUT_PDF)
-
-    print(f"price_rows={len(rows)}")
-    print(f"output={OUTPUT_PDF.relative_to(ROOT)}")
+    OUTPUT_PDF.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="flora-price-") as temp:
+        pending = Path(temp) / "price.pdf"
+        build_pdf(rows, pending)
+        OUTPUT_PDF.write_bytes(pending.read_bytes())
+    print(f"price_rows={len(rows)} output={OUTPUT_PDF}")
 
 
 if __name__ == "__main__":

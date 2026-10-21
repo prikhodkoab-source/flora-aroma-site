@@ -37,7 +37,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -87,7 +87,7 @@ export const productCatalog = {
         "container_type_id": "POT-P11",
         "format_code": "P11",
         "container": "Горщик P11",
-        "price": 65,
+        "price": 75,
         "unit": "шт."
       }
     ]
@@ -155,7 +155,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -202,7 +202,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -210,7 +210,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 75,
         "unit": "шт."
       }
     ]
@@ -223,7 +223,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -260,7 +260,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 85,
         "unit": "шт."
       }
     ]
@@ -273,7 +273,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -307,7 +307,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -349,7 +349,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -357,7 +357,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 75,
         "unit": "шт."
       },
       {
@@ -378,7 +378,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -386,7 +386,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 65,
         "unit": "шт."
       }
     ]
@@ -399,7 +399,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       }
     ]
@@ -412,7 +412,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -420,7 +420,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 70,
         "unit": "шт."
       }
     ]
@@ -454,7 +454,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -475,7 +475,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -496,7 +496,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -517,7 +517,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       },
       {
@@ -559,7 +559,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 25,
+        "price": 30,
         "unit": "шт."
       },
       {
@@ -614,7 +614,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -635,7 +635,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -651,7 +651,7 @@ export const productCatalog = {
         "container_type_id": "POT-P11",
         "format_code": "P11",
         "container": "Горщик P11",
-        "price": 65,
+        "price": 75,
         "unit": "шт."
       },
       {
@@ -659,7 +659,7 @@ export const productCatalog = {
         "container_type_id": "POT-P19",
         "format_code": "P19",
         "container": "Горщик P19",
-        "price": 125,
+        "price": 140,
         "unit": "шт."
       }
     ]
@@ -672,7 +672,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       },
       {
@@ -680,7 +680,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 65,
         "unit": "шт."
       },
       {
@@ -688,7 +688,7 @@ export const productCatalog = {
         "container_type_id": "POT-P11",
         "format_code": "P11",
         "container": "Горщик P11",
-        "price": 65,
+        "price": 75,
         "unit": "шт."
       }
     ]
@@ -709,7 +709,7 @@ export const productCatalog = {
         "container_type_id": "POT-P9",
         "format_code": "P9",
         "container": "Горщик P9",
-        "price": 55,
+        "price": 65,
         "unit": "шт."
       },
       {
@@ -725,7 +725,7 @@ export const productCatalog = {
         "container_type_id": "POT-P19",
         "format_code": "P19",
         "container": "Горщик P19",
-        "price": 125,
+        "price": 140,
         "unit": "шт."
       }
     ]
@@ -738,7 +738,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
+        "price": 45,
         "unit": "шт."
       }
     ]
@@ -798,7 +798,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       }
     ]
@@ -811,7 +811,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 35,
         "unit": "шт."
       }
     ]
@@ -858,7 +858,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
+        "price": 40,
         "unit": "шт."
       }
     ]
@@ -871,7 +871,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 40,
+        "price": 45,
         "unit": "шт."
       }
     ]
@@ -884,7 +884,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 30,
+        "price": 40,
         "unit": "шт."
       }
     ]
@@ -897,7 +897,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
+        "price": 45,
         "unit": "шт."
       }
     ]
@@ -910,7 +910,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
+        "price": 45,
         "unit": "шт."
       }
     ]
@@ -923,7 +923,7 @@ export const productCatalog = {
         "container_type_id": "CASSETTE-HIKO-V120SS",
         "format_code": "V-120",
         "container": "CASSETTE-HIKO-V120SS",
-        "price": 35,
+        "price": 40,
         "unit": "шт."
       }
     ]

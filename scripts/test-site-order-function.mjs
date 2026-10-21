@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { onRequestGet as exportGet, onRequestPost as exportAck } from "../functions/api/site-orders.js";
 import { onRequestGet, onRequestPost } from "../functions/api/site-order.js";
+import { productCatalog } from "../functions/_product-catalog.js";
+
+const approvedSagePrice = productCatalog["PLANT-0041"].variants.find(
+  (variant) => variant.variant_id === "VAR-PLANT-0041-V120"
+).price;
 
 const originalFetch = globalThis.fetch;
 const originalConsoleError = console.error;
@@ -177,7 +182,7 @@ const validPayload = {
       name: "Шавлія дібровна",
       container: "0.12 л",
       qty: 2,
-      price: 30,
+      price: approvedSagePrice,
       unit: "шт."
     }
   ]
@@ -192,6 +197,7 @@ assert.equal(successBody.telegramStatus, "sent");
 assert.equal(db.orders.length, 1);
 assert.equal(db.items.length, 1);
 assert.equal(db.items[0].variant_id, validPayload.items[0].variantId);
+assert.equal(db.items[0].unit_price, approvedSagePrice);
 assert.equal(db.orders[0].delivery_method, "Нова пошта");
 assert.equal(db.orders[0].delivery_address, "Київ, відділення 1");
 assert.equal(db.orders[0].telegram_status, "sent");

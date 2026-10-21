@@ -115,14 +115,14 @@ assert.ok(
   products.some((product) => product.plantId === "PLANT-0099"),
   "Expected approved Salvia officinalis 'Purpurascens' in the public catalog."
 );
-for (const [plantId, cultivar] of [
-  ["PLANT-0095", "Merleau Compact Blue"],
-  ["PLANT-0096", "Rosakönigin"],
-  ["PLANT-0097", "Blaukönigin"]
+for (const [plantId, cultivar, price] of [
+  ["PLANT-0095", "Merleau Compact Blue", 45],
+  ["PLANT-0096", "Rosakönigin", 45],
+  ["PLANT-0097", "Blaukönigin", 40]
 ]) {
   const product = products.find((item) => item.plantId === plantId);
   assert.ok(product, `Expected approved Salvia nemorosa '${cultivar}' in the public catalog.`);
-  assert.equal(product.price, 35, `${cultivar} should use the approved 35 UAH price.`);
+  assert.equal(product.price, price, `${cultivar} should use the approved shared retail price.`);
   assert.ok(product.formatLabels.includes("0,12 л"), `${cultivar} should expose the public 0,12 л volume.`);
 }
 const blauköniginImagePaths = [
