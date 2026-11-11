@@ -186,7 +186,7 @@ assert.throws(
       ],
       publicPlants
     ),
-  /own\/generated site-local visualizations/
+  /requires at least 2 controlled images/
 );
 
 assert.throws(
@@ -297,22 +297,31 @@ assert.match(approvedContent, /coverMediaAssetId:\s*GEN-AROMATIC-BORDER-01/);
 assert.match(approvedContent, /bodyMediaLayout:\s*inline/);
 assert.equal((approvedContent.match(/<figure class="publication-inline-media">/g) ?? []).length, 4);
 
-const gardenFashionDraft = read("src/content/publications/sadova-moda-2026-pryrodnyi-sad-speka.md");
-assert.match(gardenFashionDraft, /publicationId:\s*WC-CR-20260815-GARDEN-FASHION-2026/);
-assert.match(gardenFashionDraft, /slug:\s*sadova-moda-2026-pryrodnyi-sad-speka/);
+const gardenFashionArticle = read("src/content/publications/sadova-moda-2026-pryrodnyi-sad-speka.md");
+assert.match(gardenFashionArticle, /publicationId:\s*WC-CR-20260815-GARDEN-FASHION-2026/);
+assert.match(gardenFashionArticle, /slug:\s*sadova-moda-2026-pryrodnyi-sad-speka/);
 assert.match(
-  gardenFashionDraft,
+  gardenFashionArticle,
   /subtitle:\s*"Чому природні композиції зі злаками, ароматичними травами, посухостійкими багаторічниками та рослинами для запилювачів стають дедалі помітнішими"/
 );
-assert.match(gardenFashionDraft, /publicationStatus:\s*draft/);
-assert.match(gardenFashionDraft, /mediaRightsStatus:\s*pending_operator_review/);
-assert.match(gardenFashionDraft, /articleMedia:\s*\[\]/);
-assert.doesNotMatch(gardenFashionDraft, /approvedRevision:/);
-assert.doesNotMatch(gardenFashionDraft, /approvedPreviewHash:/);
-assert.doesNotMatch(gardenFashionDraft, /publishedAt:/);
-assert.doesNotMatch(gardenFashionDraft, /coverImage:/);
+assert.match(gardenFashionArticle, /draftRevision:\s*895f181dd9f3f170/);
+assert.match(gardenFashionArticle, /approvedRevision:\s*895f181dd9f3f170/);
+assert.match(gardenFashionArticle, /publicationStatus:\s*approved/);
+assert.match(gardenFashionArticle, /mediaRightsStatus:\s*approved/);
+assert.match(gardenFashionArticle, /mediaGateStatus:\s*approved_for_publication/);
+assert.match(gardenFashionArticle, /mediaApprovalStatus:\s*approved/);
+assert.match(gardenFashionArticle, /coverImage:\s*\/images\/publications\/garden-fashion-review\/grasses\.jpg/);
+assert.match(gardenFashionArticle, /approvedPreviewHash:\s*9230232b5adf309a887f29e61dc34736ef0881d66be5c4de26c0b334a33bb8af/);
+assert.match(gardenFashionArticle, /approvedMediaManifestHash:\s*5ca30387d23cbe72859adc6101384d0ab2080869d00df51473a0eac5a8b358f6/);
+assert.equal((gardenFashionArticle.match(/mediaAssetId:\s*GF26-CC-/g) ?? []).length, 6);
+assert.equal((gardenFashionArticle.match(/<figure>/g) ?? []).length, 4);
+const gardenFashionBody = gardenFashionArticle.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/u, "");
+assert.equal(
+  createHash("sha256").update(gardenFashionBody, "utf8").digest("hex"),
+  "ab9ca6483d58b6a512df2d0f80ffd66f7afcc3fd800bb499741208870d944986"
+);
 for (const plantId of ["PLANT-0003", "PLANT-0009", "PLANT-0085", "PLANT-0087"]) {
-  assert.match(gardenFashionDraft, new RegExp(`relatedPlantIds:[\\s\\S]*${plantId}`));
+  assert.match(gardenFashionArticle, new RegExp(`relatedPlantIds:[\\s\\S]*${plantId}`));
 }
 for (const route of [
   "/plants/penisetum-lysokhvostyi-plant-0003/",
@@ -321,13 +330,13 @@ for (const route of [
   "/plants/chebrets-povzuchyi-plant-0087/",
   "/shop/"
 ]) {
-  assert.match(gardenFashionDraft, new RegExp(route.replaceAll("/", "\\/")));
+  assert.match(gardenFashionArticle, new RegExp(route.replaceAll("/", "\\/")));
 }
 assert.doesNotMatch(
-  gardenFashionDraft,
+  gardenFashionArticle,
   /у поточному підтвердженому асортименті|за підтвердженою карткою|за даними картки|water-wise|lower-input/iu
 );
-assert.doesNotMatch(gardenFashionDraft, /\b(?:UAH|грн)\b/u);
+assert.doesNotMatch(gardenFashionArticle, /\b(?:UAH|грн)\b/u);
 for (const mediaAssetId of [
   "GEN-AROMATIC-BORDER-01",
   "GEN-AROMATIC-BORDER-02",
@@ -356,6 +365,12 @@ for (const plantId of [
 }
 
 const approvedMediaHashes = new Map([
+  ["public/images/publications/garden-fashion-review/grasses.jpg", "552e82c691286101e21592b6e01c26b98048917c60136c308f32316fbbf6391b"],
+  ["public/images/publications/garden-fashion-review/lurie-primary.jpg", "3499c5b05ab9e331577bb9304cc866baf1941eada419489f9b8b786786c8396c"],
+  ["public/images/publications/garden-fashion-review/festuca.jpg", "32fab245943b5269c013162d004efe7bfa0c5a9d4b6b10cc092012ad762060d7"],
+  ["public/images/publications/garden-fashion-review/lavender-border.jpg", "ee5a5039a8da6c6b2511ab6be2dd803b54a52434e9e56d1670d9b9bfb5850517"],
+  ["public/images/publications/garden-fashion-review/echinacea-primary.jpg", "8cb744a4020fb4fe39ab6f81eea30ecc24a0bcd4887b4027e537e36adebfb371"],
+  ["public/images/publications/garden-fashion-review/thyme-social.jpg", "f4837cc638e4cbf236ae03e4d3f16069c974e78479c677dc73da892d9a75660b"],
   ["public/images/publications/aromatic-border/01-dry-aromatic-border.png", "3843dc21eb32121178b02b1bd8659939057cc2e40ad45e30e285466d2c5853c4"],
   ["public/images/publications/aromatic-border/02-terrace-aromatic-border.png", "11c58260c5257526c66636531b3417105557cc7532a69c6aaec8f3417da94e50"],
   ["public/images/publications/aromatic-border/03-kitchen-herb-garden.png", "627f51e1f2cb617aa93e9da9b7922937c72e2fc34576549056151f1ee522ff92"],

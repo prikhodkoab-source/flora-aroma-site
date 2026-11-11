@@ -89,6 +89,17 @@ const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
             ))}
           </div>
         )}
+        {data.articleMedia.some(item => ["creative_commons", "public_domain"].includes(item.sourceType) && item.placement !== "social") && (
+          <section class="publication-detail__credits" aria-labelledby="publication-photo-credits">
+            <h2 id="publication-photo-credits">Фото: автори та ліцензії</h2>
+            <ul>{data.articleMedia.filter(item => ["creative_commons", "public_domain"].includes(item.sourceType) && item.placement !== "social").map(item => (
+              <li><strong>{item.creator}</strong>: {item.attributionText}{" "}
+                <a href={item.sourceUrl} rel="noopener noreferrer">Джерело</a>{" · "}
+                <a href={item.licenseRef} rel="noopener noreferrer">Умови ліцензії</a>
+                {item.derivativeSpec && ` · Зміни: ${item.derivativeSpec}`}</li>
+            ))}</ul>
+          </section>
+        )}
       </article>
 
       {collectionProducts.length > 0 && (
@@ -144,19 +155,23 @@ const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
   }
 
   .collection-eyebrow {
+    max-width: 100%;
     margin: 0 0 18px;
     color: #4d6b45;
     font-size: 15px;
     font-weight: 700;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
   }
 
   .collection-hero h1 {
+    width: 100%;
     max-width: 880px;
     margin: 0;
     color: #1d2819;
     font-size: 58px;
     line-height: 1.08;
+    overflow-wrap: break-word;
   }
 
   .collection-lead {
@@ -224,18 +239,21 @@ const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
     padding-left: 22px;
   }
 
-  .collection-article :global(.publication-inline-media) {
+  .collection-article :global(.publication-inline-media),
+  .collection-article :global(figure:not(.publication-detail__media)) {
     margin: 30px 0 40px;
   }
 
-  .collection-article :global(.publication-inline-media img) {
+  .collection-article :global(.publication-inline-media img),
+  .collection-article :global(figure:not(.publication-detail__media) img) {
     display: block;
     width: 100%;
     max-width: 100%;
     height: auto;
   }
 
-  .collection-article :global(.publication-inline-media figcaption) {
+  .collection-article :global(.publication-inline-media figcaption),
+  .collection-article :global(figure:not(.publication-detail__media) figcaption) {
     margin-top: 10px;
     color: #596254;
     font-size: 14px;
@@ -391,11 +409,12 @@ const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
 
   @media (max-width: 520px) {
     .collection-shell {
-      width: min(100% - 28px, 1120px);
+      width: calc(100% - 28px);
+      max-width: 1120px;
     }
 
     .collection-hero h1 {
-      font-size: 32px;
+      font-size: 30px;
     }
 
     .collection-content,

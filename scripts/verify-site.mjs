@@ -5,6 +5,7 @@ const cwd = typeof process !== "undefined" ? process.cwd() : globalThis.nodeRepl
 const root = existsSync(join(cwd, "data", "products.csv")) ? cwd : join(cwd, "flora-aroma-site");
 const siteBase = "https://flora-aroma-site.pages.dev";
 const approvedArticleSlug = "aromatnyi-bordiur-priani-zapashni-roslyny";
+const gardenFashionArticleSlug = "sadova-moda-2026-pryrodnyi-sad-speka";
 let failed = false;
 
 function fail(message) {
@@ -79,6 +80,9 @@ for (const requiredPage of [
 if (!existsSync(join(root, "dist", "publications", approvedArticleSlug, "index.html"))) {
   fail("Approved publication must generate a public article route.");
 }
+if (!existsSync(join(root, "dist", "publications", gardenFashionArticleSlug, "index.html"))) {
+  fail("Approved garden-fashion publication must generate a public article route.");
+}
 
 for (const requiredAsset of [
   "public/images/tilda-clone/hero-greenhouse.jpg",
@@ -87,6 +91,12 @@ for (const requiredAsset of [
   "public/images/plants/local/plant-0051-format-02.jpg",
   "public/images/plants/local/plant-0074-format-01.jpg",
   "public/images/plants/local/plant-0077-format-02.jpg",
+  "public/images/publications/garden-fashion-review/grasses.jpg",
+  "public/images/publications/garden-fashion-review/lurie-primary.jpg",
+  "public/images/publications/garden-fashion-review/festuca.jpg",
+  "public/images/publications/garden-fashion-review/lavender-border.jpg",
+  "public/images/publications/garden-fashion-review/echinacea-primary.jpg",
+  "public/images/publications/garden-fashion-review/thyme-social.jpg",
   "public/_redirects",
   "public/cart.js",
   "functions/_analytics.js",
@@ -271,6 +281,9 @@ if (!publicationsPage.includes(approvedArticleSlug)) {
 if (!publicationsPage.includes("01-dry-aromatic-border.png")) {
   fail("Approved publication cover is missing from publications index.");
 }
+if (!publicationsPage.includes(gardenFashionArticleSlug) || !publicationsPage.includes("garden-fashion-review/grasses.jpg")) {
+  fail("Approved garden-fashion publication is missing from publications index.");
+}
 
 const approvedArticlePage = readFileSync(
   join(root, "dist", "publications", approvedArticleSlug, "index.html"),
@@ -326,6 +339,32 @@ if (relatedPlantsIndex <= previousInlineMediaIndex) {
   fail("Related plant cards must render after all inline article visualizations.");
 }
 
+const gardenFashionPage = readFileSync(
+  join(root, "dist", "publications", gardenFashionArticleSlug, "index.html"),
+  "utf8"
+);
+for (const requiredGardenFashionMarker of [
+  "garden-fashion-review/grasses.jpg",
+  "garden-fashion-review/lurie-primary.jpg",
+  "garden-fashion-review/festuca.jpg",
+  "garden-fashion-review/lavender-border.jpg",
+  "garden-fashion-review/echinacea-primary.jpg",
+  "Esther Westerveld",
+  "Krzysztof Ziarnek, Kenraiz",
+  "SterlingHerron",
+  "Фото: автори та ліцензії"
+]) {
+  if (!gardenFashionPage.includes(requiredGardenFashionMarker)) {
+    fail(`Garden-fashion article is missing approved media or credit: ${requiredGardenFashionMarker}`);
+  }
+}
+if (gardenFashionPage.includes('<div class="publication-detail__gallery">')) {
+  fail("Garden-fashion inline-media article must not render a duplicate bottom gallery.");
+}
+if (gardenFashionPage.includes("garden-fashion-review/thyme-social.jpg")) {
+  fail("Social-only thyme media must not render in the site article body.");
+}
+
 const contactsPage = readFileSync(join(root, "dist", "contacts", "index.html"), "utf8");
 for (const requiredContactMarker of ["tel:+380500272882", "mailto:Flora_%26_Aroma@gmail.com"]) {
   if (!contactsPage.includes(requiredContactMarker)) {
@@ -345,6 +384,9 @@ if (!sitemap.includes(publicationIndexUrl)) {
 }
 if (!sitemap.includes(`${siteBase}/publications/${approvedArticleSlug}/`)) {
   fail("Approved publication must appear in sitemap.");
+}
+if (!sitemap.includes(`${siteBase}/publications/${gardenFashionArticleSlug}/`)) {
+  fail("Approved garden-fashion publication must appear in sitemap.");
 }
 if (sitemap.includes(`${siteBase}/${approvedArticleSlug}/`)) {
   fail("Legacy article URL must redirect and must not appear as a sitemap canonical.");

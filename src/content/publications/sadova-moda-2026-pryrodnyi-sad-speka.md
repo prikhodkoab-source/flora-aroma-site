@@ -1,17 +1,157 @@
 ---
 publicationId: WC-CR-20260815-GARDEN-FASHION-2026
-draftRevision: e596411a75626164
-mediaManifestHash: 60f86bed99ad0d48961174e701e0b0cc88199ac5bce98d448d72d5717cda05ed
-mediaGateStatus: blocked_waiting_for_photography
-mediaApprovalStatus: blocked_waiting_for_photography
+draftRevision: 895f181dd9f3f170
+mediaManifestHash: 5ca30387d23cbe72859adc6101384d0ab2080869d00df51473a0eac5a8b358f6
+mediaGateStatus: approved_for_publication
+mediaApprovalStatus: approved
+approvedRevision: 895f181dd9f3f170
+approvedPreviewHash: 9230232b5adf309a887f29e61dc34736ef0881d66be5c4de26c0b334a33bb8af
+approvedMediaManifestHash: 5ca30387d23cbe72859adc6101384d0ab2080869d00df51473a0eac5a8b358f6
 slug: sadova-moda-2026-pryrodnyi-sad-speka
 language: uk
 title: "Садова мода 2026: природний сад, що витримує спеку"
 subtitle: "Чому природні композиції зі злаками, ароматичними травами, посухостійкими багаторічниками та рослинами для запилювачів стають дедалі помітнішими"
 excerpt: "У садовому дизайні 2026 року дедалі помітніші природні, але продумані посадки, де краса поєднується зі стійкістю до спеки, ощадливішим використанням води та користю для запилювачів. Розбираємо, як застосувати цей підхід в українському саду."
 category: "Садовий дизайн Flora & Aroma"
+coverImage: /images/publications/garden-fashion-review/grasses.jpg
+coverImageAlt: "Декоративні злаки в багаторічній композиції. Фото: Gerttabak / Wikimedia Commons, CC BY-SA 4.0."
+coverMediaAssetId: GF26-CC-GRASSES
 bodyMediaLayout: inline
-articleMedia: []
+articleMedia:
+  - mediaAssetId: GF26-CC-GRASSES
+    src: /images/publications/garden-fashion-review/grasses.jpg
+    alt: "Декоративні злаки в багаторічній композиції. Фото: Gerttabak / Wikimedia Commons, CC BY-SA 4.0."
+    caption: "Декоративні злаки в багаторічній композиції. Фото: Gerttabak / Wikimedia Commons, CC BY-SA 4.0."
+    sourceType: creative_commons
+    creator: Gerttabak
+    attributionText: "Декоративні злаки в багаторічній композиції. Фото: Gerttabak / Wikimedia Commons, CC BY-SA 4.0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Siergrassen_in_september.jpg"
+    licenseRef: "https://creativecommons.org/licenses/by-sa/4.0/"
+    originalChecksum: 552e82c691286101e21592b6e01c26b98048917c60136c308f32316fbbf6391b
+    placement: cover
+    sortOrder: 0
+    rightsStatus: approved
+    checksum: 552e82c691286101e21592b6e01c26b98048917c60136c308f32316fbbf6391b
+    width: 2000
+    height: 1328
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Original bytes unchanged"
+    targetChannel: site_blog
+    approvalStatus: approved
+  - mediaAssetId: GF26-CC-LURIE-JPEG
+    src: /images/publications/garden-fashion-review/lurie-primary.jpg
+    alt: "Lurie Garden, Чикаго: приклад природного багаторічного саду. Фото: Esther Westerveld / Wikimedia Commons, CC BY 2.0."
+    caption: "Lurie Garden, Чикаго: приклад природного багаторічного саду. Фото: Esther Westerveld / Wikimedia Commons, CC BY 2.0. Primary JPEG extracted without pixel re-encoding; MPF index removed."
+    sourceType: creative_commons
+    creator: "Esther Westerveld"
+    attributionText: "Lurie Garden, Чикаго: приклад природного багаторічного саду. Фото: Esther Westerveld / Wikimedia Commons, CC BY 2.0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Lurie_Garden_(Piet_Oudolf)_-_Millennium_Park_-_Chicago_IL_(7833291498).jpg"
+    licenseRef: "https://creativecommons.org/licenses/by/2.0/"
+    originalChecksum: 47753b17de01a425391e852a1480319dbc3d9ebd835478261f21f164cc6344d0
+    originalMediaAssetId: GF26-CC-LURIE-SOURCE
+    placement: body
+    sortOrder: 1
+    rightsStatus: approved
+    checksum: 3499c5b05ab9e331577bb9304cc866baf1941eada419489f9b8b786786c8396c
+    width: 4608
+    height: 3456
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Primary JPEG extracted without pixel re-encoding; MPF index removed"
+    targetChannel: site_blog
+    approvalStatus: approved
+  - mediaAssetId: GF26-CC-FESTUCA
+    src: /images/publications/garden-fashion-review/festuca.jpg
+    alt: "Festuca gautieri у кам’янистій посадці ботанічного саду Клуж-Напоки. Фото: Krzysztof Ziarnek, Kenraiz / Wikimedia Commons, CC BY-SA 4.0."
+    caption: "Festuca gautieri у кам’янистій посадці ботанічного саду Клуж-Напоки. Фото: Krzysztof Ziarnek, Kenraiz / Wikimedia Commons, CC BY-SA 4.0."
+    sourceType: creative_commons
+    creator: "Krzysztof Ziarnek, Kenraiz"
+    attributionText: "Festuca gautieri у кам’янистій посадці ботанічного саду Клуж-Напоки. Фото: Krzysztof Ziarnek, Kenraiz / Wikimedia Commons, CC BY-SA 4.0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Festuca_gautieri_kz02.jpg"
+    licenseRef: "https://creativecommons.org/licenses/by-sa/4.0/"
+    originalChecksum: 32fab245943b5269c013162d004efe7bfa0c5a9d4b6b10cc092012ad762060d7
+    placement: body
+    sortOrder: 2
+    rightsStatus: approved
+    checksum: 32fab245943b5269c013162d004efe7bfa0c5a9d4b6b10cc092012ad762060d7
+    width: 4608
+    height: 3072
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Original bytes unchanged"
+    relatedPlantIds:
+      - PLANT-0085
+    targetChannel: site_blog
+    approvalStatus: approved
+  - mediaAssetId: GF26-CC-LAVENDER
+    src: /images/publications/garden-fashion-review/lavender-border.jpg
+    alt: "Лавандовий бордюр уздовж доріжки, Forty Hall, Англія. Фото: Jim Osley / Geograph, CC BY-SA 2.0."
+    caption: "Лавандовий бордюр уздовж доріжки, Forty Hall, Англія. Фото: Jim Osley / Geograph, CC BY-SA 2.0."
+    sourceType: creative_commons
+    creator: "Jim Osley"
+    attributionText: "Лавандовий бордюр уздовж доріжки, Forty Hall, Англія. Фото: Jim Osley / Geograph, CC BY-SA 2.0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Lavender_border,_Forty_Hall_rose_garden_-_geograph.org.uk_-_3027239.jpg"
+    licenseRef: "https://creativecommons.org/licenses/by-sa/2.0/"
+    originalChecksum: ee5a5039a8da6c6b2511ab6be2dd803b54a52434e9e56d1670d9b9bfb5850517
+    placement: body
+    sortOrder: 3
+    rightsStatus: approved
+    checksum: ee5a5039a8da6c6b2511ab6be2dd803b54a52434e9e56d1670d9b9bfb5850517
+    width: 3008
+    height: 1831
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Original bytes unchanged"
+    targetChannel: site_blog
+    approvalStatus: approved
+  - mediaAssetId: GF26-CC-ECHINACEA-JPEG
+    src: /images/publications/garden-fashion-review/echinacea-primary.jpg
+    alt: "Метелик на ехінацеї пурпуровій. Фото: SterlingHerron / Wikimedia Commons, CC0. Primary JPEG extracted without pixel re-encoding; MPF index removed."
+    caption: "Метелик на ехінацеї пурпуровій. Фото: SterlingHerron / Wikimedia Commons, CC0. Primary JPEG extracted without pixel re-encoding; MPF index removed."
+    sourceType: public_domain
+    creator: SterlingHerron
+    attributionText: "Метелик на ехінацеї пурпуровій. Фото: SterlingHerron / Wikimedia Commons, CC0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Purple_coneflower_(Echinacea_purpurea)_01.jpg"
+    licenseRef: "https://creativecommons.org/publicdomain/zero/1.0/"
+    originalChecksum: 9708d1270134e7599d10b5684503c99a7343c3dca77480352e627f04a3dc33f0
+    originalMediaAssetId: GF26-CC-ECHINACEA-SOURCE
+    placement: body
+    sortOrder: 4
+    rightsStatus: approved
+    checksum: 8cb744a4020fb4fe39ab6f81eea30ecc24a0bcd4887b4027e537e36adebfb371
+    width: 2198
+    height: 2985
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Primary JPEG extracted without pixel re-encoding; MPF index removed"
+    relatedPlantIds:
+      - PLANT-0009
+    targetChannel: site_blog
+    approvalStatus: approved
+  - mediaAssetId: GF26-CC-THYME
+    src: /images/publications/garden-fashion-review/thyme-social.jpg
+    alt: "Рожеві квіти чебрецю серед трави, крупний план"
+    caption: "Чебрець повзучий (Thymus serpyllum), назва виду за джерелом. Фото: AnRo0002 / Wikimedia Commons, CC0."
+    sourceType: public_domain
+    creator: AnRo0002
+    attributionText: "Чебрець повзучий (Thymus serpyllum), назва виду за джерелом. Фото: AnRo0002 / Wikimedia Commons, CC0."
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:20240613Thymus_serpyllum.jpg"
+    licenseRef: "https://creativecommons.org/publicdomain/zero/1.0/"
+    originalChecksum: f4837cc638e4cbf236ae03e4d3f16069c974e78479c677dc73da892d9a75660b
+    placement: social
+    sortOrder: 5
+    rightsStatus: approved
+    checksum: f4837cc638e4cbf236ae03e4d3f16069c974e78479c677dc73da892d9a75660b
+    width: 3500
+    height: 2625
+    mimeType: image/jpeg
+    isAiGenerated: false
+    derivativeSpec: "Original bytes unchanged"
+    relatedPlantIds:
+      - PLANT-0087
+    targetChannel: facebook
+    approvalStatus: approved
 relatedPlantIds:
   - PLANT-0003
   - PLANT-0009
@@ -20,9 +160,12 @@ relatedPlantIds:
 relatedPlantCards: []
 seoTitle: "Садова мода 2026: природний сад, стійкий до спеки"
 seoDescription: "Тренди садового дизайну 2026: природні композиції, декоративні злаки, ароматичні багаторічники, рослини для запилювачів і практичний підхід для України."
-publicationStatus: draft
-mediaRightsStatus: pending_operator_review
+publishedAt: 2026-11-11T00:00:00+02:00
+updatedAt: 2026-11-11T00:00:00+02:00
+publicationStatus: approved
+mediaRightsStatus: approved
 ---
+
 
 У виставковому й професійному садовому дизайні 2026 року поруч із кольором і формою дедалі помітнішими стали інші критерії: як посадка поводиться протягом сезону, скільки води й догляду потребує та чи зберігає структуру після основного цвітіння. Спека, нерівномірні опади й бажання мати виразний сад довше, ніж кілька тижнів, підсилюють інтерес до природніших, багатошарових композицій.
 
@@ -58,6 +201,10 @@ mediaRightsStatus: pending_operator_review
 
 Обидва види потребують сонця й доброго відведення зайвої води, але це не означає однаковий водний режим. Пенісетум краще формує об'єм у глибшому ґрунті з помірною вологою в період активного росту й після вкорінення переносить короткі сухі періоди. Костриця доречніша на сухішому передньому краї. Важкий мокрий ґрунт узимку знижує надійність такої комбінації.
 
+<figure><img src="/images/publications/garden-fashion-review/lurie-primary.jpg" alt="Lurie Garden, Чикаго: приклад природного багаторічного саду. Фото: Esther Westerveld / Wikimedia Commons, CC BY 2.0."><figcaption>Lurie Garden, Чикаго: приклад природного багаторічного саду. Фото: Esther Westerveld / Wikimedia Commons, CC BY 2.0. Primary JPEG extracted without pixel re-encoding; MPF index removed.</figcaption></figure>
+
+<figure><img src="/images/publications/garden-fashion-review/festuca.jpg" alt="Festuca gautieri у кам’янистій посадці ботанічного саду Клуж-Напоки. Фото: Krzysztof Ziarnek, Kenraiz / Wikimedia Commons, CC BY-SA 4.0."><figcaption>Festuca gautieri у кам’янистій посадці ботанічного саду Клуж-Напоки. Фото: Krzysztof Ziarnek, Kenraiz / Wikimedia Commons, CC BY-SA 4.0.</figcaption></figure>
+
 ## 4. Ароматичні рослини стають частиною дизайну
 
 Шавлії, котівники, лаванди, материнка й чебреці цікаві не лише для кухонної грядки. У декоративній посадці вони можуть давати фактуру листя, аромат біля доріжки, сезонне цвітіння та нижній шар, який поєднує більші рослини. На RHS Hampton Court 2025 родину глухокропивових показували саме як повноцінний матеріал для садового дизайну.
@@ -65,6 +212,8 @@ mediaRightsStatus: pending_operator_review
 Аромат особливо доречний там, де листя можна легко торкнутися: біля стежки, лави або тераси. Але належність до «ароматичних рослин» не означає однакової агротехніки. У цій композиції, наприклад, [чебрець повзучий](/plants/chebrets-povzuchyi-plant-0087/) (*Thymus serpyllum*) отримує найсухіший сонячний край із проникним ґрунтом, тоді як інші ароматичні види потрібно розміщувати за їхніми власними вимогами.
 
 Чебрець добре працює біля каміння або вздовж краю, де вода не застоюється. Там його дрібна фактура пом'якшує межу квітника, а аромат стає помітним саме в русі людини через сад.
+
+<figure><img src="/images/publications/garden-fashion-review/lavender-border.jpg" alt="Лавандовий бордюр уздовж доріжки, Forty Hall, Англія. Фото: Jim Osley / Geograph, CC BY-SA 2.0."><figcaption>Лавандовий бордюр уздовж доріжки, Forty Hall, Англія. Фото: Jim Osley / Geograph, CC BY-SA 2.0.</figcaption></figure>
 
 ## 5. Стійкість до спеки починається з місця
 
@@ -83,6 +232,8 @@ mediaRightsStatus: pending_operator_review
 Важливий не рекламний ярлик на одному сорті, а послідовність цвітіння та доступність нектару й пилку в різні періоди. Оновлений список RHS Plants for Pollinators проходив систематичний перегляд; аналіз, опублікований у *BioScience*, показав, що більшість перевірених таксонів відповідали критеріям, але частину переліку потрібно було переглянути. Це хороший аргумент за перевірені дані й сезонну комбінацію замість однієї «чарівної» рослини.
 
 [Ехінацея пурпурова](/plants/ekhinatseia-purpurova-plant-0009/) (*Echinacea purpurea*) формує виразний середній ярус і літню кольорову пляму. Після цвітіння її кошики продовжують тримати структуру. У цій композиції вона поєднує декоративну роль із літнім ресурсом для запилювачів і найкраще працює на сонячному місці з проникним ґрунтом без застою води.
+
+<figure><img src="/images/publications/garden-fashion-review/echinacea-primary.jpg" alt="Метелик на ехінацеї пурпуровій. Фото: SterlingHerron / Wikimedia Commons, CC0. Primary JPEG extracted without pixel re-encoding; MPF index removed."><figcaption>Метелик на ехінацеї пурпуровій. Фото: SterlingHerron / Wikimedia Commons, CC0. Primary JPEG extracted without pixel re-encoding; MPF index removed.</figcaption></figure>
 
 ## 7. Рослини мають працювати разом
 

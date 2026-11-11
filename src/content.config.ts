@@ -4,6 +4,7 @@ import { glob } from "astro/loaders";
 const publicationStatuses = ["draft", "pending_operator_review", "approved", "suspended", "archived"] as const;
 const mediaRightsStatuses = ["pending_operator_review", "approved", "restricted", "rejected", "expired"] as const;
 const mediaSourceTypes = ["own", "supplier", "generated", "unknown"] as const;
+const articleMediaSourceTypes = [...mediaSourceTypes, "creative_commons", "public_domain"] as const;
 const mediaPlacements = ["cover", "body", "social"] as const;
 
 const articleMediaItem = z.object({
@@ -11,7 +12,12 @@ const articleMediaItem = z.object({
   src: z.string().trim().min(1),
   alt: z.string().trim().min(1),
   caption: z.string().trim().min(1),
-  sourceType: z.enum(mediaSourceTypes),
+  sourceType: z.enum(articleMediaSourceTypes),
+  creator: z.string().trim().min(1).optional(),
+  attributionText: z.string().trim().min(1).optional(),
+  sourceUrl: z.string().url().optional(),
+  licenseRef: z.string().url().optional(),
+  originalChecksum: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   placement: z.enum(mediaPlacements),
   sortOrder: z.number().int().nonnegative(),
   rightsStatus: z.enum(mediaRightsStatuses),
@@ -47,10 +53,15 @@ const publications = defineCollection({
       publicationId: z.string().trim().min(1),
       draftRevision: z.string().trim().regex(/^[0-9a-f]{16}$/).optional(),
       mediaManifestHash: z.string().trim().regex(/^[0-9a-f]{64}$/).optional(),
-      mediaGateStatus: z.enum(["blocked_waiting_for_photography", "ready_for_operator_review"]).optional(),
-      mediaApprovalStatus: z.enum(["pending_operator_review", "blocked_waiting_for_photography"]).optional(),
+      mediaGateStatus: z
+        .enum(["blocked_waiting_for_photography", "ready_for_operator_review", "approved_for_publication"])
+        .optional(),
+      mediaApprovalStatus: z
+        .enum(["pending_operator_review", "blocked_waiting_for_photography", "approved"])
+        .optional(),
       approvedRevision: z.string().trim().min(1).optional(),
       approvedPreviewHash: z.string().trim().min(1).optional(),
+      approvedMediaManifestHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
       slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
       language: z.string().trim().min(2).optional(),
       title: z.string().trim().min(1),

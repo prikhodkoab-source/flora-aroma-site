@@ -91,8 +91,8 @@ No example file is stored as an approved public entry unless it has passed opera
 publicationStatus=draft|pending_operator_review|approved|suspended|archived
 mediaRightsStatus=pending_operator_review|approved|restricted|rejected|expired
 articleMedia[].rightsStatus=pending_operator_review|approved|restricted|rejected|expired
-articleMedia[].sourceType=own|supplier|generated|unknown
-articleMedia[].placement=cover|body
+articleMedia[].sourceType=own|supplier|generated|creative_commons|public_domain|unknown
+articleMedia[].placement=cover|body|social
 relatedPlantCards[].rightsStatus=pending_operator_review|approved|restricted|rejected|expired
 relatedPlantCards[].sourceType=own|supplier|generated|unknown
 ```
@@ -127,14 +127,15 @@ For a public `approved + approved` entry it additionally requires:
 - `publishedAt`;
 - `seoTitle` and `seoDescription`;
 - `approvedRevision`, `approvedPreviewHash`, and `language`;
+- for licensed media, `approvedRevision` must equal `draftRevision` and `approvedMediaManifestHash` must equal the deterministic manifest hash for the exact approved media metadata;
 - `coverMediaAssetId`;
 - `coverImage` and `coverImageAlt`;
 - cover image path and alt must match the approved cover media item;
 - inline body media must keep the exact registered path, accessible text, and caption in the article body;
 - all media items must have `rightsStatus=approved`;
 - no media item may use `sourceType=unknown`;
-- a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 controlled (`own` or `generated`), and at least 2 body images;
-- a long article (over 1200 words) must have at least 5 unique approved images, at least 3 controlled (`own` or `generated`), and at least 4 body images;
+- a short article (up to 1200 words) must have at least 3 unique approved images, at least 2 controlled (`own`, `generated`, or verified site-local licensed media), and at least 2 body images;
+- a long article (over 1200 words) must have at least 5 unique approved images, at least 3 controlled (`own`, `generated`, or verified site-local licensed media), and at least 4 body images;
 - duplicate `mediaAssetId` values do not increase image counts;
 - every approved article must include generated or copied site-local visualizations that satisfy the controlled-media threshold;
 - every approved article must have at least one related public plant card or link;
@@ -150,12 +151,16 @@ Validation errors stop the build. Internal notes, operator comments, source dump
 - Controlled generated or copied (`own`) visualizations count only when they are stored as site-local `/images/` assets.
 - Generated composition images do not replace real product evidence; related plant cards must remain based on approved plant media and exact Flora catalog identity.
 - `supplier` media may be approved, but it does not count toward the minimum controlled-media requirement.
+- `creative_commons` media must use a supported CC BY or CC BY-SA license URL and preserve creator, attribution text, source URL, original checksum, reviewed file checksum, and any derivative description.
+- `public_domain` media is limited to reviewed CC0 1.0 sources and keeps voluntary creator/source credit plus the same checksum and derivative evidence.
+- Licensed media counts as controlled only when its file is site-local, rights and binding statuses are approved, its HTTPS source and license are valid, and its approved revision/manifest binding is current.
+- Public article pages render source and license links for every non-social licensed image.
 - `unknown` media is forbidden for public articles.
 - Every public image must resolve through an approved media registry item and keep a stable `mediaAssetId`.
 
 ## Operator boundary
 
-Publication files must never be manually changed to `approved` as a shortcut. The future WebPublisher exporter may generate approved site entries only from the canonical operator-approved revision and approved media evidence.
+Publication files must never be manually changed to `approved` as a shortcut. The exporter may generate approved site entries only from the operator-approved revision and media evidence; licensed exports additionally bind `approvedRevision` and `approvedMediaManifestHash` to the exact reviewed content and manifest.
 
 Pending `WebsiteContent`, social drafts, and `WebsitePublishQueue` rows are not imported automatically. The website remains a consumer, not the approval system.
 

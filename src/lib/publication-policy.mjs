@@ -19,6 +19,7 @@ export const MEDIA_RIGHTS_STATUSES = new Set([
 ]);
 
 export const MEDIA_SOURCE_TYPES = new Set(["own", "supplier", "generated", "unknown"]);
+export const LICENSED_MEDIA_SOURCE_TYPES = new Set(["creative_commons", "public_domain"]);
 export const MEDIA_PLACEMENTS = new Set(["cover", "body", "social"]);
 export const BODY_MEDIA_LAYOUTS = new Set(["gallery", "inline"]);
 export const PREVIEW_MEDIA_GATE_STATUSES = new Set(["blocked_waiting_for_photography", "ready_for_operator_review"]);
@@ -27,6 +28,30 @@ export const PREVIEW_IMAGE_MIME_TYPES = new Set(["image/jpeg", "image/png", "ima
 
 function hasText(value) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+// The source remains third-party even when the reviewed derivative is hosted locally.
+function ccCredit(item) {
+  return {
+    origin_type: item.sourceType, creator: item.creator ?? "", source_url: item.sourceUrl ?? "",
+    license_ref: item.licenseRef ?? "", attribution_text: item.attributionText ?? "",
+    original_checksum: item.originalChecksum ?? ""
+  };
+}
+
+function validLicensedMedia(item) {
+  let source;
+  try { source = new URL(item.sourceUrl); } catch { return false; }
+  const licenseIsValid = item.sourceType === "creative_commons"
+    ? /^https:\/\/creativecommons\.org\/licenses\/(by|by-sa)\/(1\.0|2\.0|2\.5|3\.0|4\.0)\/?$/u.test(item.licenseRef)
+    : item.sourceType === "public_domain" &&
+      /^https:\/\/creativecommons\.org\/publicdomain\/zero\/1\.0\/?$/u.test(item.licenseRef);
+  return source.protocol === "https:" && !source.username && !source.password &&
+    licenseIsValid &&
+    hasText(item.creator) && hasText(item.attributionText) &&
+    /^[0-9a-f]{64}$/u.test(item.checksum) && /^[0-9a-f]{64}$/u.test(item.originalChecksum) &&
+    item.src?.startsWith("/images/") && item.rightsStatus === "approved" && item.isAiGenerated === false &&
+    (item.originalChecksum === item.checksum || (hasText(item.originalMediaAssetId) && hasText(item.derivativeSpec)));
 }
 
 function publicationLabel(entry, index) {
@@ -80,10 +105,14 @@ function previewMediaRole(item) {
   return item.placement;
 }
 
+// IDs and roles use canonical registry ordering, not the machine's locale.
+const compareKey = (a, b) => a < b ? -1 : a > b ? 1 : 0;
+
 export function publicationMediaManifestHash(entry) {
   const data = entry?.data ?? {};
   const items = (Array.isArray(data.articleMedia) ? data.articleMedia : [])
     .map((item) => ({
+      ...(LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType) ? ccCredit(item) : {}),
       approval_status: item.approvalStatus ?? data.mediaApprovalStatus ?? "",
       alt_text: item.alt ?? "",
       caption: item.caption ?? "",
@@ -99,9 +128,9 @@ export function publicationMediaManifestHash(entry) {
     }))
     .sort(
       (left, right) =>
-        left.media_role.localeCompare(right.media_role) ||
+        compareKey(left.media_role, right.media_role) ||
         left.sort_order - right.sort_order ||
-        left.media_asset_id.localeCompare(right.media_asset_id)
+        compareKey(left.media_asset_id, right.media_asset_id)
     );
   const payload = canonicalJson({
     content_id: data.publicationId ?? "",
@@ -280,7 +309,13 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
       } else {
         mediaIds.set(item.mediaAssetId, item);
       }
-      if (!MEDIA_SOURCE_TYPES.has(item.sourceType)) {
+      const licensedByUrl = item.licenseRef?.startsWith("https://creativecommons.org/licenses/") ||
+        item.licenseRef?.startsWith("https://creativecommons.org/publicdomain/zero/");
+      if (!LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType) && licensedByUrl) {
+        errors.push(`${label}: licensed media mislabeled as ${item.sourceType}`);
+      } else if (LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType) && !validLicensedMedia(item)) {
+        errors.push(`${label}: licensed-media credit, source, rights or checksum incomplete for ${item.mediaAssetId}`);
+      } else if (!LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType) && !MEDIA_SOURCE_TYPES.has(item.sourceType)) {
         errors.push(`${label}: unsupported media sourceType ${item.sourceType}`);
       }
       if (!MEDIA_PLACEMENTS.has(item.placement)) {
@@ -328,6 +363,16 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
 
     if (!isPublicPublication(entry)) return;
 
+    if (mediaItems.some((item) => LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType))) {
+      if (!hasText(data.draftRevision) || data.approvedRevision !== data.draftRevision ||
+          data.approvedMediaManifestHash !== publicationMediaManifestHash(entry)) {
+        errors.push(`${label}: missing or stale licensed article/media approval`);
+      }
+      if (data.mediaGateStatus !== "approved_for_publication" || data.mediaApprovalStatus !== "approved") {
+        errors.push(`${label}: licensed media is not approved_for_publication`);
+      }
+    }
+
     if (!(data.publishedAt instanceof Date) || Number.isNaN(data.publishedAt.valueOf())) {
       errors.push(`${label}: approved publication requires publishedAt`);
     }
@@ -346,7 +391,8 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     const coverMediaId = hasText(data.coverMediaAssetId) ? data.coverMediaAssetId.trim() : "";
     const coverMedia = coverMediaId ? uniqueMedia.get(coverMediaId) : null;
     const controlledMediaCount = [...uniqueMedia.values()].filter(
-      (item) => ["own", "generated"].includes(item.sourceType) && item.src.startsWith("/images/")
+      (item) => (["own", "generated"].includes(item.sourceType) && item.src.startsWith("/images/")) ||
+        (LICENSED_MEDIA_SOURCE_TYPES.has(item.sourceType) && validLicensedMedia(item))
     ).length;
     const bodyMediaCount = [...uniqueMedia.values()].filter((item) => item.placement === "body").length;
 
@@ -394,7 +440,7 @@ export function validatePublicationEntries(entries, publicPlantIds = new Set()) 
     }
     if (controlledMediaCount < minControlledImages) {
       errors.push(
-        `${label}: approved publication requires at least ${minControlledImages} controlled images (own/generated site-local visualizations)`
+        `${label}: approved publication requires at least ${minControlledImages} controlled images (own, generated or verified site-local licensed media)`
       );
     }
     if (bodyMediaCount < minBodyImages) {

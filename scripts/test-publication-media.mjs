@@ -94,6 +94,41 @@ try {
   assert.equal(entry.data.mediaApprovalStatus, "pending_operator_review");
   assert.ok(entry.data.articleMedia.every((item) => item.src.startsWith("/images/")));
 
+  const licensed = structuredClone(entry);
+  const photo = licensed.data.articleMedia[0];
+  Object.assign(photo, {sourceType: "creative_commons", creator: "Fixture photographer",
+    attributionText: "Fixture photograph", originalChecksum: photo.checksum, sourceUrl: "https://example.org/original",
+    licenseRef: "https://creativecommons.org/licenses/by-sa/4.0/"});
+  const select = () => selectDraftPreviewPublication([licensed], new Set(["PLANT-0009"]), {
+    enabled: true, contentId, contentRevision: revision, manifestHash: licensed.data.mediaManifestHash
+  });
+  licensed.data.mediaManifestHash = publicationMediaManifestHash(licensed);
+  assert.equal(select(), licensed);
+  photo.attributionText += " edited";
+  assert.throws(select, /computed media manifest hash/);
+  photo.licenseRef = "https://creativecommons.org/licenses/by-nc/4.0/";
+  assert.throws(select, /licensed-media credit/);
+  photo.licenseRef = "https://creativecommons.org/licenses/by/4.0/";
+  photo.creator = "";
+  assert.throws(select, /licensed-media credit/);
+  photo.creator = "Fixture photographer";
+  licensed.data.articleMedia.forEach((item) => { item.approvalStatus = "approved"; });
+  Object.assign(licensed.data, {publicationStatus: "approved", mediaRightsStatus: "approved",
+    mediaGateStatus: "approved_for_publication", mediaApprovalStatus: "approved",
+    approvedRevision: revision, approvedPreviewHash: "approved-preview-fixture",
+    publishedAt: new Date("2026-11-09T08:16:00+02:00")});
+  licensed.data.approvedMediaManifestHash = publicationMediaManifestHash(licensed);
+  assert.equal(selectPublicPublications([licensed], new Set(["PLANT-0009"]))[0], licensed);
+  photo.attributionText += " stale";
+  assert.throws(() => selectPublicPublications([licensed], new Set(["PLANT-0009"])), /stale licensed article\/media approval/);
+
+  const publicDomain = structuredClone(licensed);
+  const publicDomainPhoto = publicDomain.data.articleMedia[0];
+  Object.assign(publicDomainPhoto, {sourceType: "public_domain", attributionText: "CC0 fixture photograph",
+    licenseRef: "https://creativecommons.org/publicdomain/zero/1.0/"});
+  publicDomain.data.approvedMediaManifestHash = publicationMediaManifestHash(publicDomain);
+  assert.equal(selectPublicPublications([publicDomain], new Set(["PLANT-0009"]))[0], publicDomain);
+
   const stableHash = publicationMediaManifestHash({ ...entry, data: { ...entry.data, articleMedia: [...entry.data.articleMedia].reverse() } });
   assert.equal(stableHash, entry.data.mediaManifestHash);
   const changedAlt = structuredClone(entry);
@@ -145,11 +180,14 @@ try {
   assert.throws(() => validatePreviewMediaFiles(entry, publicRoot), /checksum mismatch/);
 
   const articleFixture = readFileSync("src/content/publications/sadova-moda-2026-pryrodnyi-sad-speka.md", "utf8");
-  assert.match(articleFixture, /draftRevision:\s*e596411a75626164/);
-  assert.match(articleFixture, /mediaManifestHash:\s*60f86bed99ad0d48961174e701e0b0cc88199ac5bce98d448d72d5717cda05ed/);
-  assert.match(articleFixture, /mediaGateStatus:\s*blocked_waiting_for_photography/);
-  assert.match(articleFixture, /publicationStatus:\s*draft/);
-  assert.match(articleFixture, /articleMedia:\s*\[\]/);
+  assert.match(articleFixture, /draftRevision:\s*895f181dd9f3f170/);
+  assert.match(articleFixture, /mediaManifestHash:\s*5ca30387d23cbe72859adc6101384d0ab2080869d00df51473a0eac5a8b358f6/);
+  assert.match(articleFixture, /approvedMediaManifestHash:\s*5ca30387d23cbe72859adc6101384d0ab2080869d00df51473a0eac5a8b358f6/);
+  assert.match(articleFixture, /mediaGateStatus:\s*approved_for_publication/);
+  assert.match(articleFixture, /mediaApprovalStatus:\s*approved/);
+  assert.match(articleFixture, /publicationStatus:\s*approved/);
+  assert.match(articleFixture, /mediaRightsStatus:\s*approved/);
+  assert.equal((articleFixture.match(/mediaAssetId:\s*GF26-CC-/g) ?? []).length, 6);
 
   const pageSource = readFileSync("src/pages/publications/[slug].astro", "utf8");
   const layoutSource = readFileSync("src/layouts/BaseLayout.astro", "utf8");
