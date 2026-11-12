@@ -51,6 +51,7 @@ const publications = defineCollection({
   schema: z
     .object({
       publicationId: z.string().trim().min(1),
+      editorialOrigin: z.literal("trend_radar").optional(),
       draftRevision: z.string().trim().regex(/^[0-9a-f]{16}$/).optional(),
       mediaManifestHash: z.string().trim().regex(/^[0-9a-f]{64}$/).optional(),
       mediaGateStatus: z

@@ -164,6 +164,8 @@ Publication files must never be manually changed to `approved` as a shortcut. Th
 
 Pending `WebsiteContent`, social drafts, and `WebsitePublishQueue` rows are not imported automatically. The website remains a consumer, not the approval system.
 
+For an approved Trend Radar entry (`WC-ED-*` or `editorialOrigin: trend_radar`), metadata alone is insufficient. At build time the site verifies an Ed25519 receipt covering the exact exported source, revision, preview, site-only snapshot, and all public photo paths and checksums. The payload digest must also be explicitly enrolled in `config/editorial-release-allowlist.json`. The repository contains only the verification key. An enrollment authorizes no other article, revision or channel. Run `node scripts/test-editorial-site-receipts.mjs` to check the verified release and tamper cases.
+
 ## Deployment boundary
 
 An approved export still requires:

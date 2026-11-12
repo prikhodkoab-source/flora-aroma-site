@@ -12,12 +12,20 @@ export type PublicationMediaItem = PublicPublication["data"]["articleMedia"][num
 
 const publicationContentFiles = import.meta.glob("../content/publications/**/*.{md,mdx}");
 const publicRoot = fileURLToPath(new URL("../../public/", import.meta.url));
+declare const __FLORA_SIGNED_SITE_ARTICLES__: Record<string, { revision: string; slug: string }>;
 
 export async function getApprovedPublications(): Promise<PublicPublication[]> {
   if (Object.keys(publicationContentFiles).length === 0) return [];
 
   const entries = await getCollection("publications");
   const publicPlantIds = new Set(getProducts().map((product) => product.plant_id));
+  for (const { data } of entries) {
+    if (data.publicationStatus !== "approved" || (!data.publicationId.startsWith("WC-ED-") && !data.editorialOrigin)) continue;
+    const proof = __FLORA_SIGNED_SITE_ARTICLES__[data.publicationId];
+    if (!proof || proof.revision !== data.approvedRevision || proof.slug !== data.slug || data.editorialOrigin !== "trend_radar") {
+      throw new Error("Approved radar article requires an enrolled site release");
+    }
+  }
 
   return selectPublicPublications(entries, publicPlantIds) as PublicPublication[];
 }

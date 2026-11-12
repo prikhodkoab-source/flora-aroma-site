@@ -78,7 +78,9 @@ const publishedDate = data.publishedAt ? new Intl.DateTimeFormat("uk-UA", {
             <figcaption>{coverMedia.caption}</figcaption>
           </figure>
         )}
-        <Content />
+        {data.editorialOrigin === "trend_radar"
+          ? <div data-editorial-prose><Content /></div>
+          : <Content />}
         {data.bodyMediaLayout !== "inline" && bodyMedia.length > 0 && (
           <div class="publication-detail__gallery">
             {bodyMedia.map((item) => (
